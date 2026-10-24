@@ -2,7 +2,7 @@
 
 # StockWise
 
-> An automated inventory record system that help calculate available stock and 
+> An intelligent, human-in-loop inventory and predictive procurement automation product designed to help calculate available stock in order to eliminate stockouts, prevent costly overstocking, and automate supplier reordering.
 
 ---
 
@@ -23,9 +23,9 @@
 | ----------------- | ---------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR-303.git    |
 | Live Demo         | https://stock-wise.replit.app                  |
-| Slide Deck        |                |
+| Slide Deck        |    [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
 | Demo Video        |                 |
-
+|Pitch Video        |    [https://youtu.be/PdYZQNNhst0](https://youtu.be/PdYZQNNhst0)          |
 ---
 
 ## Overview
@@ -59,12 +59,12 @@ Malaysian micro, small, and medium enterprises (MSMEs) in manufacturing, retail,
 
 ```
 ├── src/
-│   ├── stockwise-updated                     # html web application        
+│   ├── stockwise-updated                      # html web application        
 ├── submission/              
-│   ├── SDC2026_TeamName_Preliminary.pdf      # Preliminary submission
-│   ├── SDC2026_TeamName_TechDeclaration.pdf  # Technology declaration
-│   ├── SDC2026_TeamName_Replit_POU.pdf       # Replit proof of use
-│   └── SDC2026_TeamName_Runpod_POU.pdf       # RunPod proof of use
+│   ├── SDC2026_ERROR 303_Preliminary.pdf      # Preliminary submission
+│   ├── SDC2026_ERROR 303_Replit_POU.pdf       # Replit proof of use
+│   ├── SDC2026_ERROR 303_Slide_Desk.pdf       # Slide Desk pdf    
+│   └── SDC2026_ERROR 303_TechDeclaration.pdf  # Technology declaration
 |
 ├── LICENSE
 |
@@ -125,14 +125,14 @@ git clone [https://github.com/timlai0402/ERROR-303.git]
 
 ---
 
-## How We Use Replit *(Required)*
+## How We Use Replit 
 
 Replit served as the primary cloud-native development environment and staging platform for Team ERROR 303:
 
 - **Collaborative Development:** Our team utilized Replit Multiplayer to co-develop the UI dashboard, integrate modular components, and debug live state across distributed devices.
 - **Rapid Prototyping & Staging:** Replit's instant preview and web container hosted our functional interactive MVP during Phase 1 testing and judging review.
 
-📄 Proof of use: [`submission/SDC2026_ERROR 303_Replit_POU.pdf`](submission/REPLIT PROOF OF USE.pdf)
+📄 Proof of use: [`submission/SDC2026_ERROR 303_Replit_POU.pdf`]([submission/REPLIT PROOF OF USE.pdf](<submission/SDC2026_ERROR 303_REPLIT PROOF OF USE.pdf>))
 
 ---
 
@@ -167,16 +167,16 @@ Learning: We developed disciplined Git hygiene—committing small, testable upda
 
 ## Submission Checklist
 
-- [ ] Team name, domain (Domain 1 / Domain 2) and SDG track filled in
-- [ ] Slide deck link added
+- [x] Team name, domain (Domain 1 / Domain 2) and SDG track filled in
+- [x] Slide deck link added
 - [ ] Demo video link added
-- [ ] Replit used, with proof of use in `submission/`
+- [x] Replit used, with proof of use in `submission/`
 - [ ] RunPod used, with proof of use in `submission/`
-- [ ] Preliminary submission completed (`SDC2026_TeamName_Preliminary.pdf`)
-- [ ] Technology declaration completed (`SDC2026_TeamName_TechDeclaration.pdf`)
-- [ ] Submission files renamed with your team name (replace `TeamName`)
-- [ ] "How to Run" steps verified
-- [ ] No API keys or secrets committed to the repository
+- [x] Preliminary submission completed (`SDC2026_TeamName_Preliminary.pdf`)
+- [x] Technology declaration completed (`SDC2026_TeamName_TechDeclaration.pdf`)
+- [x] Submission files renamed with your team name (replace `TeamName`)
+- [x] "How to Run" steps verified
+- [x] No API keys or secrets committed to the repository
 
 ## License
 
