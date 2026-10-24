@@ -24,7 +24,6 @@
 | ----------------- | ---------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR-303.git  |
 | Live Demo         | https://stock-wise.replit.app           |
-| RunPod Endpoint   | https://api.runpod.ai/v2/your-endpoint-id xxxx     |
 | Slide Deck        | https://example.com/slides               xxx      |
 | Demo Video        | https://example.com/demo-video         xxxx        |
 
