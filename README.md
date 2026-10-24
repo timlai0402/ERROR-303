@@ -34,26 +34,25 @@
 
 ### Problem
 
-Describe the real-world problem you are solving in 2–4 sentences. Who is affected, and why does it matter?
+Malaysian micro, small, and medium enterprises (MSMEs) in manufacturing, retail, and F&B still rely heavily on paper logs, fragmented WhatsApp messages, and static spreadsheets to track inventory. Manual tracking cannot adapt dynamically to fluctuating customer demand, supplier lead times, or market price volatility, resulting in frequent stockouts (baseline 25%) and costly overstocking. Inefficient manual procurement consumes hours of owners' evenings and creates avoidable material and packaging waste.
 
 ### Solution
 
-Explain how your project uses AI to solve the problem and what makes it valuable.
+**StockWise AI** is an automation product built to sit within the Orbyte SME business hub. It maps incoming customer orders directly against bills of materials (BOM), current stock reserves, and supplier lead times. StockWise AI blends deterministic algorithms (for exact reorder quantities and safety stock calculations) with Generative AI (to interpret supplier risk and explain restocking justifications in plain language). Built on strict human-in-the-loop governance, no capital or purchase order is committed without manager sign-off, leaving an immutable audit trail.
 
 ### Key Features
 
-- **Feature 1** — Short description.
-- **Feature 2** — Short description.
-- **Feature 3** — Short description.
+ **Automated BOM & Shortage Detection** — Automatically extracts raw material needs from incoming orders and flags potential stock deficits before production stalls.
+- **Deterministic Reorder Engine + AI Insights** — Computes exact Reorder Points (ROP) and Economic Order Quantities (EOQ) mathematically, paired with GenAI summaries highlighting price trends and lead-time risks.
+- **5-Step Orbyte Journey with Human Approval** — Triggers work from order events, pulls connected inventory data, runs decision logic, enforces mandatory manager approval, and logs actions into an activity ledger.
+- **Supplier & Lead-Time Coordinator** — Compares multi-vendor price catalogues and delivery lead times to recommend optimal restocking schedules.
+- **PDPA & Role-Based Access Control (RBAC)** — Designed for Malaysian SMEs to protect supplier commercial terms and limit purchase approvals to authorized managers.
 
 ### Tech Stack
 
 | Layer         | Technology                   |
 | ------------- | ---------------------------- |
-| Frontend      | e.g. HTML, React             |
-| Backend       | e.g. Python, Flask / FastAPI |
-| Database      | e.g. PostgreSQL, SQLite      |
-| AI / Compute  | RunPod (GPU)                 |
+| Frontend      | HTML5                        |
 | Hosting / Dev | Replit                       |
 
 ---
@@ -63,8 +62,8 @@ Explain how your project uses AI to solve the problem and what makes it valuable
 ```
 .
 ├── docs/                    # Screenshots, diagrams
-├── runpod/
-│   └── handler.py           # RunPod serverless handler (GPU workload)
+|
+│  
 ├── src/
 │   ├── main.py              # Application entry point
 │   └── utils.py             # Helper functions
@@ -73,23 +72,42 @@ Explain how your project uses AI to solve the problem and what makes it valuable
 │   ├── SDC2026_TeamName_TechDeclaration.pdf  # Technology declaration
 │   ├── SDC2026_TeamName_Replit_POU.pdf       # Replit proof of use
 │   └── SDC2026_TeamName_Runpod_POU.pdf       # RunPod proof of use
-├── tests/
-│   └── test_utils.py        # Unit tests
-├── .env.example             # Example environment variables
-├── .gitignore
+|
 ├── .replit                  # Replit run configuration
 ├── LICENSE
-├── requirements.txt         # Python dependencies
+|
 └── README.md
 ```
 
 ### Architecture
 
 ```
-User ──► Replit (App / API) ──► RunPod Endpoint (GPU model)
-                │
-                └──► Response returned to user
+                                  ORBYTE BUSINESS HUB
+ ┌────────────────┐         ┌─────────────────────────────────────────────────────────┐
+ │ Incoming Order │ ──────► │ 1. Trigger & Connected Data Ingestion                   │
+ └────────────────┘         │    (Order Items ◄─► Bill of Materials ◄─► Stock Levels) │
+                            └────────────────────────────┬────────────────────────────┘
+                                                         │
+                                                         ▼
+                                    ┌────────────────────────────────────────┐
+                                    │ 2. Dual Decision Engine                │
+                                    │    • Deterministic: ROP & EOQ Formulas │
+                                    │    • GenAI: Disruption & Risk Rationale│
+                                    └────────────────────┬───────────────────┘
+                                                         │
+                                                         ▼
+ ┌───────────────────────────┐      ┌────────────────────────────────────────┐
+ │ Manager Review & Approval │ ◄─── │ 3. Human-in-the-Loop Gate              │
+ └─────────────┬─────────────┘      │    (Restock Quantity, Cost, Vendor)    │
+               │                    └────────────────────────────────────────┘
+               ▼
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 4. Visible Outcome & Audit Log                                             │
+ │    • Generated PO dispatched to supplier                                   │
+ │    • Action and timestamp committed to immutable Activity Ledger           │
+ └────────────────────────────────────────────────────────────────────────────┘
 ```
+
 
 ---
 
@@ -97,89 +115,61 @@ User ──► Replit (App / API) ──► RunPod Endpoint (GPU model)
 
 ### Option 1 — Run on Replit (Recommended)
 
-1. Open the [Replit Project](https://replit.com/@your-username/your-project), or import this repository via **Create Repl → Import from GitHub**.
-2. Open the **Secrets** tab (🔒) and add the variables listed in `.env.example`:
-   - `RUNPOD_API_KEY`
-   - `RUNPOD_ENDPOINT_ID`
-3. Click **Run**. Replit uses the `.replit` file to start `python src/main.py`.
+1. Open the [StockWise Replit Project](https://stock-wise.replit.app)
+2. Sign in using the email and password provided below
+
+email : [error303xmun@gmail.com] 
+password : [123qweasd]
+
 
 ### Option 2 — Run Locally
+1. Clone the repository in Visual Studio Code
+git clone [https://github.com/timlai0402/ERROR-303.git]
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/your-project.git
-cd your-project
+2. Open the folder
 
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+3. Click Run adn start debugging
 
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Configure environment variables
-cp .env.example .env            # then fill in your values
-
-# 5. Run the app
-python src/main.py
-```
-
-### Run Tests
-
-```bash
-python -m unittest discover tests
-```
 
 ---
 
 ## How We Use Replit *(Required)*
 
-Describe how your team used Replit. For example:
+Replit served as the primary cloud-native development environment and staging platform for Team ERROR 303:
 
-- **Development:** Collaborative coding in a shared Repl using Multiplayer.
-- **Hosting:** The app is deployed with Replit Deployments at the Live Demo link above.
-- **Secrets:** API keys are stored in Replit Secrets, never in the code.
+- **Collaborative Development:** Our team utilized Replit Multiplayer to co-develop the UI dashboard, integrate modular components, and debug live state across distributed devices.
+- **Rapid Prototyping & Staging:** Replit's instant preview and web container hosted our functional interactive MVP during Phase 1 testing and judging review.
 
 📄 Proof of use: [`submission/SDC2026_TeamName_Replit_POU.pdf`](submission/SDC2026_TeamName_Replit_POU.pdf)
-
-## How We Use RunPod *(Required)*
-
-Describe how your team used RunPod. For example:
-
-- **Workload:** Model inference (e.g. text generation, image processing) runs on a RunPod GPU.
-- **Setup:** `runpod/handler.py` is deployed as a **RunPod Serverless Endpoint**.
-- **Integration:** The Replit app sends requests to the endpoint using `RUNPOD_API_KEY` and `RUNPOD_ENDPOINT_ID`.
-
-Example request:
-
-```bash
-curl -X POST https://api.runpod.ai/v2/$RUNPOD_ENDPOINT_ID/runsync \
-  -H "Authorization: Bearer $RUNPOD_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"input": {"prompt": "Hello"}}'
-```
-
-📄 Proof of use: [`submission/SDC2026_TeamName_Runpod_POU.pdf`](submission/SDC2026_TeamName_Runpod_POU.pdf)
 
 ---
 
 ## Challenges & Learnings
 
-- What challenges did you face, and how did you overcome them?
-- What did your team learn?
+- **Overcoming the Non-Technical Learning Curve with AI-Assisted Debugging:**
+
+Challenge: Entering the hackathon with no prior coding background, interpreting cryptic browser console errors, syntax bugs, and broken layout alignments in Replit was initially overwhelming and stalled development.
+
+Learning: We learned to treat AI tools (such as Replit AI and Gemini) not as automatic code generators, but as patient 24/7 technical mentors. By pasting raw error logs into the AI, asking it to explain why something broke, and iteratively testing small code changes, we built a working understanding of web structure, learned how to isolate bugs, and successfully brought the interactive dashboard to life from scratch.
+
+- **Overcoming Git & Cloud Deployment WorkflowsChallenge:**
+As beginners to software version control, managing concurrent branches, avoiding merge conflicts, and synchronizing code between Replit and GitHub created friction during fast-paced prototyping. 
+
+Learning: We developed disciplined Git hygiene—committing small, testable updates, isolating features into separate files, and automating staging deployments directly through Replit’s environment. This transformed version control from an intimidating blocker into an essential safety net for experimentation. 
+
 
 ## Future Improvements
 
-- [ ] Improvement 1
-- [ ] Improvement 2
+- [ ] Add WhatsApp notification webhooks so SME owners can approve pending stock orders directly from their phones.
+- [ ] Connect directly to Orbyte's unified SME Hub APIs for automated supplier e-invoicing and purchase order syncing.
 
 ## Team
 
-| Name        | Role                | GitHub                                   |
-| ----------- | ------------------- | ---------------------------------------- |
-| Member Name | Team Lead / Backend | [@username](https://github.com/username) |
-| Member Name | Frontend            | [@username](https://github.com/username) |
-| Member Name | AI / RunPod         | [@username](https://github.com/username) |
+| Name                  | Role                           | GitHub                                             |
+| --------------------- | ------------------------------ | -------------------------------------------------- |
+| Timothy Lai Yong Fong | Team Leader / Idea pitching    | [@timlai0402](https://github.com/timlai0402)       |
+| Zayn Koh Hao Xiang    | Frontend & UI/UX Design        | [@zayn0214](https://github.com/username)           |
+| Chong Zhen Xi         | Documentation & Making slides  | [Ben-newbie@](https://github.com/Ben-newbie)       |
 
 ---
 
