@@ -1,4 +1,3 @@
-
 ---
 
 # StockWise
@@ -9,23 +8,23 @@
 
 ## Team Information
 
-| Field                  | Details                                     |
-| ---------------------- | ------------------------------------------- |
-| **Team Name**          | ERROR 303                            |
-| **Team Domain**        | Domain 2         |
+| Field                  | Details                                         |
+| ---------------------- | -------------------------------------------     |
+| **Team Name**          | ERROR 303                                       |
+| **Team Domain**        | Domain 2                                        |
 | **SDG Track (1–17)**   | SDG 9 — Industry, Innovation and Infrastructure |
-| **Team Leader**        | Timothy Lai Yong Fong                                 |
-| **University**         | Taylor's University                          |
-| **Number of Members**  | 3                                     |
+| **Team Leader**        | Timothy Lai Yong Fong                           |
+| **University**         | Taylor's University                             |
+| **Number of Members**  | 3                                               |
 
 ## Links
 
 | Resource          | Link                                           |
 | ----------------- | ---------------------------------------------- |
-| GitHub Repository | https://github.com/timlai0402/ERROR-303.git  |
-| Live Demo         | https://stock-wise.replit.app           |
-| Slide Deck        | https://example.com/slides               xxx      |
-| Demo Video        | https://example.com/demo-video         xxxx        |
+| GitHub Repository | https://github.com/timlai0402/ERROR-303.git    |
+| Live Demo         | https://stock-wise.replit.app                  |
+| Slide Deck        |                |
+| Demo Video        |                 |
 
 ---
 
@@ -59,20 +58,14 @@ Malaysian micro, small, and medium enterprises (MSMEs) in manufacturing, retail,
 ## Project Structure
 
 ```
-.
-├── docs/                    # Screenshots, diagrams
-|
-│  
 ├── src/
-│   ├── main.py              # Application entry point
-│   └── utils.py             # Helper functions
-├── submission/              # Required submission documents
+│   ├── stockwise-updated                     # html web application        
+├── submission/              
 │   ├── SDC2026_TeamName_Preliminary.pdf      # Preliminary submission
 │   ├── SDC2026_TeamName_TechDeclaration.pdf  # Technology declaration
 │   ├── SDC2026_TeamName_Replit_POU.pdf       # Replit proof of use
 │   └── SDC2026_TeamName_Runpod_POU.pdf       # RunPod proof of use
 |
-├── .replit                  # Replit run configuration
 ├── LICENSE
 |
 └── README.md
@@ -127,7 +120,7 @@ git clone [https://github.com/timlai0402/ERROR-303.git]
 
 2. Open the folder
 
-3. Click Run adn start debugging
+3. Click Run and start debugging
 
 
 ---
@@ -139,7 +132,7 @@ Replit served as the primary cloud-native development environment and staging pl
 - **Collaborative Development:** Our team utilized Replit Multiplayer to co-develop the UI dashboard, integrate modular components, and debug live state across distributed devices.
 - **Rapid Prototyping & Staging:** Replit's instant preview and web container hosted our functional interactive MVP during Phase 1 testing and judging review.
 
-📄 Proof of use: [`submission/SDC2026_TeamName_Replit_POU.pdf`](submission/SDC2026_TeamName_Replit_POU.pdf)
+📄 Proof of use: [`submission/SDC2026_ERROR 303_Replit_POU.pdf`](submission/REPLIT PROOF OF USE.pdf)
 
 ---
 
