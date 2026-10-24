@@ -24,7 +24,7 @@
 | GitHub Repository | https://github.com/timlai0402/ERROR-303.git    |
 | Live Demo         | https://stock-wise.replit.app                  |
 | Slide Deck        |    [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
-| Demo Video        |                 |
+| Demo Video        |[https://youtu.be/QjNjUeEtulU](https://youtu.be/QjNjUeEtulU)|
 |Pitch Video        |    [https://youtu.be/PdYZQNNhst0](https://youtu.be/PdYZQNNhst0)          |
 ---
 
