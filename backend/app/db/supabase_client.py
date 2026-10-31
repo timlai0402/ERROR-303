@@ -82,26 +82,6 @@ class SupabaseService:
         self.hardware_movements: List[Dict[str, Any]] = []
         self.hardware_import_batches: Dict[str, Dict[str, Any]] = {}
         self.processed_idempotency_keys: Dict[str, Dict[str, Any]] = {}
-        self.hardware_staff: Dict[str, Dict[str, Any]] = {
-            "staff-01": {
-                "id": "staff-01",
-                "business_id": self.default_business_id,
-                "name": "Ah Seng (Head Counter)",
-                "username": "ahseng",
-                "role": "Counter Staff",
-                "is_active": True,
-                "created_at": now_str
-            },
-            "staff-02": {
-                "id": "staff-02",
-                "business_id": self.default_business_id,
-                "name": "Muthu (Workshop Mechanic)",
-                "username": "muthu",
-                "role": "Mechanic",
-                "is_active": True,
-                "created_at": now_str
-            }
-        }
 
         initial_products = [
             {
@@ -713,56 +693,6 @@ class SupabaseService:
                 "deleted_products_count": len(product_ids),
                 "message": f"Import batch successfully reversed. {len(product_ids)} products and opening movements rolled back."
             }
-
-    # --- Hardware Staff Management (Owner Access Only) ---
-    def get_hardware_staff(self, business_id: str) -> Dict[str, Any]:
-        with self.lock:
-            staff_list = [s for s in self.hardware_staff.values() if s.get("business_id") == business_id]
-            staff_list.sort(key=lambda x: x["created_at"])
-            return {
-                "staff": staff_list,
-                "total": len(staff_list)
-            }
-
-    def create_hardware_staff(self, business_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        with self.lock:
-            username = data["username"].strip().lower()
-            # Check unique username per business
-            for s in self.hardware_staff.values():
-                if s.get("business_id") == business_id and s["username"].lower() == username:
-                    raise ValueError(f"Staff username '{data['username']}' already exists.")
-
-            staff_id = f"staff-{uuid.uuid4().hex[:8]}"
-            record = {
-                "id": staff_id,
-                "business_id": business_id,
-                "name": data["name"].strip(),
-                "username": username,
-                "role": data.get("role", "Floor Staff"),
-                "is_active": True,
-                "created_at": datetime.utcnow().isoformat()
-            }
-            self.hardware_staff[staff_id] = record
-            return record
-
-    def toggle_hardware_staff_status(self, business_id: str, staff_id: str, is_active: Optional[bool] = None) -> Dict[str, Any]:
-        with self.lock:
-            staff = self.hardware_staff.get(staff_id)
-            if not staff or staff.get("business_id") != business_id:
-                raise ValueError("Staff member not found")
-            if is_active is not None:
-                staff["is_active"] = is_active
-            else:
-                staff["is_active"] = not staff["is_active"]
-            return staff
-
-    def delete_hardware_staff(self, business_id: str, staff_id: str) -> bool:
-        with self.lock:
-            staff = self.hardware_staff.get(staff_id)
-            if not staff or staff.get("business_id") != business_id:
-                raise ValueError("Staff member not found")
-            del self.hardware_staff[staff_id]
-            return True
 
     # --- Legacy Compatibility Methods ---
     def get_items(self) -> List[Dict[str, Any]]:

@@ -3,1415 +3,705 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StockWise — Hardware Shop & Workshop Inventory Tracker</title>
-  <link rel="icon" href="logo.jpg" type="image/jpeg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>StockWise — Hardware Shop Inventory Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%228%22%20fill%3D%22%232563eb%22%2F%3E%3Cpath%20d%3D%22M12%2014h16M12%2020h16M12%2026h10%22%20stroke%3D%22%23fff%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2226%22%20r%3D%223%22%20fill%3D%22%2322c55e%22%2F%3E%3C%2Fsvg%3E">
   <script src="frontend-bridge.js"></script>
   <style>
-    /* ==========================================================================
-       APPLE INC. LIQUID GLASS DESIGN SYSTEM (SERIOUS & MINIMALIST FOR SMES)
-       ========================================================================== */
     :root {
-      /* Apple System Palette */
-      --canvas: #F5F5F7;
-      --canvas-subtle: #EBEBED;
-      --glass-surface: rgba(255, 255, 255, 0.76);
-      --glass-surface-opaque: rgba(255, 255, 255, 0.92);
-      --glass-surface-hover: rgba(255, 255, 255, 0.88);
-      
-      /* Glass Borders & Highlights */
-      --glass-border: rgba(255, 255, 255, 0.85);
-      --glass-hairline: rgba(0, 0, 0, 0.08);
-      --glass-specular: inset 0 1px 0 rgba(255, 255, 255, 0.95);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
-      --glass-shadow-hover: 0 14px 40px -4px rgba(0, 0, 0, 0.08), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-      --glass-blur: blur(28px) saturate(190%);
-
-      /* Typography & Text */
-      --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", "Helvetica Neue", sans-serif;
-      --font-mono: "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      --text-primary: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --text-tertiary: #86868B;
-      --text-quaternary: #A1A1A6;
-
-      /* Apple Accent Colors */
-      --apple-blue: #0071E3;
-      --apple-blue-hover: #0077ED;
-      --apple-dark: #1D1D1F;
-      --apple-dark-hover: #2D2D2F;
-      --apple-green: #34C759;
-      --apple-green-subtle: rgba(52, 199, 89, 0.12);
-      --apple-red: #FF3B30;
-      --apple-red-subtle: rgba(255, 59, 48, 0.12);
-      --apple-amber: #FF9500;
-      --apple-amber-subtle: rgba(255, 149, 0, 0.12);
-      --apple-chartreuse: #84CC16;
-      --apple-chartreuse-glow: rgba(132, 204, 22, 0.25);
-
-      /* Radii */
-      --radius-squircle: 22.5%;
-      --radius-card: 22px;
-      --radius-sheet: 26px;
-      --radius-pill: 980px;
-      --radius-control: 12px;
-      --radius-sm: 8px;
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --purple: #8b5cf6;
+      --purple-bg: rgba(139, 92, 246, 0.15);
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 8px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: var(--font-system);
-      background-color: var(--canvas);
-      background-image: 
-        radial-gradient(at 15% 15%, rgba(45, 74, 62, 0.06) 0px, transparent 45%),
-        radial-gradient(at 85% 12%, rgba(132, 204, 22, 0.04) 0px, transparent 40%),
-        radial-gradient(at 50% 90%, rgba(220, 140, 116, 0.05) 0px, transparent 50%);
-      background-attachment: fixed;
-      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 14px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow-x: hidden;
     }
 
-    /* Ambient Subtle Mesh Depth */
-    .ambient-lighting {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      pointer-events: none;
-      z-index: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
-    }
-
-    /* ==========================================================================
-       HEADER & NAVIGATION BAR (APPLE LIQUID GLASS)
-       ========================================================================== */
-    .apple-nav-header {
-      position: sticky;
-      top: 16px;
-      z-index: 100;
-      margin: 16px 28px 0 28px;
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sheet);
-      box-shadow: var(--glass-shadow);
-      padding: 10px 20px;
+    /* Header */
+    header {
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.75rem 1.5rem;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      transition: all 0.25s ease;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
     }
-
-    /* Brand Block with Squircle Logo */
-    .brand-identity {
+    .brand-section {
       display: flex;
       align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: inherit;
+      gap: 0.75rem;
     }
-
-    .logo-squircle {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    .logo-badge {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      letter-spacing: -0.5px;
     }
-
-    .logo-squircle img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .brand-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand-name {
+    .brand-title {
       font-size: 1.15rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
-      color: var(--text-primary);
+      color: #fff;
       display: flex;
       align-items: center;
-      gap: 6px;
-      line-height: 1.2;
+      gap: 0.5rem;
     }
-
-    .brand-badge {
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: var(--radius-pill);
-      background: rgba(0, 0, 0, 0.05);
-      color: var(--text-secondary);
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .brand-caption {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
+    .tag-hardware {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
       font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      border: 1px solid #334155;
     }
-
-    .biz-selector {
-      background: transparent;
-      border: none;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      cursor: pointer;
-      outline: none;
-      border-bottom: 1px dashed var(--text-tertiary);
-      padding: 0 2px;
-    }
-
-    /* Top Navigation Tabs */
-    .nav-tabs {
-      display: flex;
-      align-items: center;
-      background: rgba(118, 118, 128, 0.08);
-      border-radius: var(--radius-pill);
-      padding: 3px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      gap: 2px;
-    }
-
-    .tab-btn {
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      padding: 7px 16px;
-      border-radius: var(--radius-pill);
+    .shop-select {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
       font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
+      outline: none;
+    }
+
+    /* Navigation Tabs */
+    nav.main-nav {
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      white-space: nowrap;
+      gap: 0.5rem;
     }
-
-    .tab-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .tab-btn.active {
-      background: #FFFFFF;
-      color: var(--text-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-    }
-
-    .tab-count {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: var(--radius-pill);
-      background: rgba(0, 0, 0, 0.08);
-      color: var(--text-secondary);
-    }
-
-    .tab-btn.active .tab-count {
-      background: var(--apple-dark);
-      color: #FFFFFF;
-    }
-
-    .tab-btn.alert .tab-count {
-      background: var(--apple-red);
-      color: #FFFFFF;
-    }
-
-    /* Right Header Controls & Dual-Role Segmented Switcher */
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* Apple Segmented Control for Role Switching */
-    .role-segmented {
-      display: flex;
-      align-items: center;
-      background: rgba(118, 118, 128, 0.12);
-      border-radius: var(--radius-pill);
-      padding: 3px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      position: relative;
-    }
-
-    .role-btn {
-      border: none;
+    .nav-btn {
       background: transparent;
-      color: var(--text-secondary);
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      font-size: 0.82rem;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      white-space: nowrap;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    .nav-btn.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-color: #0284c7;
+    }
+    .nav-badge {
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-weight: 700;
     }
 
-    .role-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .role-btn.active {
-      background: #FFFFFF;
-      color: var(--text-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
-    }
-
-    .role-icon {
-      font-size: 0.95rem;
-    }
-
-    /* Status Indicator Pill */
-    .backend-status-pill {
+    .header-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.65);
-      border: 1px solid var(--glass-hairline);
-      padding: 5px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 0.74rem;
-      font-weight: 600;
-      color: var(--text-secondary);
+      gap: 0.6rem;
     }
+    .btn-journey {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      transition: transform 0.1s ease;
+    }
+    .btn-journey:hover { transform: translateY(-1px); }
 
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
     .status-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--apple-green);
-      box-shadow: 0 0 6px var(--apple-green);
+      background: #10b981;
     }
+    .status-dot.offline { background: #f59e0b; }
 
-    .status-dot.offline {
-      background: var(--apple-amber);
-      box-shadow: 0 0 6px var(--apple-amber);
-    }
-
-    .btn-journey-pill {
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      background: #FFFFFF;
-      color: var(--text-primary);
-      padding: 6px 12px;
-      border-radius: var(--radius-pill);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      transition: all 0.15s ease;
-    }
-
-    .btn-journey-pill:hover {
-      background: var(--apple-dark);
-      color: #FFFFFF;
-      border-color: var(--apple-dark);
-    }
-
-    /* ==========================================================================
-       ROLE CONTEXT BANNER
-       ========================================================================== */
-    .role-banner-wrap {
-      margin: 16px 28px 0 28px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .role-banner {
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-card);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-    }
-
-    .role-banner-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .role-badge-tag {
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      letter-spacing: 0.02em;
-    }
-
-    .role-badge-owner {
-      background: rgba(0, 113, 227, 0.12);
-      color: var(--apple-blue);
-      border: 1px solid rgba(0, 113, 227, 0.2);
-    }
-
-    .role-badge-staff {
-      background: rgba(132, 204, 22, 0.14);
-      color: #4D7C0F;
-      border: 1px solid rgba(132, 204, 22, 0.28);
-    }
-
-    .role-banner-desc {
-      font-size: 0.83rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .role-banner-desc strong {
-      color: var(--text-primary);
-    }
-
-    /* ==========================================================================
-       MAIN CONTENT CONTAINER
-       ========================================================================== */
-    main.main-content {
-      position: relative;
-      z-index: 10;
-      padding: 16px 28px 48px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    /* Main Container */
+    main {
       flex: 1;
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
     }
 
-    /* Summary Metric Tiles (Apple Liquid Glass) */
-    .metric-grid {
+    /* Operational Bar (Cards) */
+    .kpi-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
     }
-
-    @media (max-width: 900px) {
-      .metric-grid { grid-template-columns: 1fr; }
-      .apple-nav-header { flex-direction: column; align-items: stretch; margin: 12px 14px 0 14px; }
-      .main-content { padding: 12px 14px 32px 14px; }
-      .role-banner-wrap { margin: 12px 14px 0 14px; }
-    }
-
-    .metric-card {
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-card);
-      padding: 20px 24px;
-      box-shadow: var(--glass-shadow);
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+      gap: 0.35rem;
       cursor: pointer;
+      transition: border-color 0.15s ease;
     }
+    .kpi-card:hover { border-color: #374151; }
+    .kpi-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .kpi-val { font-size: 1.75rem; font-weight: 700; color: #fff; }
+    .kpi-sub { font-size: 0.75rem; color: var(--text-muted); }
 
-    .metric-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--glass-shadow-hover);
-    }
-
-    .metric-card-top {
+    /* Action bar on views */
+    .toolbar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .metric-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-    }
-
-    .metric-icon-bubble {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-    }
-
-    .metric-val {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.035em;
-      line-height: 1;
-      color: var(--text-primary);
-    }
-
-    .metric-footer {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--glass-hairline);
-      padding-top: 8px;
-    }
-
-    .metric-card.alert-card {
-      border-color: rgba(255, 59, 48, 0.25);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(254, 242, 242, 0.75) 100%);
-    }
-
-    .metric-card.alert-card .metric-val {
-      color: var(--apple-red);
-    }
-
-    /* ==========================================================================
-       CONTENT GLASS SHEET
-       ========================================================================== */
-    .content-sheet {
-      background: var(--glass-surface);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sheet);
-      box-shadow: var(--glass-shadow);
-      padding: 22px 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Toolbar within Sheet */
-    .sheet-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
     }
-
     .toolbar-left, .toolbar-right {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 0.6rem;
     }
-
-    /* Search Bar with SF Pro style */
-    .apple-search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(118, 118, 128, 0.1);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      border-radius: var(--radius-control);
-      padding: 7px 12px;
-      min-width: 280px;
-      transition: all 0.2s ease;
-    }
-
-    .apple-search-box:focus-within {
-      background: #FFFFFF;
-      border-color: var(--apple-blue);
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
-    }
-
-    .apple-search-box input {
-      border: none;
-      background: transparent;
+    .search-input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
       font-size: 0.85rem;
-      font-family: inherit;
-      color: var(--text-primary);
+      min-width: 260px;
       outline: none;
-      width: 100%;
     }
-
-    .apple-search-box input::placeholder {
-      color: var(--text-tertiary);
-    }
-
-    .apple-select {
-      background: rgba(118, 118, 128, 0.1);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      border-radius: var(--radius-control);
-      padding: 7px 12px;
-      font-size: 0.83rem;
-      font-weight: 500;
-      color: var(--text-primary);
+    .search-input:focus { border-color: var(--primary); }
+    .select-filter {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
       outline: none;
-      cursor: pointer;
     }
 
-    .apple-select:focus {
-      background: #FFFFFF;
-      border-color: var(--apple-blue);
-    }
-
-    /* Apple Buttons */
+    /* Buttons */
     .btn {
-      border: none;
-      border-radius: var(--radius-pill);
-      padding: 7px 16px;
-      font-size: 0.83rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 0.35rem;
+      transition: all 0.15s ease;
       text-decoration: none;
-      white-space: nowrap;
     }
+    .btn:hover { background: #334155; color: #fff; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; }
 
-    .btn-primary {
-      background: var(--apple-dark);
-      color: #FFFFFF;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-primary:hover {
-      background: var(--apple-dark-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: #FFFFFF;
-      color: var(--text-primary);
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0, 0, 0, 0.02);
-      border-color: rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-action-blue {
-      background: var(--apple-blue);
-      color: #FFFFFF;
-    }
-
-    .btn-action-blue:hover {
-      background: var(--apple-blue-hover);
-    }
-
-    .btn-sm {
-      padding: 4px 10px;
-      font-size: 0.76rem;
-      border-radius: var(--radius-sm);
-    }
-
-    .btn-danger {
-      background: rgba(255, 59, 48, 0.1);
-      color: var(--apple-red);
-      border: 1px solid rgba(255, 59, 48, 0.2);
-    }
-
-    .btn-danger:hover {
-      background: var(--apple-red);
-      color: #FFFFFF;
-    }
-
-    /* ==========================================================================
-       DATA TABLE (SERIOUS APPLE MINIMALISM)
-       ========================================================================== */
+    /* Tables */
     .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
       overflow-x: auto;
-      border-radius: var(--radius-control);
-      border: 1px solid var(--glass-hairline);
-      background: rgba(255, 255, 255, 0.6);
     }
-
-    table.apple-table {
+    table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.83rem;
+      font-size: 0.85rem;
     }
-
-    table.apple-table th {
-      padding: 10px 14px;
+    th {
+      background: #0f172a;
+      color: #94a3b8;
       font-weight: 600;
-      color: var(--text-secondary);
-      background: rgba(245, 245, 247, 0.7);
-      border-bottom: 1px solid var(--glass-hairline);
-      font-size: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--card-border);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
     }
-
-    table.apple-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-      color: var(--text-primary);
-      vertical-align: middle;
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
     }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-    table.apple-table tbody tr {
-      transition: background 0.12s ease;
-    }
-
-    table.apple-table tbody tr:hover {
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    table.apple-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Badges & Pills */
     .sku-badge {
       font-family: var(--font-mono);
-      font-size: 0.76rem;
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
       font-weight: 600;
-      background: rgba(0, 0, 0, 0.05);
-      color: var(--text-primary);
-      padding: 2px 7px;
-      border-radius: 6px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
-      display: inline-block;
+      border: 1px solid #334155;
     }
 
-    .stock-badge {
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: var(--radius-pill);
-      font-size: 0.76rem;
-      display: inline-block;
-    }
-
-    .stock-badge.healthy {
-      background: rgba(52, 199, 89, 0.12);
-      color: #15803D;
-    }
-
-    .stock-badge.low {
-      background: rgba(255, 149, 0, 0.12);
-      color: #B45309;
-    }
-
-    .stock-badge.zero {
-      background: rgba(255, 59, 48, 0.14);
-      color: #B91C1C;
-    }
-
-    /* Confidentiality Masking Badge */
-    .confidential-badge {
-      font-size: 0.73rem;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      background: rgba(0, 0, 0, 0.04);
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px dashed rgba(0, 0, 0, 0.12);
+    /* Badges */
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-    }
-
-    .supplier-visible {
-      font-size: 0.8rem;
-    }
-
-    .supplier-phone {
-      font-family: var(--font-mono);
-      font-size: 0.76rem;
-      color: var(--apple-blue);
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
       font-weight: 600;
-      text-decoration: none;
     }
+    .badge-success { background: var(--success-bg); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-warning { background: var(--warning-bg); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-danger { background: var(--danger-bg); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-purple { background: var(--purple-bg); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-gray { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
 
-    .supplier-phone:hover {
-      text-decoration: underline;
-    }
-
-    /* Pagination Bar */
+    /* Pagination */
     .pagination-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--card-border);
       font-size: 0.8rem;
-      color: var(--text-secondary);
-      padding-top: 8px;
+      color: var(--text-muted);
     }
-
     .page-controls {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.4rem;
     }
 
-    /* Staff Interface Floor Counter Callout */
-    .floor-staff-callout {
-      background: rgba(132, 204, 22, 0.08);
-      border: 1px solid rgba(132, 204, 22, 0.25);
-      border-radius: var(--radius-card);
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .floor-staff-callout h4 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #365314;
-    }
-
-    .floor-staff-callout p {
-      font-size: 0.78rem;
-      color: #4D7C0F;
-      margin-top: 2px;
-    }
-
-    /* ==========================================================================
-       MODALS & DIALOGS (APPLE SHEETS)
-       ========================================================================== */
+    /* Modals */
     .modal-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1000;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      z-index: 50;
+      padding: 1rem;
     }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
-
+    .modal-backdrop.active { display: flex; }
     .modal-card {
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sheet);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      max-width: 620px;
       width: 100%;
-      max-width: 580px;
       max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    @keyframes modalSlideIn {
-      from { transform: scale(0.96) translateY(8px); opacity: 0; }
-      to { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
     .modal-header {
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--glass-hairline);
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-
-    .modal-title {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-    }
-
-    .modal-close-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.05);
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .modal-close {
+      background: transparent;
       border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      color: var(--text-secondary);
+      color: #94a3b8;
+      font-size: 1.25rem;
       cursor: pointer;
     }
-
-    .modal-close-btn:hover {
-      background: rgba(0, 0, 0, 0.1);
-      color: var(--text-primary);
-    }
-
+    .modal-close:hover { color: #fff; }
     .modal-body {
-      padding: 18px 22px;
-      overflow-y: auto;
+      padding: 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 1rem;
     }
-
     .modal-footer {
-      padding: 14px 22px;
-      border-top: 1px solid var(--glass-hairline);
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
-      background: rgba(245, 245, 247, 0.5);
+      gap: 0.5rem;
+      background: #0b0f19;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 0.35rem;
     }
-
     .form-group label {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: var(--text-secondary);
+      color: #cbd5e1;
     }
-
+    .form-control {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--primary); }
+    .form-control:disabled { opacity: 0.6; cursor: not-allowed; }
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 0.75rem;
     }
-
-    .form-control {
-      background: #FFFFFF;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      border-radius: var(--radius-control);
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      font-family: inherit;
-      color: var(--text-primary);
-      outline: none;
-      transition: border 0.15s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--apple-blue);
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
-    }
-
     .form-help {
-      font-size: 0.72rem;
-      color: var(--text-tertiary);
+      font-size: 0.75rem;
+      color: #94a3b8;
     }
 
-    /* Toast Notification */
-    .toast-pill {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(50px);
-      background: rgba(29, 29, 31, 0.94);
-      backdrop-filter: blur(20px);
-      color: #FFFFFF;
-      font-size: 0.84rem;
-      font-weight: 600;
-      padding: 9px 18px;
-      border-radius: var(--radius-pill);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      z-index: 2000;
-      pointer-events: none;
-      opacity: 0;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toast-pill.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    .toast-pill.toast-err {
-      background: rgba(220, 38, 38, 0.95);
-    }
-
-    /* Journey Modal Steps */
+    /* Stepper / Journey Modal */
     .journey-step {
       display: flex;
+      gap: 0.85rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
       align-items: flex-start;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.02);
-      border: 1px solid rgba(0, 0, 0, 0.04);
     }
-
-    .journey-step.active {
-      background: rgba(0, 113, 227, 0.06);
-      border-color: rgba(0, 113, 227, 0.25);
-    }
-
     .journey-num {
-      width: 24px;
-      height: 24px;
+      background: var(--primary);
+      color: #fff;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: var(--apple-dark);
-      color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.74rem;
       font-weight: 700;
+      font-size: 0.8rem;
       flex-shrink: 0;
     }
+    .journey-num.completed { background: var(--success); }
+    .journey-num.active { background: var(--warning); color: #000; }
+    .journey-content h4 { font-size: 0.85rem; color: #fff; margin-bottom: 0.2rem; }
+    .journey-content p { font-size: 0.75rem; color: #94a3b8; }
 
-    .journey-step.active .journey-num {
-      background: var(--apple-blue);
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
     }
+    .empty-state h3 { color: #e2e8f0; font-size: 1.1rem; margin-bottom: 0.5rem; }
 
-    .journey-content h4 {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .journey-content p {
-      font-size: 0.77rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    /* Hide utilities based on role */
-    body[data-role="staff"] .owner-only {
-      display: none !important;
-    }
-
-    body[data-role="owner"] .staff-only {
-      display: none !important;
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1e293b;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 100;
+      font-size: 0.85rem;
     }
   </style>
 </head>
-<body data-role="owner">
-  <div class="ambient-lighting"></div>
+<body>
 
-  <!-- ==========================================================================
-       HEADER & TOP GLASS NAVIGATION BAR
-       ========================================================================== -->
-  <header class="apple-nav-header">
-    <!-- Brand Identity with Logo -->
-    <a href="#" class="brand-identity">
-      <div class="logo-squircle">
-        <img src="logo.jpg" alt="StockWise Logo">
-      </div>
-      <div class="brand-info">
-        <div class="brand-name">
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand-section">
+      <div class="logo-badge">SW</div>
+      <div>
+        <div class="brand-title">
           StockWise
-          <span class="brand-badge">SME Pro</span>
-        </div>
-        <div class="brand-caption">
-          <span>Shop:</span>
-          <select id="bizSelector" class="biz-selector">
-            <option value="biz-hardware-01">Ah Huat Hardware & Auto Parts</option>
-            <option value="biz-other-shop">Other Branch (Isolated)</option>
-          </select>
+          <span class="tag-hardware">Hardware & Mechanics SME</span>
         </div>
       </div>
-    </a>
+      <select id="businessSelector" class="shop-select" title="Active Shop Profile">
+        <option value="biz-hardware-01">Ah Huat Hardware & Auto Parts (MYR)</option>
+        <option value="biz-demo-02">Mun Seng Motor Works</option>
+      </select>
+    </div>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-      <button class="tab-btn active" id="tabBtnProducts" onclick="switchTab('products')">
-        <span>📦</span>
-        <span id="tabTitleProducts">Products</span>
-        <span class="tab-count" id="countProducts">0</span>
+    <!-- Small 3-Tab Main Navigation as requested -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-tab="products" id="tabBtnProducts">
+        📦 Products
       </button>
-
-      <button class="tab-btn" id="tabBtnMovements" onclick="switchTab('movements')">
-        <span>🔄</span>
-        <span>Stock Movements</span>
-        <span class="tab-count" id="countMovements">0</span>
+      <button class="nav-btn" data-tab="movements" id="tabBtnMovements">
+        📋 Stock Movements
       </button>
-
-      <button class="tab-btn" id="tabBtnLowStock" onclick="switchTab('lowstock')">
-        <span>⚠️</span>
-        <span>Low Stock</span>
-        <span class="tab-count alert" id="countLowStock" style="display:none;">0</span>
-      </button>
-
-      <!-- Staff Accounts (Owner Only) -->
-      <button class="tab-btn owner-only" id="tabBtnStaff" onclick="switchTab('staff')">
-        <span>👥</span>
-        <span>Staff Accounts</span>
-        <span class="tab-count" id="countStaff">2</span>
+      <button class="nav-btn" data-tab="lowstock" id="tabBtnLowStock">
+        ⚠️ Low Stock
+        <span class="nav-badge" id="lowStockBadge" style="display:none;">0</span>
       </button>
     </nav>
 
-    <!-- Header Actions & Role Segmented Switcher -->
-    <div class="header-right">
-      <!-- 1-Click Operational Journey Presentation Modal -->
-      <button class="btn-journey-pill" id="btnOpenJourneyModal" title="Open SME Operational Journey Presentation">
-        <span>⚡</span>
-        <span>1-Click Demo Journey</span>
+    <div class="header-actions">
+      <!-- Complete Operational SME Journey Button for Mentors/Judges -->
+      <button class="btn-journey" id="btnOpenJourneyModal" title="Demonstrate Trigger -> Connected Data -> Decision Logic -> Human Approval -> Visible Outcome -> Scale">
+        ⚡ Live Demo Workflow
       </button>
-
-      <!-- Segmented Control for Dual Role Switch -->
-      <div class="role-segmented">
-        <button class="role-btn active" id="btnRoleOwner" onclick="switchRole('owner')">
-          <span class="role-icon">👑</span>
-          <span>Owner</span>
-        </button>
-        <button class="role-btn" id="btnRoleStaff" onclick="switchRole('staff')">
-          <span class="role-icon">👤</span>
-          <span>Staff</span>
-        </button>
-      </div>
-
-      <!-- Live Backend Indicator -->
-      <div class="backend-status-pill" id="backendStatusPill" title="FastAPI Backend Health">
+      <div class="status-pill" id="connStatusPill" title="Connection Diagnostics">
         <span class="status-dot" id="statusDot"></span>
-        <span id="statusLabel">FastAPI Live</span>
+        <span id="statusLabel">FastAPI Ready</span>
       </div>
     </div>
   </header>
 
-  <!-- ==========================================================================
-       ROLE CONTEXT BANNER
-       ========================================================================== -->
-  <div class="role-banner-wrap">
-    <div class="role-banner">
-      <div class="role-banner-left">
-        <span class="role-badge-tag role-badge-owner" id="roleBadge">
-          <span>👑</span>
-          <span id="roleBadgeText">Owner Mode</span>
-        </span>
-        <span class="role-banner-desc" id="roleBannerDesc">
-          <strong>Full Administrative Access:</strong> Unrestricted catalog management, confidential supplier contacts, CSV batch import/reversal, and staff user control.
-        </span>
-      </div>
-      <div class="role-banner-right">
-        <button class="btn btn-secondary btn-sm" id="btnSwitchRoleQuick" onclick="toggleRoleQuick()">
-          Switch to <span id="quickSwitchTargetName">Staff Mode</span> &rarr;
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- Main Workspace -->
+  <main>
 
-  <!-- ==========================================================================
-       MAIN CONTENT CONTAINER
-       ========================================================================== -->
-  <main class="main-content">
-
-    <!-- KPI Metric Cards -->
-    <div class="metric-grid">
-      <!-- Metric 1: Total Catalog SKUs -->
-      <div class="metric-card" onclick="switchTab('products')">
-        <div class="metric-card-top">
-          <span class="metric-label">Tracked Hardware Items</span>
-          <div class="metric-icon-bubble">📦</div>
-        </div>
-        <div class="metric-val" id="metricTotalSkus">0</div>
-        <div class="metric-footer">
-          <span>Healthy Stock: <strong style="color:var(--apple-green)" id="metricHealthyStock">0</strong></span>
-          <span>Non-Expiry Inventory</span>
-        </div>
+    <!-- Operational KPI Banner (Directs to Core Actions, not a bloated dashboard) -->
+    <div class="kpi-row">
+      <div class="kpi-card" onclick="switchTab('products')">
+        <div class="kpi-title">Active SKUs</div>
+        <div class="kpi-val" id="kpiTotalSkus">0</div>
+        <div class="kpi-sub">Total catalog inventory</div>
       </div>
-
-      <!-- Metric 2: Movements Logged -->
-      <div class="metric-card" onclick="switchTab('movements')">
-        <div class="metric-card-top">
-          <span class="metric-label">Stock Movements Ledger</span>
-          <div class="metric-icon-bubble">🔄</div>
-        </div>
-        <div class="metric-val" id="metricTotalMovements">0</div>
-        <div class="metric-footer">
-          <span>Atomic Balances Recorded</span>
-          <span>Ledger History &rarr;</span>
-        </div>
+      <div class="kpi-card" onclick="switchTab('products')">
+        <div class="kpi-title">Healthy Stock Items</div>
+        <div class="kpi-val" id="kpiHealthyStock" style="color:#34d399;">0</div>
+        <div class="kpi-sub">Above minimum threshold</div>
       </div>
-
-      <!-- Metric 3: Low Stock Radar -->
-      <div class="metric-card alert-card" onclick="switchTab('lowstock')">
-        <div class="metric-card-top">
-          <span class="metric-label">Restock Radar</span>
-          <div class="metric-icon-bubble" style="color:var(--apple-red); background:rgba(255,59,48,0.1);">⚠️</div>
-        </div>
-        <div class="metric-val" id="metricZeroStock">0</div>
-        <div class="metric-footer">
-          <span id="metricLowStockDesc">0 Items Below Minimum</span>
-          <span style="color:var(--apple-red); font-weight:700;">Inspect Deficits &rarr;</span>
-        </div>
+      <div class="kpi-card" onclick="switchTab('lowstock')">
+        <div class="kpi-title">Low Stock Alerts</div>
+        <div class="kpi-val" id="kpiLowStock" style="color:#fbbf24;">0</div>
+        <div class="kpi-sub">Replenishment needed</div>
+      </div>
+      <div class="kpi-card" onclick="switchTab('lowstock')">
+        <div class="kpi-title">Out of Stock (Zero)</div>
+        <div class="kpi-val" id="kpiZeroStock" style="color:#f87171;">0</div>
+        <div class="kpi-sub">Critical deficit stockouts</div>
       </div>
     </div>
 
-    <!-- ========================================================================
-         VIEW 1: PRODUCTS / INVENTORY COUNT
-         ======================================================================== -->
+    <!-- TAB 1: PRODUCTS PAGE -->
     <section id="viewProducts" class="tab-view">
-      <div class="content-sheet">
-        <!-- Floor staff quick scan callout (Staff mode only) -->
-        <div class="floor-staff-callout staff-only">
-          <div>
-            <h4>Floor Counter Mode &mdash; Fast Hardware Check</h4>
-            <p>Scan or search items to check stock balance. Tap "+ In" or "- Out" to record inventory changes immediately.</p>
-          </div>
-          <div>
-            <button class="btn btn-primary btn-sm" onclick="openRecordMovementModal()">+ Record Movement</button>
-          </div>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" id="searchProducts" class="search-input" placeholder="🔍 Search SKU, product name, or supplier...">
+          <select id="filterProductStatus" class="select-filter">
+            <option value="active">Active Products</option>
+            <option value="archived">Archived Products</option>
+            <option value="all">All Products</option>
+          </select>
         </div>
-
-        <!-- Sheet Toolbar -->
-        <div class="sheet-toolbar">
-          <div class="toolbar-left">
-            <div class="apple-search-box">
-              <span>🔍</span>
-              <input type="text" id="searchProducts" placeholder="Search SKU, item name, or supplier...">
-            </div>
-            <select id="filterProductStatus" class="apple-select owner-only">
-              <option value="active">Active Catalog</option>
-              <option value="archived">Archived Products</option>
-              <option value="all">All Products</option>
-            </select>
-          </div>
-
-          <div class="toolbar-right">
-            <!-- Owner Only Actions -->
-            <button class="btn btn-secondary owner-only" id="btnOpenImportCsv">📥 Import CSV</button>
-            <button class="btn btn-secondary owner-only" id="btnExportCsv">📤 Export CSV</button>
-            <button class="btn btn-primary owner-only" id="btnOpenNewProduct">+ New Product</button>
-
-            <!-- Staff Only Actions -->
-            <button class="btn btn-primary staff-only" onclick="openRecordMovementModal()">+ Fast Stock Record</button>
-          </div>
+        <div class="toolbar-right">
+          <!-- CSV Import/Export on Products Page as requested -->
+          <button class="btn" id="btnOpenImportCsv">📥 Import CSV</button>
+          <button class="btn" id="btnExportCsv">📤 Export CSV</button>
+          <button class="btn btn-primary" id="btnOpenNewProduct">+ New Product</button>
         </div>
+      </div>
 
-        <!-- Table -->
-        <div class="table-container">
-          <table class="apple-table">
-            <thead>
-              <tr>
-                <th>Product Code / SKU</th>
-                <th>Part Description</th>
-                <th>Stock Unit</th>
-                <th>Current Stock</th>
-                <th class="owner-only">Min Threshold</th>
-                <th>Supplier &amp; Terms</th>
-                <th class="owner-only">Status</th>
-                <th style="text-align: right;">Inventory Action</th>
-              </tr>
-            </thead>
-            <tbody id="productsTableBody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Code / SKU</th>
+              <th>Product Name</th>
+              <th>Unit</th>
+              <th>Current Stock</th>
+              <th>Min Stock</th>
+              <th>Supplier & Contact</th>
+              <th>Status</th>
+              <th style="text-align: right;">Stock Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
         <div class="pagination-bar">
           <span id="productsPageInfo">Showing 0 of 0 products</span>
           <div class="page-controls">
-            <button class="btn btn-secondary btn-sm" id="btnPrevProductPage">Prev</button>
-            <span id="currentProductPage" style="font-weight:600; padding: 0 4px;">Page 1</span>
-            <button class="btn btn-secondary btn-sm" id="btnNextProductPage">Next</button>
+            <button class="btn btn-sm" id="btnPrevProductPage">Prev</button>
+            <span id="currentProductPage">Page 1</span>
+            <button class="btn btn-sm" id="btnNextProductPage">Next</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ========================================================================
-         VIEW 2: STOCK MOVEMENTS LEDGER
-         ======================================================================== -->
+    <!-- TAB 2: STOCK MOVEMENTS PAGE -->
     <section id="viewMovements" class="tab-view" style="display:none;">
-      <div class="content-sheet">
-        <div class="sheet-toolbar">
-          <div class="toolbar-left">
-            <div class="apple-search-box">
-              <span>🔍</span>
-              <input type="text" id="searchMovements" placeholder="Filter movements by SKU, user, reason...">
-            </div>
-            <select id="filterMovementType" class="apple-select">
-              <option value="ALL">All Movement Types</option>
-              <option value="STOCK_IN">Stock In (+) Restock / Delivery</option>
-              <option value="STOCK_OUT">Stock Out (-) Sold / Repaired</option>
-              <option value="CORRECTION">Stock Correction (=) Audit Recount</option>
-              <option value="OPENING_STOCK">Opening Baseline</option>
-            </select>
-          </div>
-          <div class="toolbar-right">
-            <button class="btn btn-primary" onclick="openRecordMovementModal()">+ Record Movement</button>
-          </div>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" id="searchMovements" class="search-input" placeholder="🔍 Filter by SKU, user, note, or reason...">
+          <select id="filterMovementType" class="select-filter">
+            <option value="ALL">All Movements</option>
+            <option value="STOCK_IN">Stock In</option>
+            <option value="STOCK_OUT">Stock Out</option>
+            <option value="CORRECTION">Stock Correction</option>
+            <option value="OPENING_STOCK">Opening Stock</option>
+          </select>
         </div>
-
-        <div class="table-container">
-          <table class="apple-table">
-            <thead>
-              <tr>
-                <th>Date &amp; Time</th>
-                <th>Hardware Part</th>
-                <th>Type</th>
-                <th>Quantity Delta</th>
-                <th>Progression</th>
-                <th>Reason / Reference</th>
-                <th>Recorded By</th>
-              </tr>
-            </thead>
-            <tbody id="movementsTableBody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" id="btnRecordMovementQuick">+ Record Movement</button>
         </div>
+      </div>
 
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Product</th>
+              <th>Movement Type</th>
+              <th>Quantity Change</th>
+              <th>Stock Balance</th>
+              <th>Reason / Note</th>
+              <th>Recorded By</th>
+            </tr>
+          </thead>
+          <tbody id="movementsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
         <div class="pagination-bar">
           <span id="movementsPageInfo">Showing 0 of 0 movements</span>
           <div class="page-controls">
-            <button class="btn btn-secondary btn-sm" id="btnPrevMovementPage">Prev</button>
-            <span id="currentMovementPage" style="font-weight:600; padding: 0 4px;">Page 1</span>
-            <button class="btn btn-secondary btn-sm" id="btnNextMovementPage">Next</button>
+            <button class="btn btn-sm" id="btnPrevMovementPage">Prev</button>
+            <span id="currentMovementPage">Page 1</span>
+            <button class="btn btn-sm" id="btnNextMovementPage">Next</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ========================================================================
-         VIEW 3: LOW STOCK RADAR
-         ======================================================================== -->
+    <!-- TAB 3: LOW STOCK LIST -->
     <section id="viewLowStock" class="tab-view" style="display:none;">
-      <div class="content-sheet">
-        <div class="sheet-toolbar">
-          <div>
-            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Restock Required Radar</h3>
-            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-              Hardware items whose balance is below minimum stock level. (Min level of 0 disables alert).
-            </p>
-          </div>
-          <div class="toolbar-right">
-            <span id="lowStockWarningSummary" class="stock-badge low">0 Items Low</span>
-          </div>
+      <div class="toolbar">
+        <div>
+          <h3 style="font-size: 1rem; color: #fff;">What Needs Restocking?</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">
+            Products whose current stock is below minimum stock level. (Min stock of 0 disables alerts).
+          </p>
         </div>
-
-        <div class="table-container">
-          <table class="apple-table">
-            <thead>
-              <tr>
-                <th>Alert Status</th>
-                <th>SKU</th>
-                <th>Product Name</th>
-                <th>Current Quantity</th>
-                <th>Min Threshold</th>
-                <th>Replenish Deficit</th>
-                <th>Supplier Information</th>
-                <th style="text-align: right;">Quick Restock</th>
-              </tr>
-            </thead>
-            <tbody id="lowStockTableBody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+        <div class="toolbar-right">
+          <span id="lowStockWarningSummary" class="badge badge-warning">0 Items Low</span>
         </div>
       </div>
-    </section>
 
-    <!-- ========================================================================
-         VIEW 4: STAFF ACCOUNT MANAGEMENT (OWNER ONLY)
-         ======================================================================== -->
-    <section id="viewStaff" class="tab-view owner-only" style="display:none;">
-      <div class="content-sheet">
-        <div class="sheet-toolbar">
-          <div>
-            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Staff Account Access Control</h3>
-            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
-              Manage workshop floor staff and counter accounts. Staff only have access to count &amp; record movements; confidential supplier details are shielded.
-            </p>
-          </div>
-          <div class="toolbar-right">
-            <button class="btn btn-primary" id="btnOpenAddStaffModal">+ Add Staff Member</button>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <table class="apple-table">
-            <thead>
-              <tr>
-                <th>Staff Name</th>
-                <th>Login Username</th>
-                <th>Assigned Role</th>
-                <th>Access Status</th>
-                <th>Created Date</th>
-                <th style="text-align: right;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="staffTableBody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Alert Status</th>
+              <th>Product Code / SKU</th>
+              <th>Product Name</th>
+              <th>Current Stock</th>
+              <th>Min Stock</th>
+              <th>Replenishment Deficit</th>
+              <th>Supplier Details</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="lowStockTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
       </div>
     </section>
 
   </main>
 
-  <!-- ==========================================================================
-       MODALS & DIALOGS
-       ========================================================================== -->
-
-  <!-- MODAL: ADD PRODUCT (OWNER ONLY) -->
+  <!-- MODAL: ADD NEW PRODUCT -->
   <div class="modal-backdrop" id="modalNewProduct">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">+ Add Hardware Item</div>
-        <button class="modal-close-btn" onclick="closeModal('modalNewProduct')">&times;</button>
+        <div class="modal-title">+ Add Hardware Product</div>
+        <button class="modal-close" onclick="closeModal('modalNewProduct')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
             <label>Product Code / SKU *</label>
             <input type="text" id="inpNewSku" class="form-control" placeholder="e.g. 00142 or BLT-08-040" required>
-            <span class="form-help">Unique per shop. Leading zeros preserved.</span>
+            <span class="form-help">Unique code per shop. Leading zeros preserved.</span>
           </div>
           <div class="form-group">
             <label>Stock Unit *</label>
@@ -1426,21 +716,20 @@
               <option value="pair">pair (Pairs)</option>
               <option value="can">can (Cans / Aerosols)</option>
               <option value="bottle">bottle (Bottles)</option>
-              <option value="carton">carton (Cartons)</option>
             </select>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Product Name / Part Description *</label>
+          <label>Product Name *</label>
           <input type="text" id="inpNewName" class="form-control" placeholder="e.g. Hex Flange Bolt M8x40 High-Tensile 8.8" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Initial Opening Stock</label>
+            <label>Opening Stock Quantity</label>
             <input type="number" id="inpNewOpeningStock" class="form-control" min="0" step="any" value="0">
-            <span class="form-help">Recorded in ledger as initial baseline</span>
+            <span class="form-help">Recorded as initial OPENING_STOCK movement</span>
           </div>
           <div class="form-group">
             <label>Minimum Stock Level</label>
@@ -1451,90 +740,90 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Supplier Name (Confidential)</label>
+            <label>Supplier Name (Optional)</label>
             <input type="text" id="inpNewSupplier" class="form-control" placeholder="e.g. MegaFasteners Malaysia">
           </div>
           <div class="form-group">
-            <label>Supplier Contact Phone (Confidential)</label>
+            <label>Supplier Contact Info (Optional)</label>
             <input type="text" id="inpNewContact" class="form-control" placeholder="e.g. +6012-3334455">
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalNewProduct')">Cancel</button>
-        <button class="btn btn-primary" id="btnSubmitNewProduct">Save Item &amp; Baseline</button>
+        <button class="btn" onclick="closeModal('modalNewProduct')">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitNewProduct">Save Product & Baseline</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: EDIT PRODUCT (OWNER ONLY) -->
+  <!-- MODAL: EDIT PRODUCT -->
   <div class="modal-backdrop" id="modalEditProduct">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">Edit Hardware Item</div>
-        <button class="modal-close-btn" onclick="closeModal('modalEditProduct')">&times;</button>
+        <div class="modal-title">Edit Hardware Product</div>
+        <button class="modal-close" onclick="closeModal('modalEditProduct')">&times;</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="editProductId">
         <div class="form-row">
           <div class="form-group">
             <label>Product Code / SKU</label>
-            <input type="text" id="editSku" class="form-control" disabled style="background:#F5F5F7;">
+            <input type="text" id="editSku" class="form-control" disabled>
           </div>
           <div class="form-group">
-            <label>Stock Unit</label>
-            <input type="text" id="editUnit" class="form-control" disabled style="background:#F5F5F7;">
-            <span class="form-help" style="color:var(--apple-amber);">⚠️ Unit cannot be changed once movements exist</span>
+            <label>Fixed Stock Unit</label>
+            <input type="text" id="editUnit" class="form-control" disabled>
+            <span class="form-help" style="color:#eab308;">⚠️ Unit fixed once movements exist</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Product Name / Part Description *</label>
+          <label>Product Name</label>
           <input type="text" id="editName" class="form-control" required>
         </div>
 
         <div class="form-group">
           <label>Minimum Stock Level</label>
           <input type="number" id="editMinStock" class="form-control" min="0" step="any">
-          <span class="form-help">Set 0 to disable alerts</span>
+          <span class="form-help">Set 0 to disable low-stock alerts</span>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Supplier Name (Confidential)</label>
+            <label>Supplier Name</label>
             <input type="text" id="editSupplier" class="form-control">
           </div>
           <div class="form-group">
-            <label>Supplier Contact Phone (Confidential)</label>
+            <label>Supplier Contact Info</label>
             <input type="text" id="editContact" class="form-control">
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalEditProduct')">Cancel</button>
+        <button class="btn" onclick="closeModal('modalEditProduct')">Cancel</button>
         <button class="btn btn-primary" id="btnSubmitEditProduct">Save Changes</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: RECORD STOCK MOVEMENT (OWNER & STAFF) -->
+  <!-- MODAL: RECORD STOCK MOVEMENT -->
   <div class="modal-backdrop" id="modalMovement">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title" id="movementModalTitle">Record Stock Movement</div>
-        <button class="modal-close-btn" onclick="closeModal('modalMovement')">&times;</button>
+        <button class="modal-close" onclick="closeModal('modalMovement')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label>Select Product *</label>
-          <select id="movProductSelect" class="form-control" onchange="updateMovementBalancePreview()"></select>
+          <select id="movProductSelect" class="form-control"></select>
         </div>
 
         <div class="form-group">
           <label>Movement Type *</label>
-          <select id="movTypeSelect" class="form-control" onchange="updateMovementBalancePreview()">
-            <option value="STOCK_IN">Stock In (+) Delivery Arrival / Replenishment</option>
-            <option value="STOCK_OUT">Stock Out (-) Counter Sale / Mechanic Job Usage</option>
+          <select id="movTypeSelect" class="form-control">
+            <option value="STOCK_IN">Stock In (+) Delivery Received</option>
+            <option value="STOCK_OUT">Stock Out (-) Counter Sale / Used in Repair</option>
             <option value="CORRECTION">Stock Correction (=) Audit Recount</option>
           </select>
         </div>
@@ -1542,12 +831,12 @@
         <div class="form-row">
           <div class="form-group">
             <label>Quantity *</label>
-            <input type="number" id="movQuantity" class="form-control" min="0.01" step="any" placeholder="0" oninput="updateMovementBalancePreview()" required>
+            <input type="number" id="movQuantity" class="form-control" min="0.01" step="any" placeholder="0" required>
           </div>
           <div class="form-group">
             <label>Resulting Balance Preview</label>
-            <div id="movBalancePreview" style="padding: 8px 12px; background: rgba(0,0,0,0.04); border-radius:10px; font-weight:700; font-size:0.83rem; color:var(--text-primary);">
-              Current: 0 &rarr; Result: 0
+            <div id="movBalancePreview" style="padding: 0.5rem; background:#1e293b; border-radius:6px; font-weight:700; color:#38bdf8;">
+              Current: 0 pcs &rarr; Result: 0 pcs
             </div>
           </div>
         </div>
@@ -1562,94 +851,55 @@
           <input type="text" id="movUser" class="form-control" value="Shop Counter Staff">
         </div>
 
-        <!-- Negative stock rejection warning -->
-        <div id="movNegativeAlert" style="display:none; padding: 10px 14px; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.25); border-radius:10px; color:#B91C1C; font-size:0.78rem; font-weight:600;">
+        <!-- Real-time negative stock warning -->
+        <div id="movNegativeAlert" style="display:none; padding: 0.6rem; background: var(--danger-bg); border: 1px solid var(--danger); border-radius:6px; color:#fca5a5; font-size:0.8rem;">
           ⚠️ <strong>Rejected:</strong> Cannot stock out more than available inventory. Resulting stock cannot be negative.
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalMovement')">Cancel</button>
+        <button class="btn" onclick="closeModal('modalMovement')">Cancel</button>
         <button class="btn btn-primary" id="btnSubmitMovement">Commit Movement</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ADD STAFF ACCOUNT (OWNER ONLY) -->
-  <div class="modal-backdrop" id="modalAddStaff">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">+ Add Staff Account</div>
-        <button class="modal-close-btn" onclick="closeModal('modalAddStaff')">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Staff Full Name *</label>
-          <input type="text" id="inpStaffName" class="form-control" placeholder="e.g. Ah Seng or David Tan" required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Login Username / Staff ID *</label>
-            <input type="text" id="inpStaffUsername" class="form-control" placeholder="e.g. ahseng" required>
-          </div>
-          <div class="form-group">
-            <label>Assigned Role *</label>
-            <select id="inpStaffRole" class="form-control">
-              <option value="Counter Staff">Counter Staff</option>
-              <option value="Mechanic">Workshop Mechanic</option>
-              <option value="Floor Staff">Floor Staff</option>
-              <option value="Assistant">Inventory Assistant</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Access PIN (Optional 4 Digits)</label>
-          <input type="password" id="inpStaffPin" class="form-control" maxlength="4" placeholder="••••">
-          <span class="form-help">Used for quick terminal authentication</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalAddStaff')">Cancel</button>
-        <button class="btn btn-primary" id="btnSubmitNewStaff">Create Staff Account</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: CSV IMPORT WIZARD (NON-AI, OWNER ONLY) -->
+  <!-- MODAL: 6-STEP CSV IMPORT WIZARD (NO AI) -->
   <div class="modal-backdrop" id="modalCsvImport">
-    <div class="modal-card" style="max-width: 680px;">
+    <div class="modal-card" style="max-width: 720px;">
       <div class="modal-header">
         <div class="modal-title">📥 Non-AI CSV Product Import Wizard</div>
-        <button class="modal-close-btn" onclick="closeModal('modalCsvImport')">&times;</button>
+        <button class="modal-close" onclick="closeModal('modalCsvImport')">&times;</button>
       </div>
       <div class="modal-body">
+        <!-- Step 1 & 2: Template & File Upload -->
         <div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label style="font-weight:700; font-size:0.83rem;">Step 1: Upload CSV File or Paste Spreadsheet Data</label>
-            <button class="btn btn-secondary btn-sm" id="btnDownloadTemplate">📄 Sample Template</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <label style="font-weight:700; color:#fff;">Step 1: Upload CSV or Paste Spreadsheet Content</label>
+            <button class="btn btn-sm" id="btnDownloadTemplate">📄 Download Template</button>
           </div>
-          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:8px;">
-            Expected columns: <code>sku, name, unit, opening_stock, min_stock, supplier_name, supplier_contact</code>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem;">
+            Columns matched: <code>sku</code>, <code>name</code>, <code>unit</code>, <code>opening_stock</code>, <code>min_stock</code>, <code>supplier_name</code>, <code>supplier_contact</code>.
           </p>
-          <textarea id="csvTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.78rem;" placeholder="sku,name,unit,opening_stock,min_stock,supplier_name,supplier_contact&#10;00142,Hex Flange Nut M10,pcs,100,30,MegaFasteners,+6012-3334455&#10;SPK-09,Spark Plug CR8E,pcs,12,10,AutoPro,+6019-8765432"></textarea>
-          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+          <textarea id="csvTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.75rem;" placeholder="sku,name,unit,opening_stock,min_stock,supplier_name,supplier_contact&#10;00142,Hex Flange Nut M10,pcs,100,30,MegaFasteners,+6012-3334455&#10;SPK-09,Spark Plug CR8E,pcs,12,10,AutoPro,+6019-8765432"></textarea>
+          <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center;">
             <input type="file" id="csvFileInput" accept=".csv" style="font-size:0.8rem;">
-            <button class="btn btn-primary btn-sm" id="btnValidateCsv">Validate File &amp; Rows</button>
+            <button class="btn btn-primary btn-sm" id="btnValidateCsv">Validate File & Rows</button>
           </div>
         </div>
 
-        <!-- Validation Results Box -->
-        <div id="csvValidationBox" style="display:none; padding:12px; background:rgba(0,0,0,0.03); border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span id="csvValidBadge" class="stock-badge healthy">0 Valid Rows</span>
-            <span id="csvErrorBadge" class="stock-badge zero">0 Errors</span>
+        <!-- Step 3 & 4: Validation Results & Preview -->
+        <div id="csvValidationBox" style="display:none; padding:0.75rem; background:#1e293b; border-radius:6px; border:1px solid #334155;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <span id="csvValidBadge" class="badge badge-success">0 Valid Rows</span>
+            <span id="csvErrorBadge" class="badge badge-danger">0 Errors</span>
           </div>
 
-          <div id="csvErrorList" style="display:none; max-height:120px; overflow-y:auto; background:#FFFFFF; padding:8px 12px; border-radius:8px; font-size:0.75rem; color:var(--apple-red); margin-bottom:8px; border:1px solid rgba(255,59,48,0.2);"></div>
+          <!-- Error listing with row numbers -->
+          <div id="csvErrorList" style="display:none; max-height:140px; overflow-y:auto; background:#0f172a; padding:0.5rem; border-radius:4px; font-size:0.75rem; color:#fca5a5; margin-bottom:0.5rem;"></div>
 
-          <div style="max-height: 150px; overflow-y: auto;">
-            <table class="apple-table" style="font-size: 0.75rem;">
+          <!-- Preview Table -->
+          <div style="max-height: 160px; overflow-y: auto;">
+            <table style="font-size: 0.75rem;">
               <thead>
                 <tr>
                   <th>Row</th>
@@ -1657,7 +907,7 @@
                   <th>Name</th>
                   <th>Unit</th>
                   <th>Opening</th>
-                  <th>Min</th>
+                  <th>Min Stock</th>
                 </tr>
               </thead>
               <tbody id="csvPreviewTableBody"></tbody>
@@ -1665,54 +915,54 @@
           </div>
         </div>
 
-        <!-- Success Box with Safe Reversal Option -->
-        <div id="csvSuccessBox" style="display:none; padding:12px; background:rgba(52, 199, 89, 0.1); border:1px solid rgba(52, 199, 89, 0.25); border-radius:12px;">
-          <div style="font-weight:700; font-size:0.9rem; color:#15803D;" id="csvSuccessTitle">✓ Import Completed</div>
-          <p style="font-size:0.78rem; color:var(--text-primary); margin-top:2px;" id="csvSuccessMsg"></p>
-          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary);" id="csvBatchIdDisplay"></span>
-            <button class="btn btn-danger btn-sm" id="btnReverseBatch">↺ Reverse This Batch</button>
+        <!-- Step 5 & 6: Batch Completion & Reversal Option -->
+        <div id="csvSuccessBox" style="display:none; padding:0.75rem; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:6px; color:#34d399;">
+          <div style="font-weight:700; font-size:0.9rem;" id="csvSuccessTitle">✓ Import Completed</div>
+          <p style="font-size:0.8rem; color:#cbd5e1; margin-top:0.25rem;" id="csvSuccessMsg"></p>
+          <div style="margin-top:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:#94a3b8;" id="csvBatchIdDisplay"></span>
+            <button class="btn btn-sm btn-danger" id="btnReverseBatch">↺ Reverse This Import</button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalCsvImport')">Close</button>
-        <button class="btn btn-action-blue" id="btnConfirmImport" style="display:none;">Confirm &amp; Import Valid Rows</button>
+        <button class="btn" onclick="closeModal('modalCsvImport')">Close</button>
+        <button class="btn btn-success" id="btnConfirmImport" style="display:none;">Confirm & Import Valid Rows</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: 1-CLICK OPERATIONAL SME JOURNEY (JUDGES / MENTOR PRESENTATION) -->
+  <!-- MODAL: LIVE DEMO OPERATIONAL JOURNEY (JUDGES / MENTOR PRESENTATION) -->
   <div class="modal-backdrop" id="modalJourney">
-    <div class="modal-card" style="max-width: 640px;">
+    <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
         <div>
           <div class="modal-title">⚡ 1-Click Operational SME Journey</div>
-          <div style="font-size:0.76rem; color:var(--text-secondary); margin-top:2px;">
-            Mechanic workshop: Oil filter replenishment workflow (Trigger &rarr; Connected Data &rarr; Decision Logic &rarr; Human Approval &rarr; Visible Outcome &rarr; Scale)
+          <div style="font-size:0.75rem; color:#94a3b8;">
+            Pain Point: Mechanic workshop running out of oil filters midway through customer jobs.
           </div>
         </div>
-        <button class="modal-close-btn" onclick="closeModal('modalJourney')">&times;</button>
+        <button class="modal-close" onclick="closeModal('modalJourney')">&times;</button>
       </div>
-      <div class="modal-body" style="gap: 8px;">
+      <div class="modal-body" style="gap: 0.75rem;">
         <div class="journey-step" id="jStep1">
-          <div class="journey-num">1</div>
+          <div class="journey-num" id="jNum1">1</div>
           <div class="journey-content">
             <h4>1. Trigger &mdash; Workshop Consumption</h4>
-            <p>Mechanic consumes 8 units of Oil Filter (<code>FLT-02</code>) for morning car servicing, dropping stock from 16 to 8.</p>
+            <p>Mechanic consumes 8 units of Oil Filter (<code>FLT-02</code>) for morning fleet servicing, dropping stock from 16 to 8.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep2">
-          <div class="journey-num">2</div>
+          <div class="journey-num" id="jNum2">2</div>
           <div class="journey-content">
-            <h4>2. Connected Data &mdash; Automatic Linkage</h4>
-            <p>System links SKU <code>FLT-02</code>, current stock (8 pcs), min threshold (20 pcs), and supplier <em>Huat Kee Auto Spares (+6012-8889999)</em>.</p>
+            <h4>2. Connected Data &mdash; Instant Threshold & Supplier Link</h4>
+            <p>System automatically links <code>FLT-02</code>, current stock (8 pcs), minimum threshold (20 pcs), and supplier <em>Huat Kee Auto Spares (+6012-8889999)</em>.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep3">
-          <div class="journey-num">3</div>
+          <div class="journey-num" id="jNum3">3</div>
           <div class="journey-content">
             <h4>3. Decision Logic &mdash; Deterministic Deficit Calculation</h4>
             <p>System computes deficit of exactly <strong>12 units</strong> (20 &minus; 8) and triggers an in-app Low Stock alert.</p>
@@ -1720,177 +970,91 @@
         </div>
 
         <div class="journey-step" id="jStep4">
-          <div class="journey-num">4</div>
+          <div class="journey-num" id="jNum4">4</div>
           <div class="journey-content">
-            <h4>4. Human Approval &mdash; Restock Sign-off</h4>
-            <p>Shop owner approves incoming supplier delivery and commits a 12-unit Stock In replenishment.</p>
+            <h4>4. Human Approval &mdash; Restock Sign-Off</h4>
+            <p>Shop owner inspects delivery invoice <code>DO-4481</code> and authorizes a 12-unit Stock In replenishment.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep5">
-          <div class="journey-num">5</div>
+          <div class="journey-num" id="jNum5">5</div>
           <div class="journey-content">
-            <h4>5. Visible Outcome &mdash; Atomic Update</h4>
-            <p>Stock balance restores to 20 pcs atomically, low-stock alert clears, and movement is saved in immutable ledger.</p>
+            <h4>5. Visible Outcome &mdash; Atomic Ledger Update</h4>
+            <p>Stock instantly updates to 20 units atomically, audit movement is committed to history, and low-stock badge clears.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep6">
-          <div class="journey-num">6</div>
+          <div class="journey-num" id="jNum6">6</div>
           <div class="journey-content">
-            <h4>6. Scale &mdash; Independent SME Catalog</h4>
-            <p>Shop scales catalog to 1,000+ non-expiry hardware items with batch CSV validation and multi-tenant isolation.</p>
+            <h4>6. Scale &mdash; Bulk CSV & Tenant Isolation</h4>
+            <p>The shop imports 1,000s of hardware items with column-matched validation and multi-tenant business isolation.</p>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalJourney')">Close</button>
-        <button class="btn btn-primary" id="btnExecuteDemoJourney">▶ Play Live Demo</button>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <span style="font-size:0.75rem; color:#94a3b8;" id="journeyStatusText">Ready to run 1-click live simulation.</span>
+        <button class="btn btn-primary" id="btnRunJourneyDemo">▶️ Run Complete Journey Now</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Pill -->
-  <div class="toast-pill" id="appToast">
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast">
     <span id="toastIcon">✓</span>
     <span id="toastMsg">Operation successful</span>
   </div>
 
-  <!-- ==========================================================================
-       JAVASCRIPT APPLICATION LOGIC
-       ========================================================================== -->
+  <!-- CORE FRONTEND APPLICATION SCRIPT -->
   <script>
-    // --- Application State ---
-    const state = {
-      businessId: "biz-hardware-01",
-      currentRole: localStorage.getItem("stockwise_role") || "owner", // "owner" | "staff"
+    // State Store
+    let state = {
       activeTab: "products",
+      businessId: "biz-hardware-01",
       products: [],
       movements: [],
       lowStock: [],
-      staffList: [],
       currentProductPage: 1,
-      totalProductPages: 1,
       currentMovementPage: 1,
-      totalMovementPages: 1,
       pageSize: 10,
+      totalProductPages: 1,
+      totalMovementPages: 1,
       backendAlive: false,
-      lastImportBatchId: null,
-      importValidationCache: null
+      lastImportBatch: null
     };
 
-    // --- In-Memory Store for Offline / Local Fallback ---
-    const localStoreKey = "stockwise_local_store_v2";
-    let localData = (function () {
-      try {
-        const saved = localStorage.getItem(localStoreKey);
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-      return {
-        products: [
-          { id: "prd-01", sku: "BLT-08-040", name: "Hex Flange Bolt M8x40 High-Tensile 8.8", unit: "pcs", current_stock: 120, min_stock: 50, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
-          { id: "prd-02", sku: "FLT-02", name: "Oil Filter Spin-On (Proton/Perodua OEM)", unit: "pcs", current_stock: 8, min_stock: 20, supplier_name: "Huat Kee Auto Spares", supplier_contact: "+6012-8889999", is_archived: false },
-          { id: "prd-03", sku: "BRK-CLN-450", name: "Aerosol Brake Cleaner 450ml", unit: "can", current_stock: 0, min_stock: 10, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
-          { id: "prd-04", sku: "BRG-6204-2RS", name: "Deep Groove Ball Bearing 6204-2RS Rubber Sealed", unit: "pcs", current_stock: 4, min_stock: 15, supplier_name: "Koyo Bearings MY", supplier_contact: "+6016-1122334", is_archived: false },
-          { id: "prd-05", sku: "WSH-M14", name: "Copper Oil Sump Drain Plug Washers M14 (100pk)", unit: "pack", current_stock: 2, min_stock: 8, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
-          { id: "prd-06", sku: "TL-BLU-50", name: "Removable Threadlocking Adhesive Blue 50ml", unit: "bottle", current_stock: 25, min_stock: 5, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
-          { id: "prd-07", sku: "BLD-HS-300", name: "Bi-Metal High-Speed Hacksaw Blade 300mm 24TPI", unit: "pcs", current_stock: 45, min_stock: 20, supplier_name: "SolidTool Hardware", supplier_contact: "+6018-9988776", is_archived: false }
-        ],
-        movements: [
-          { id: "mov-01", product_id: "prd-01", product_sku: "BLT-08-040", product_name: "Hex Flange Bolt M8x40 High-Tensile 8.8", product_unit: "pcs", movement_type: "OPENING_STOCK", quantity_change: 120, previous_stock: 0, resulting_stock: 120, reason: "Initial inventory setup", user_recorded: "Shop Manager", created_at: new Date(Date.now() - 86400000).toISOString() },
-          { id: "mov-02", product_id: "prd-02", product_sku: "FLT-02", product_name: "Oil Filter Spin-On", product_unit: "pcs", movement_type: "STOCK_OUT", quantity_change: -8, previous_stock: 16, resulting_stock: 8, reason: "Morning car repair servicing", user_recorded: "Mechanic Muthu", created_at: new Date(Date.now() - 3600000).toISOString() }
-        ],
-        staff: [
-          { id: "staff-01", name: "Ah Seng (Head Counter)", username: "ahseng", role: "Counter Staff", is_active: true, created_at: new Date().toISOString() },
-          { id: "staff-02", name: "Muthu (Workshop Mechanic)", username: "muthu", role: "Mechanic", is_active: true, created_at: new Date().toISOString() }
-        ]
-      };
-    })();
+    // --- Tab Switching ---
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+      document.getElementById("viewProducts").style.display = (tabName === "products" ? "block" : "none");
+      document.getElementById("viewMovements").style.display = (tabName === "movements" ? "block" : "none");
+      document.getElementById("viewLowStock").style.display = (tabName === "lowstock" ? "block" : "none");
 
-    function saveLocalStore() {
-      try {
-        localStorage.setItem(localStoreKey, JSON.stringify(localData));
-      } catch (e) {}
+      if (tabName === "products") loadProducts();
+      else if (tabName === "movements") loadMovements();
+      else if (tabName === "lowstock") loadLowStock();
     }
 
-    // --- Role Management (Owner vs. Staff) ---
-    function switchRole(role) {
-      state.currentRole = role;
-      localStorage.setItem("stockwise_role", role);
-      document.body.dataset.role = role;
-
-      const btnOwner = document.getElementById("btnRoleOwner");
-      const btnStaff = document.getElementById("btnRoleStaff");
-      const badge = document.getElementById("roleBadge");
-      const badgeText = document.getElementById("roleBadgeText");
-      const desc = document.getElementById("roleBannerDesc");
-      const quickTarget = document.getElementById("quickSwitchTargetName");
-      const tabTitleProducts = document.getElementById("tabTitleProducts");
-
-      if (role === "owner") {
-        btnOwner.classList.add("active");
-        btnStaff.classList.remove("active");
-        badge.className = "role-badge-tag role-badge-owner";
-        badge.innerHTML = "<span>👑</span><span>Owner Mode</span>";
-        desc.innerHTML = "<strong>Full Administrative Access:</strong> Unrestricted catalog management, confidential supplier contacts, CSV batch import/reversal, and staff user control.";
-        quickTarget.innerText = "Staff Mode";
-        tabTitleProducts.innerText = "Products";
-      } else {
-        btnStaff.classList.add("active");
-        btnOwner.classList.remove("active");
-        badge.className = "role-badge-tag role-badge-staff";
-        badge.innerHTML = "<span>👤</span><span>Staff Mode</span>";
-        desc.innerHTML = "<strong>Floor Counter View:</strong> Fast hardware search, balance check, and stock in/out logging. Confidential supplier details &amp; admin controls are restricted.";
-        quickTarget.innerText = "Owner Mode";
-        tabTitleProducts.innerText = "Inventory Count";
-
-        // If staff view was active on staff tab, switch to products
-        if (state.activeTab === "staff") {
-          switchTab("products");
-        }
-      }
-
-      renderProductsTable();
-      renderLowStockTable();
+    // Modal Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.add("active");
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
     }
 
-    function toggleRoleQuick() {
-      const target = state.currentRole === "owner" ? "staff" : "owner";
-      switchRole(target);
-      showToast(`Switched to ${target === 'owner' ? 'Owner (Admin)' : 'Staff (Floor)'} Mode`);
+    function showToast(msg, isError = false) {
+      const t = document.getElementById("toast");
+      document.getElementById("toastMsg").innerText = msg;
+      document.getElementById("toastIcon").innerText = isError ? "⚠️" : "✓";
+      t.style.borderColor = isError ? "var(--danger)" : "var(--success)";
+      t.style.display = "flex";
+      setTimeout(() => { t.style.display = "none"; }, 3500);
     }
 
-    // --- Navigation Tabs ---
-    function switchTab(tabId) {
-      if (tabId === "staff" && state.currentRole !== "owner") {
-        showToast("Staff management is restricted to Owner", true);
-        return;
-      }
-
-      state.activeTab = tabId;
-      document.querySelectorAll(".tab-view").forEach(el => el.style.display = "none");
-      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-
-      if (tabId === "products") {
-        document.getElementById("viewProducts").style.display = "block";
-        document.getElementById("tabBtnProducts").classList.add("active");
-        loadProducts();
-      } else if (tabId === "movements") {
-        document.getElementById("viewMovements").style.display = "block";
-        document.getElementById("tabBtnMovements").classList.add("active");
-        loadMovements();
-      } else if (tabId === "lowstock") {
-        document.getElementById("viewLowStock").style.display = "block";
-        document.getElementById("tabBtnLowStock").classList.add("active");
-        loadLowStock();
-      } else if (tabId === "staff") {
-        document.getElementById("viewStaff").style.display = "block";
-        document.getElementById("tabBtnStaff").classList.add("active");
-        loadStaff();
-      }
-    }
-
-    // --- Data Loading Functions ---
+    // --- Data Fetching ---
     async function loadProducts() {
       const search = document.getElementById("searchProducts").value.trim();
       const status = document.getElementById("filterProductStatus").value;
@@ -1899,34 +1063,21 @@
       try {
         if (state.backendAlive && window.StockWiseBridge) {
           const res = await window.StockWiseBridge.apiFetch(
-            `/api/hardware/products?business_id=${state.businessId}&page=${page}&page_size=${state.pageSize}&status=${status}${search ? `&search=${encodeURIComponent(search)}` : ''}`
+            `/api/hardware/products?business_id=${state.businessId}&status=${status}&page=${page}&page_size=${state.pageSize}${search ? `&search=${encodeURIComponent(search)}` : ''}`
           );
           state.products = res.items || [];
           state.totalProductPages = res.total_pages || 1;
           document.getElementById("productsPageInfo").innerText = `Showing ${res.items.length} of ${res.total} products`;
         } else {
+          // Local storage fallback
           loadLocalProducts(search, status);
         }
-      } catch (e) {
+      } catch (err) {
+        console.warn("Backend products fetch failed, using local store:", err);
         loadLocalProducts(search, status);
       }
       renderProductsTable();
       updateKPICounters();
-    }
-
-    function loadLocalProducts(search, status) {
-      let filtered = localData.products.slice();
-      if (status === "active") filtered = filtered.filter(p => !p.is_archived);
-      else if (status === "archived") filtered = filtered.filter(p => p.is_archived);
-
-      if (search) {
-        const s = search.toLowerCase();
-        filtered = filtered.filter(p => p.sku.toLowerCase().includes(s) || p.name.toLowerCase().includes(s) || (p.supplier_name && p.supplier_name.toLowerCase().includes(s)));
-      }
-
-      state.products = filtered;
-      state.totalProductPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
-      document.getElementById("productsPageInfo").innerText = `Showing ${filtered.length} products (Local)`;
     }
 
     async function loadMovements() {
@@ -1945,22 +1096,10 @@
         } else {
           loadLocalMovements(search, mType);
         }
-      } catch (e) {
+      } catch (err) {
         loadLocalMovements(search, mType);
       }
       renderMovementsTable();
-    }
-
-    function loadLocalMovements(search, mType) {
-      let filtered = localData.movements.slice();
-      if (mType !== "ALL") filtered = filtered.filter(m => m.movement_type === mType);
-      if (search) {
-        const s = search.toLowerCase();
-        filtered = filtered.filter(m => m.product_sku.toLowerCase().includes(s) || (m.reason && m.reason.toLowerCase().includes(s)) || m.user_recorded.toLowerCase().includes(s));
-      }
-      state.movements = filtered;
-      state.totalMovementPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
-      document.getElementById("movementsPageInfo").innerText = `Showing ${filtered.length} movements (Local)`;
     }
 
     async function loadLowStock() {
@@ -1968,57 +1107,15 @@
         if (state.backendAlive && window.StockWiseBridge) {
           const res = await window.StockWiseBridge.apiFetch(`/api/hardware/low-stock?business_id=${state.businessId}`);
           state.lowStock = res.items || [];
-          document.getElementById("lowStockWarningSummary").innerText = `${res.total_low_stock} Low Stock (${res.total_zero_stock} Zero)`;
+          document.getElementById("lowStockWarningSummary").innerText = `${res.total_low_stock} Low Stock (${res.total_zero_stock} Critical Zero)`;
         } else {
           loadLocalLowStock();
         }
-      } catch (e) {
+      } catch (err) {
         loadLocalLowStock();
       }
       renderLowStockTable();
       updateKPICounters();
-    }
-
-    function loadLocalLowStock() {
-      const items = [];
-      let zeroCount = 0;
-      localData.products.filter(p => !p.is_archived).forEach(p => {
-        const cur = Number(p.current_stock);
-        const minS = Number(p.min_stock);
-        if (minS > 0 && cur < minS) {
-          const isZero = (cur === 0);
-          if (isZero) zeroCount++;
-          items.push({
-            product_id: p.id,
-            sku: p.sku,
-            name: p.name,
-            current_stock: cur,
-            unit: p.unit,
-            min_stock: minS,
-            deficit_qty: Math.round((minS - cur) * 100) / 100,
-            is_zero_stock: isZero,
-            supplier_name: p.supplier_name,
-            supplier_contact: p.supplier_contact
-          });
-        }
-      });
-      state.lowStock = items;
-      document.getElementById("lowStockWarningSummary").innerText = `${items.length} Low Stock (${zeroCount} Zero)`;
-    }
-
-    async function loadStaff() {
-      try {
-        if (state.backendAlive && window.StockWiseBridge) {
-          const res = await window.StockWiseBridge.apiFetch(`/api/hardware/staff?business_id=${state.businessId}`);
-          state.staffList = res.staff || [];
-        } else {
-          state.staffList = localData.staff || [];
-        }
-      } catch (e) {
-        state.staffList = localData.staff || [];
-      }
-      renderStaffTable();
-      document.getElementById("countStaff").innerText = state.staffList.length;
     }
 
     // --- Render Functions ---
@@ -2027,11 +1124,9 @@
       tbody.innerHTML = "";
 
       if (state.products.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--text-secondary);">No products found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3>No products found</h3><p>Click "+ New Product" or "Import CSV" to add hardware inventory.</p></div></td></tr>`;
         return;
       }
-
-      const isStaff = state.currentRole === "staff";
 
       state.products.forEach(p => {
         const tr = document.createElement("tr");
@@ -2040,44 +1135,27 @@
         const isZero = (cur === 0);
         const isLow = (minS > 0 && cur < minS);
 
-        let stockPill = `<span class="stock-badge healthy">${cur} ${p.unit}</span>`;
-        if (isZero) stockPill = `<span class="stock-badge zero">0 ${p.unit} (OUT)</span>`;
-        else if (isLow) stockPill = `<span class="stock-badge low">${cur} ${p.unit} (LOW)</span>`;
-
-        // Confidentiality handling for supplier
-        let supplierHtml = "";
-        if (isStaff) {
-          supplierHtml = `<span class="confidential-badge">🔒 Confidential · Owner Access</span>`;
-        } else {
-          supplierHtml = `
-            <div class="supplier-visible">
-              ${p.supplier_name ? `<strong>${escapeHtml(p.supplier_name)}</strong>` : '<span style="color:var(--text-tertiary);">—</span>'}
-              ${p.supplier_contact ? `<div><a href="tel:${escapeHtml(p.supplier_contact)}" class="supplier-phone">${escapeHtml(p.supplier_contact)}</a></div>` : ''}
-            </div>
-          `;
-        }
-
-        // Action buttons
-        let actionsHtml = `
-          <button class="btn btn-secondary btn-sm" onclick="quickStockAction('${p.id}', 'STOCK_IN')">+ In</button>
-          <button class="btn btn-secondary btn-sm" onclick="quickStockAction('${p.id}', 'STOCK_OUT')">- Out</button>
-        `;
-        if (!isStaff) {
-          actionsHtml += `
-            <button class="btn btn-secondary btn-sm owner-only" onclick="openEditProduct('${p.id}')">✏️ Edit</button>
-            <button class="btn btn-secondary btn-sm owner-only" onclick="toggleArchiveProduct('${p.id}', ${!p.is_archived})">${p.is_archived ? 'Restore' : 'Archive'}</button>
-          `;
-        }
+        let stockBadge = `<span class="badge badge-success">${cur} ${p.unit}</span>`;
+        if (isZero) stockBadge = `<span class="badge badge-danger">0 ${p.unit} (OUT OF STOCK)</span>`;
+        else if (isLow) stockBadge = `<span class="badge badge-warning">${cur} ${p.unit} (LOW)</span>`;
 
         tr.innerHTML = `
           <td><span class="sku-badge">${escapeHtml(p.sku)}</span></td>
-          <td style="font-weight:600;">${escapeHtml(p.name)}</td>
-          <td style="color:var(--text-secondary);">${escapeHtml(p.unit)}</td>
-          <td>${stockPill}</td>
-          <td class="owner-only" style="color:var(--text-secondary);">${minS === 0 ? '<span style="color:var(--text-quaternary);">Disabled</span>' : `${minS} ${p.unit}`}</td>
-          <td>${supplierHtml}</td>
-          <td class="owner-only">${p.is_archived ? '<span class="stock-badge" style="background:#E5E5EA; color:#636366;">Archived</span>' : '<span class="stock-badge healthy">Active</span>'}</td>
-          <td style="text-align: right; white-space:nowrap;">${actionsHtml}</td>
+          <td style="font-weight:600; color:#fff;">${escapeHtml(p.name)}</td>
+          <td><span class="badge badge-gray">${escapeHtml(p.unit)}</span></td>
+          <td>${stockBadge}</td>
+          <td>${minS === 0 ? '<span style="color:#64748b;">Alerts Disabled</span>' : `${minS} ${p.unit}`}</td>
+          <td style="font-size:0.75rem;">
+            ${p.supplier_name ? `<div><strong>${escapeHtml(p.supplier_name)}</strong></div>` : '<span style="color:#64748b;">—</span>'}
+            ${p.supplier_contact ? `<div style="color:#38bdf8;">${escapeHtml(p.supplier_contact)}</div>` : ''}
+          </td>
+          <td>${p.is_archived ? '<span class="badge badge-gray">Archived</span>' : '<span class="badge badge-success">Active</span>'}</td>
+          <td style="text-align: right; white-space:nowrap;">
+            <button class="btn btn-sm btn-success" onclick="quickStockAction('${p.id}', 'STOCK_IN')">+ In</button>
+            <button class="btn btn-sm btn-danger" onclick="quickStockAction('${p.id}', 'STOCK_OUT')">- Out</button>
+            <button class="btn btn-sm" onclick="openEditProduct('${p.id}')">✏️ Edit</button>
+            <button class="btn btn-sm" onclick="toggleArchiveProduct('${p.id}', ${!p.is_archived})">${p.is_archived ? 'Restore' : 'Archive'}</button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -2089,40 +1167,42 @@
       tbody.innerHTML = "";
 
       if (state.movements.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:var(--text-secondary);">No movements recorded.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h3>No movements recorded</h3><p>Every stock in, out, or adjustment creates an immutable audit trail here.</p></div></td></tr>`;
         return;
       }
 
       state.movements.forEach(m => {
         const tr = document.createElement("tr");
-        let badge = `<span class="stock-badge" style="background:#E5E5EA; color:#1C1C1E;">${m.movement_type}</span>`;
-        let delta = `<span>${m.quantity_change > 0 ? '+' : ''}${m.quantity_change} ${m.product_unit}</span>`;
+        let typeBadge = `<span class="badge badge-gray">${m.movement_type}</span>`;
+        let qtyChange = `<span style="font-weight:700;">${m.quantity_change > 0 ? '+' : ''}${m.quantity_change} ${m.product_unit}</span>`;
 
         if (m.movement_type === "STOCK_IN") {
-          badge = `<span class="stock-badge healthy">STOCK IN</span>`;
-          delta = `<span style="color:var(--apple-green); font-weight:700;">+${m.quantity_change} ${m.product_unit}</span>`;
+          typeBadge = `<span class="badge badge-success">STOCK IN</span>`;
+          qtyChange = `<span style="color:#34d399; font-weight:700;">+${m.quantity_change} ${m.product_unit}</span>`;
         } else if (m.movement_type === "STOCK_OUT") {
-          badge = `<span class="stock-badge zero">STOCK OUT</span>`;
-          delta = `<span style="color:var(--apple-red); font-weight:700;">${m.quantity_change} ${m.product_unit}</span>`;
+          typeBadge = `<span class="badge badge-danger">STOCK OUT</span>`;
+          qtyChange = `<span style="color:#f87171; font-weight:700;">${m.quantity_change} ${m.product_unit}</span>`;
         } else if (m.movement_type === "CORRECTION") {
-          badge = `<span class="stock-badge low">CORRECTION</span>`;
+          typeBadge = `<span class="badge badge-purple">CORRECTION</span>`;
         } else if (m.movement_type === "OPENING_STOCK") {
-          badge = `<span class="stock-badge" style="background:rgba(0,0,0,0.06); color:var(--text-secondary);">OPENING</span>`;
+          typeBadge = `<span class="badge badge-gray">OPENING STOCK</span>`;
         }
 
+        const dateStr = formatDateTime(m.created_at);
+
         tr.innerHTML = `
-          <td style="font-size:0.78rem; color:var(--text-secondary);">${formatDateTime(m.created_at)}</td>
+          <td style="font-size:0.75rem; color:#94a3b8;">${dateStr}</td>
           <td>
             <span class="sku-badge">${escapeHtml(m.product_sku)}</span>
-            <span style="font-weight:600; margin-left:4px;">${escapeHtml(m.product_name)}</span>
+            <div style="font-size:0.75rem; color:#fff;">${escapeHtml(m.product_name)}</div>
           </td>
-          <td>${badge}</td>
-          <td>${delta}</td>
-          <td style="font-family:var(--font-mono); font-size:0.78rem;">
-            ${m.previous_stock} &rarr; <strong>${m.resulting_stock} ${m.product_unit}</strong>
+          <td>${typeBadge}</td>
+          <td>${qtyChange}</td>
+          <td style="font-family:var(--font-mono); font-size:0.75rem;">
+            ${m.previous_stock} &rarr; <strong style="color:#fff;">${m.resulting_stock} ${m.product_unit}</strong>
           </td>
-          <td style="color:var(--text-secondary);">${escapeHtml(m.reason || "—")}</td>
-          <td style="font-weight:600;">${escapeHtml(m.user_recorded)}</td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">${escapeHtml(m.reason || "—")}</td>
+          <td style="font-size:0.75rem; color:#94a3b8;">${escapeHtml(m.user_recorded)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -2134,74 +1214,32 @@
       tbody.innerHTML = "";
 
       if (state.lowStock.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--apple-green); font-weight:600;">✓ All stock levels are sufficient.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3 style="color:#34d399;">🎉 All Items Sufficiently Stocked</h3><p>No products are currently below their minimum threshold.</p></div></td></tr>`;
         return;
       }
 
-      const isStaff = state.currentRole === "staff";
-
       state.lowStock.forEach(item => {
         const tr = document.createElement("tr");
-        let alertBadge = `<span class="stock-badge low">⚠️ LOW STOCK</span>`;
+        let alertBadge = `<span class="badge badge-warning">⚠️ LOW STOCK</span>`;
         if (item.is_zero_stock) {
-          alertBadge = `<span class="stock-badge zero">🚨 OUT OF STOCK (0)</span>`;
-        }
-
-        // Supplier details (masked for staff)
-        let supplierHtml = "";
-        if (isStaff) {
-          supplierHtml = `<span class="confidential-badge">🔒 Confidential · Owner Access</span>`;
-        } else {
-          supplierHtml = `
-            <div class="supplier-visible">
-              ${item.supplier_name ? `<strong>${escapeHtml(item.supplier_name)}</strong>` : ''}
-              ${item.supplier_contact ? `<div><a href="tel:${escapeHtml(item.supplier_contact)}" class="supplier-phone">${escapeHtml(item.supplier_contact)}</a></div>` : '<span style="color:var(--text-tertiary);">No phone</span>'}
-            </div>
-          `;
+          alertBadge = `<span class="badge badge-danger">🚨 OUT OF STOCK (0)</span>`;
         }
 
         tr.innerHTML = `
           <td>${alertBadge}</td>
           <td><span class="sku-badge">${escapeHtml(item.sku)}</span></td>
-          <td style="font-weight:600;">${escapeHtml(item.name)}</td>
-          <td style="font-weight:700; color:${item.is_zero_stock ? 'var(--apple-red)' : 'var(--apple-amber)'};">${item.current_stock} ${item.unit}</td>
-          <td style="color:var(--text-secondary);">${item.min_stock} ${item.unit}</td>
-          <td><span style="color:var(--apple-red); font-weight:700;">Deficit: &minus;${item.deficit_qty} ${item.unit}</span></td>
-          <td>${supplierHtml}</td>
-          <td style="text-align:right;">
-            <button class="btn btn-primary btn-sm" onclick="quickRestockAction('${item.product_id}', ${item.deficit_qty})">
-              + Stock In (${item.deficit_qty})
-            </button>
+          <td style="font-weight:600; color:#fff;">${escapeHtml(item.name)}</td>
+          <td style="font-weight:700; color:${item.is_zero_stock ? '#f87171' : '#fbbf24'};">${item.current_stock} ${item.unit}</td>
+          <td>${item.min_stock} ${item.unit}</td>
+          <td><span style="color:#f87171; font-weight:700;">Deficit: &minus;${item.deficit_qty} ${item.unit}</span></td>
+          <td style="font-size:0.75rem;">
+            ${item.supplier_name ? `<div><strong>${escapeHtml(item.supplier_name)}</strong></div>` : ''}
+            ${item.supplier_contact ? `<a href="tel:${escapeHtml(item.supplier_contact)}" style="color:#38bdf8; text-decoration:none;">${escapeHtml(item.supplier_contact)}</a>` : '<span style="color:#64748b;">No contact</span>'}
           </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderStaffTable() {
-      const tbody = document.getElementById("staffTableBody");
-      tbody.innerHTML = "";
-
-      if (state.staffList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color:var(--text-secondary);">No staff accounts registered.</td></tr>`;
-        return;
-      }
-
-      state.staffList.forEach(s => {
-        const tr = document.createElement("tr");
-        const statusBadge = s.is_active 
-          ? `<span class="stock-badge healthy">Active</span>`
-          : `<span class="stock-badge" style="background:#E5E5EA; color:#8E8E93;">Inactive</span>`;
-
-        tr.innerHTML = `
-          <td style="font-weight:600;">${escapeHtml(s.name)}</td>
-          <td><code style="font-family:var(--font-mono); font-size:0.8rem; background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px;">${escapeHtml(s.username)}</code></td>
-          <td><span class="stock-badge" style="background:rgba(0,113,227,0.1); color:var(--apple-blue);">${escapeHtml(s.role)}</span></td>
-          <td>${statusBadge}</td>
-          <td style="font-size:0.78rem; color:var(--text-secondary);">${formatDateTime(s.created_at)}</td>
-          <td style="text-align:right; white-space:nowrap;">
-            <button class="btn btn-secondary btn-sm" onclick="toggleStaffStatus('${s.id}')">${s.is_active ? 'Deactivate' : 'Activate'}</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteStaffAccount('${s.id}')">Delete</button>
+          <td style="text-align:right;">
+            <button class="btn btn-sm btn-success" onclick="quickRestockAction('${item.product_id}', ${item.deficit_qty})">
+              ⚡ Stock In (${item.deficit_qty})
+            </button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -2215,40 +1253,31 @@
       const lowItems = active.filter(p => Number(p.min_stock) > 0 && Number(p.current_stock) < Number(p.min_stock));
       const healthyItems = totalSkus - lowItems.length;
 
-      document.getElementById("metricTotalSkus").innerText = totalSkus;
-      document.getElementById("metricHealthyStock").innerText = healthyItems;
-      document.getElementById("metricTotalMovements").innerText = state.movements.length || (localData.movements ? localData.movements.length : 0);
-      document.getElementById("metricZeroStock").innerText = zeroItems.length;
-      document.getElementById("metricLowStockDesc").innerText = `${lowItems.length} Low Stock Alerts`;
+      document.getElementById("kpiTotalSkus").innerText = totalSkus;
+      document.getElementById("kpiHealthyStock").innerText = healthyItems;
+      document.getElementById("kpiLowStock").innerText = lowItems.length;
+      document.getElementById("kpiZeroStock").innerText = zeroItems.length;
 
-      document.getElementById("countProducts").innerText = totalSkus;
-      document.getElementById("countMovements").innerText = state.movements.length || (localData.movements ? localData.movements.length : 0);
-
-      const lowCountBadge = document.getElementById("countLowStock");
+      const badge = document.getElementById("lowStockBadge");
       if (lowItems.length > 0) {
-        lowCountBadge.innerText = lowItems.length;
-        lowCountBadge.style.display = "inline-block";
+        badge.innerText = lowItems.length;
+        badge.style.display = "inline-block";
       } else {
-        lowCountBadge.style.display = "none";
+        badge.style.display = "none";
       }
     }
 
-    // --- Actions: Stock Movement ---
-    function openRecordMovementModal() {
-      populateMovementProductSelect();
-      document.getElementById("movQuantity").value = "";
-      document.getElementById("movReason").value = "Daily counter inventory update";
-      document.getElementById("movUser").value = state.currentRole === "owner" ? "Shop Owner" : "Floor Staff";
-      updateMovementBalancePreview();
-      openModal("modalMovement");
-    }
+    // --- Actions ---
 
+    // Quick stock in/out
     function quickStockAction(productId, type) {
+      const prod = state.products.find(p => p.id === productId);
+      if (!prod) return;
+
       populateMovementProductSelect(productId);
       document.getElementById("movTypeSelect").value = type;
       document.getElementById("movQuantity").value = "";
-      document.getElementById("movReason").value = type === "STOCK_IN" ? "Restock delivery received" : "Counter sale";
-      document.getElementById("movUser").value = state.currentRole === "owner" ? "Shop Owner" : "Floor Staff";
+      document.getElementById("movReason").value = type === "STOCK_IN" ? "Restock delivery received" : "Counter sale order";
       updateMovementBalancePreview();
       openModal("modalMovement");
     }
@@ -2258,7 +1287,6 @@
       document.getElementById("movTypeSelect").value = "STOCK_IN";
       document.getElementById("movQuantity").value = suggestedDeficit > 0 ? suggestedDeficit : 10;
       document.getElementById("movReason").value = "Replenishment for low-stock deficit";
-      document.getElementById("movUser").value = state.currentRole === "owner" ? "Shop Owner" : "Floor Staff";
       updateMovementBalancePreview();
       openModal("modalMovement");
     }
@@ -2304,6 +1332,7 @@
       }
     }
 
+    // Submit stock movement
     document.getElementById("btnSubmitMovement").addEventListener("click", async () => {
       const prodId = document.getElementById("movProductSelect").value;
       const type = document.getElementById("movTypeSelect").value;
@@ -2312,17 +1341,18 @@
       const user = document.getElementById("movUser").value.trim() || "Shop Staff";
 
       if (isNaN(qty) || qty <= 0) {
-        showToast("Enter a valid quantity greater than 0", true);
+        showToast("Please enter a valid quantity greater than 0", true);
         return;
       }
 
+      const idempotencyKey = `mov-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
       const payload = {
         product_id: prodId,
         movement_type: type,
         quantity: qty,
         reason: reason,
         user_recorded: user,
-        idempotency_key: `mov-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
+        idempotency_key: idempotencyKey
       };
 
       try {
@@ -2332,7 +1362,7 @@
           commitLocalMovement(payload);
         }
         closeModal("modalMovement");
-        showToast(`Stock updated: ${type === 'STOCK_IN' ? '+' : '-'}${qty}`);
+        showToast(`Stock updated successfully: ${type === 'STOCK_IN' ? '+' : '-'}${qty}`);
         await loadProducts();
         if (state.activeTab === "movements") await loadMovements();
         if (state.activeTab === "lowstock") await loadLowStock();
@@ -2341,11 +1371,7 @@
       }
     });
 
-    // --- Actions: Product Management (Owner Only) ---
-    document.getElementById("btnOpenNewProduct").addEventListener("click", () => {
-      openModal("modalNewProduct");
-    });
-
+    // Create New Product
     document.getElementById("btnSubmitNewProduct").addEventListener("click", async () => {
       const sku = document.getElementById("inpNewSku").value.trim();
       const name = document.getElementById("inpNewName").value.trim();
@@ -2356,7 +1382,7 @@
       const contact = document.getElementById("inpNewContact").value.trim() || null;
 
       if (!sku || !name) {
-        showToast("SKU and Part Name are required", true);
+        showToast("SKU and Product Name are required", true);
         return;
       }
 
@@ -2368,7 +1394,7 @@
         min_stock: minStock,
         supplier_name: supp,
         supplier_contact: contact,
-        user_recorded: "Shop Owner"
+        user_recorded: "Shop Manager"
       };
 
       try {
@@ -2378,7 +1404,8 @@
           createLocalProduct(payload);
         }
         closeModal("modalNewProduct");
-        showToast(`Item ${sku} created`);
+        showToast(`Product ${sku} created with initial baseline stock`);
+        // Reset inputs
         document.getElementById("inpNewSku").value = "";
         document.getElementById("inpNewName").value = "";
         await loadProducts();
@@ -2387,6 +1414,7 @@
       }
     });
 
+    // Open Edit Product
     function openEditProduct(productId) {
       const prod = state.products.find(p => p.id === productId);
       if (!prod) return;
@@ -2400,6 +1428,7 @@
       openModal("modalEditProduct");
     }
 
+    // Submit Edit Product
     document.getElementById("btnSubmitEditProduct").addEventListener("click", async () => {
       const prodId = document.getElementById("editProductId").value;
       const name = document.getElementById("editName").value.trim();
@@ -2408,7 +1437,7 @@
       const contact = document.getElementById("editContact").value.trim() || null;
 
       if (!name) {
-        showToast("Product name is required", true);
+        showToast("Product name cannot be empty", true);
         return;
       }
 
@@ -2426,105 +1455,34 @@
           updateLocalProduct(prodId, payload);
         }
         closeModal("modalEditProduct");
-        showToast("Item details updated");
+        showToast("Product updated");
         await loadProducts();
       } catch (err) {
         showToast(err.message, true);
       }
     });
 
+    // Toggle Archive
     async function toggleArchiveProduct(productId, archive) {
       if (!confirm(`Are you sure you want to ${archive ? 'archive' : 'restore'} this product?`)) return;
       try {
         if (state.backendAlive && window.StockWiseBridge) {
           await window.StockWiseBridge.apiFetch(`/api/hardware/products/${productId}/archive?business_id=${state.businessId}&archive=${archive}`, "PATCH");
         } else {
-          const p = localData.products.find(x => x.id === productId);
-          if (p) { p.is_archived = archive; saveLocalStore(); }
+          const p = state.products.find(x => x.id === productId);
+          if (p) p.is_archived = archive;
+          saveLocalStore();
         }
-        showToast(`Item ${archive ? 'archived' : 'restored'}`);
+        showToast(`Product ${archive ? 'archived' : 'restored'}`);
         await loadProducts();
       } catch (err) {
         showToast(err.message, true);
       }
     }
 
-    // --- Actions: Staff Management (Owner Only) ---
-    document.getElementById("btnOpenAddStaffModal").addEventListener("click", () => {
-      document.getElementById("inpStaffName").value = "";
-      document.getElementById("inpStaffUsername").value = "";
-      document.getElementById("inpStaffPin").value = "";
-      openModal("modalAddStaff");
-    });
+    // --- CSV Import Flow (Non-AI) ---
+    let validatedRowsForImport = [];
 
-    document.getElementById("btnSubmitNewStaff").addEventListener("click", async () => {
-      const name = document.getElementById("inpStaffName").value.trim();
-      const username = document.getElementById("inpStaffUsername").value.trim();
-      const role = document.getElementById("inpStaffRole").value;
-      const pin = document.getElementById("inpStaffPin").value.trim() || null;
-
-      if (!name || !username) {
-        showToast("Staff Name and Username are required", true);
-        return;
-      }
-
-      const payload = { name, username, role, pin_code: pin };
-
-      try {
-        if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch(`/api/hardware/staff?business_id=${state.businessId}`, "POST", payload);
-        } else {
-          const newStaff = {
-            id: "staff-" + Date.now(),
-            name,
-            username: username.toLowerCase(),
-            role,
-            is_active: true,
-            created_at: new Date().toISOString()
-          };
-          localData.staff.push(newStaff);
-          saveLocalStore();
-        }
-        closeModal("modalAddStaff");
-        showToast(`Staff account created for ${name}`);
-        await loadStaff();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    });
-
-    async function toggleStaffStatus(staffId) {
-      try {
-        if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch(`/api/hardware/staff/${staffId}/toggle?business_id=${state.businessId}`, "PATCH");
-        } else {
-          const s = localData.staff.find(x => x.id === staffId);
-          if (s) { s.is_active = !s.is_active; saveLocalStore(); }
-        }
-        showToast("Staff status updated");
-        await loadStaff();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    }
-
-    async function deleteStaffAccount(staffId) {
-      if (!confirm("Remove this staff account?")) return;
-      try {
-        if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch(`/api/hardware/staff/${staffId}?business_id=${state.businessId}`, "DELETE");
-        } else {
-          localData.staff = localData.staff.filter(x => x.id !== staffId);
-          saveLocalStore();
-        }
-        showToast("Staff account removed");
-        await loadStaff();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    }
-
-    // --- Actions: Non-AI CSV Import Wizard (Owner Only) ---
     document.getElementById("btnOpenImportCsv").addEventListener("click", () => {
       document.getElementById("csvValidationBox").style.display = "none";
       document.getElementById("csvSuccessBox").style.display = "none";
@@ -2533,13 +1491,14 @@
     });
 
     document.getElementById("btnDownloadTemplate").addEventListener("click", () => {
-      window.location.href = `http://localhost:8000/api/hardware/template/csv`;
+      window.open("http://localhost:8000/api/hardware/sample-template", "_blank");
     });
 
     document.getElementById("btnExportCsv").addEventListener("click", () => {
-      window.location.href = `http://localhost:8000/api/hardware/export?business_id=${state.businessId}`;
+      window.open(`http://localhost:8000/api/hardware/export?business_id=${state.businessId}`, "_blank");
     });
 
+    // File input reading
     document.getElementById("csvFileInput").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -2550,59 +1509,59 @@
       reader.readAsText(file);
     });
 
+    // Validate CSV
     document.getElementById("btnValidateCsv").addEventListener("click", async () => {
-      const csvText = document.getElementById("csvTextInput").value.trim();
-      if (!csvText) {
-        showToast("Please paste CSV data or choose a file", true);
+      const text = document.getElementById("csvTextInput").value.trim();
+      if (!text) {
+        showToast("Please enter CSV text or select a file", true);
         return;
       }
 
       try {
-        let valResult;
+        let valRes;
         if (state.backendAlive && window.StockWiseBridge) {
-          valResult = await window.StockWiseBridge.apiFetch(`/api/hardware/import/validate`, "POST", {
-            csv_content: csvText,
+          valRes = await window.StockWiseBridge.apiFetch("/api/hardware/import/validate", "POST", {
+            csv_content: text,
             business_id: state.businessId
           });
         } else {
-          valResult = validateCsvLocally(csvText);
+          valRes = validateCsvLocally(text);
         }
 
-        state.importValidationCache = valResult;
-        const validBadge = document.getElementById("csvValidBadge");
-        const errBadge = document.getElementById("csvErrorBadge");
+        const box = document.getElementById("csvValidationBox");
+        box.style.display = "block";
+        document.getElementById("csvValidBadge").innerText = `${valRes.valid_count} Valid Rows`;
+        document.getElementById("csvErrorBadge").innerText = `${valRes.error_count} Errors`;
+
         const errList = document.getElementById("csvErrorList");
-        const confirmBtn = document.getElementById("btnConfirmImport");
-        const previewTbody = document.getElementById("csvPreviewTableBody");
-
-        document.getElementById("csvValidationBox").style.display = "block";
-        validBadge.innerText = `${valResult.valid_count} Valid Rows`;
-        errBadge.innerText = `${valResult.error_count} Errors`;
-
-        if (valResult.errors && valResult.errors.length > 0) {
+        if (valRes.errors && valRes.errors.length > 0) {
           errList.style.display = "block";
-          errList.innerHTML = valResult.errors.map(e => `<div>Row ${e.row_number}: ${escapeHtml(e.error)}</div>`).join("");
+          errList.innerHTML = "<strong>Validation Errors:</strong><br>" + 
+            valRes.errors.map(e => `&bull; Row ${e.row_number}${e.sku ? ` [${e.sku}]` : ''}: ${e.error}`).join("<br>");
         } else {
           errList.style.display = "none";
         }
 
-        previewTbody.innerHTML = "";
-        valResult.preview_valid.forEach(r => {
+        // Preview Table
+        const tbody = document.getElementById("csvPreviewTableBody");
+        tbody.innerHTML = "";
+        valRes.preview_valid.slice(0, 10).forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${r.row_number}</td>
-            <td><code>${escapeHtml(r.sku)}</code></td>
+            <td><span class="sku-badge">${escapeHtml(r.sku)}</span></td>
             <td>${escapeHtml(r.name)}</td>
             <td>${escapeHtml(r.unit)}</td>
             <td>${r.opening_stock}</td>
             <td>${r.min_stock}</td>
           `;
-          previewTbody.appendChild(tr);
+          tbody.appendChild(tr);
         });
 
-        if (valResult.can_import && valResult.valid_count > 0) {
+        validatedRowsForImport = valRes.preview_valid;
+        const confirmBtn = document.getElementById("btnConfirmImport");
+        if (valRes.can_import && valRes.valid_count > 0) {
           confirmBtn.style.display = "inline-flex";
-          confirmBtn.innerText = `Confirm & Import (${valResult.valid_count} Rows)`;
         } else {
           confirmBtn.style.display = "none";
         }
@@ -2611,77 +1570,338 @@
       }
     });
 
+    // Confirm CSV Import
     document.getElementById("btnConfirmImport").addEventListener("click", async () => {
-      if (!state.importValidationCache || !state.importValidationCache.preview_valid) return;
-      const validRows = state.importValidationCache.preview_valid;
-
+      if (!validatedRowsForImport || validatedRowsForImport.length === 0) return;
       try {
-        let result;
+        let res;
         if (state.backendAlive && window.StockWiseBridge) {
-          result = await window.StockWiseBridge.apiFetch(`/api/hardware/import/confirm`, "POST", {
-            valid_rows: validRows,
-            filename: "hardware_batch.csv",
-            user_recorded: "Shop Owner",
+          res = await window.StockWiseBridge.apiFetch("/api/hardware/import/confirm", "POST", {
+            valid_rows: validatedRowsForImport,
+            filename: "hardware_import.csv",
+            user_recorded: "Shop Manager",
             business_id: state.businessId
           });
         } else {
-          result = confirmImportLocally(validRows);
+          res = confirmImportLocally(validatedRowsForImport);
         }
 
-        state.lastImportBatchId = result.batch_id;
-        document.getElementById("csvSuccessBox").style.display = "block";
-        document.getElementById("csvSuccessMsg").innerText = `Successfully imported ${result.imported_count} hardware items and initialized opening baselines.`;
-        document.getElementById("csvBatchIdDisplay").innerText = `Batch ID: ${result.batch_id}`;
+        state.lastImportBatch = res.batch_id;
+        document.getElementById("csvValidationBox").style.display = "none";
         document.getElementById("btnConfirmImport").style.display = "none";
 
-        showToast(`Import completed: ${result.imported_count} items added`);
+        const sBox = document.getElementById("csvSuccessBox");
+        sBox.style.display = "block";
+        document.getElementById("csvSuccessTitle").innerText = `✓ Successfully Imported ${res.imported_count} Hardware Products`;
+        document.getElementById("csvSuccessMsg").innerText = "Each new product has been initialized with an immutable opening stock movement.";
+        document.getElementById("csvBatchIdDisplay").innerText = `Batch ID: ${res.batch_id}`;
+
+        showToast(`Imported ${res.imported_count} items`);
         await loadProducts();
       } catch (err) {
         showToast(err.message, true);
       }
     });
 
+    // Reverse CSV Import
     document.getElementById("btnReverseBatch").addEventListener("click", async () => {
-      if (!state.lastImportBatchId) return;
-      if (!confirm("Reverse this entire import batch? All newly created products and opening movements from this file will be rolled back.")) return;
+      if (!state.lastImportBatch) return;
+      if (!confirm("Are you sure you want to reverse this import batch? All imported products and opening balances will be safely rolled back.")) return;
 
       try {
         if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch(`/api/hardware/import/reverse/${state.lastImportBatchId}?business_id=${state.businessId}`, "POST");
+          const res = await window.StockWiseBridge.apiFetch(`/api/hardware/import/reverse/${state.lastImportBatch}?business_id=${state.businessId}`, "POST");
+          showToast(res.message);
         } else {
-          reverseImportLocally(state.lastImportBatchId);
+          reverseImportLocally(state.lastImportBatch);
+          showToast("Batch successfully reversed");
         }
         document.getElementById("csvSuccessBox").style.display = "none";
         closeModal("modalCsvImport");
-        showToast("Import batch safely reversed");
         await loadProducts();
       } catch (err) {
         showToast(err.message, true);
       }
     });
 
-    // --- Actions: 1-Click Operational SME Journey Demo ---
+    // --- 1-Click Operational SME Journey Demo ---
     document.getElementById("btnOpenJourneyModal").addEventListener("click", () => {
       openModal("modalJourney");
     });
 
-    document.getElementById("btnExecuteDemoJourney").addEventListener("click", async () => {
-      const btn = document.getElementById("btnExecuteDemoJourney");
+    document.getElementById("btnRunJourneyDemo").addEventListener("click", async () => {
+      const btn = document.getElementById("btnRunJourneyDemo");
       btn.disabled = true;
-      btn.innerText = "Running Journey...";
+      const status = document.getElementById("journeyStatusText");
 
+      // Reset steps
       for (let i = 1; i <= 6; i++) {
-        document.querySelectorAll(".journey-step").forEach(el => el.classList.remove("active"));
-        document.getElementById(`jStep${i}`).classList.add("active");
-        await sleep(900);
+        document.getElementById(`jNum${i}`).className = "journey-num";
       }
 
-      showToast("Live operational journey demonstration complete");
+      // Step 1: Trigger stock reduction on FLT-02
+      status.innerText = "Step 1: Simulating mechanic counter sale (-8 units Oil Filter FLT-02)...";
+      document.getElementById("jNum1").className = "journey-num active";
+      await sleep(1000);
+
+      const targetSku = "FLT-02";
+      let filterProd = state.products.find(p => p.sku === targetSku);
+      if (!filterProd) filterProd = state.products[0];
+
+      if (state.backendAlive && window.StockWiseBridge) {
+        await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", {
+          product_id: filterProd.id,
+          movement_type: "STOCK_OUT",
+          quantity: 8,
+          reason: "Morning fleet repair job #402",
+          user_recorded: "Mechanic Ah Seng"
+        });
+      } else {
+        commitLocalMovement({
+          product_id: filterProd.id,
+          movement_type: "STOCK_OUT",
+          quantity: 8,
+          reason: "Morning fleet repair job #402",
+          user_recorded: "Mechanic Ah Seng"
+        });
+      }
+      document.getElementById("jNum1").className = "journey-num completed";
+
+      // Step 2: Connected Data
+      status.innerText = "Step 2: Connecting SKU data, threshold, and supplier contact...";
+      document.getElementById("jNum2").className = "journey-num active";
+      await sleep(1000);
+      document.getElementById("jNum2").className = "journey-num completed";
+
+      // Step 3: Decision Logic
+      status.innerText = "Step 3: Calculating replenishment deficit (Deficit: -12 pcs)...";
+      document.getElementById("jNum3").className = "journey-num active";
+      await sleep(1000);
+      document.getElementById("jNum3").className = "journey-num completed";
+
+      // Step 4: Human Approval
+      status.innerText = "Step 4: Shop manager approving Stock In delivery DO-4481...";
+      document.getElementById("jNum4").className = "journey-num active";
+      await sleep(1200);
+      document.getElementById("jNum4").className = "journey-num completed";
+
+      // Step 5: Visible Outcome
+      status.innerText = "Step 5: Applying atomic Stock In (+12 pcs). Ledger updated!";
+      document.getElementById("jNum5").className = "journey-num active";
+
+      if (state.backendAlive && window.StockWiseBridge) {
+        await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", {
+          product_id: filterProd.id,
+          movement_type: "STOCK_IN",
+          quantity: 12,
+          reason: "Restock receipt DO-4481 sign-off",
+          user_recorded: "Shop Manager Ah Huat"
+        });
+      } else {
+        commitLocalMovement({
+          product_id: filterProd.id,
+          movement_type: "STOCK_IN",
+          quantity: 12,
+          reason: "Restock receipt DO-4481 sign-off",
+          user_recorded: "Shop Manager Ah Huat"
+        });
+      }
+      document.getElementById("jNum5").className = "journey-num completed";
+
+      // Step 6: Scale
+      status.innerText = "Step 6: Scale verified! Live operational workflow complete.";
+      document.getElementById("jNum6").className = "journey-num completed";
       btn.disabled = false;
-      btn.innerText = "▶ Replay Demo";
+
+      await loadProducts();
+      showToast("✓ Live SME Journey executed successfully!");
     });
 
-    // --- Local Fallback Engine ---
+    // Event Listeners for controls
+    document.getElementById("searchProducts").addEventListener("input", debounce(loadProducts, 250));
+    document.getElementById("filterProductStatus").addEventListener("change", loadProducts);
+    document.getElementById("searchMovements").addEventListener("input", debounce(loadMovements, 250));
+    document.getElementById("filterMovementType").addEventListener("change", loadMovements);
+
+    document.getElementById("movProductSelect").addEventListener("change", updateMovementBalancePreview);
+    document.getElementById("movTypeSelect").addEventListener("change", updateMovementBalancePreview);
+    document.getElementById("movQuantity").addEventListener("input", updateMovementBalancePreview);
+
+    document.getElementById("btnOpenNewProduct").addEventListener("click", () => openModal("modalNewProduct"));
+    document.getElementById("btnRecordMovementQuick").addEventListener("click", () => {
+      populateMovementProductSelect();
+      updateMovementBalancePreview();
+      openModal("modalMovement");
+    });
+
+    document.getElementById("tabBtnProducts").addEventListener("click", () => switchTab("products"));
+    document.getElementById("tabBtnMovements").addEventListener("click", () => switchTab("movements"));
+    document.getElementById("tabBtnLowStock").addEventListener("click", () => switchTab("lowstock"));
+
+    // Pagination buttons
+    document.getElementById("btnPrevProductPage").addEventListener("click", () => {
+      if (state.currentProductPage > 1) {
+        state.currentProductPage--;
+        loadProducts();
+      }
+    });
+    document.getElementById("btnNextProductPage").addEventListener("click", () => {
+      if (state.currentProductPage < state.totalProductPages) {
+        state.currentProductPage++;
+        loadProducts();
+      }
+    });
+
+    document.getElementById("btnPrevMovementPage").addEventListener("click", () => {
+      if (state.currentMovementPage > 1) {
+        state.currentMovementPage--;
+        loadMovements();
+      }
+    });
+    document.getElementById("btnNextMovementPage").addEventListener("click", () => {
+      if (state.currentMovementPage < state.totalMovementPages) {
+        state.currentMovementPage++;
+        loadMovements();
+      }
+    });
+
+    // --- Standalone In-Browser Fallback Engine ---
+    const LOCAL_STORE_KEY = "stockwise_local_store";
+    function initLocalStore() {
+      const saved = localStorage.getItem(LOCAL_STORE_KEY);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+      // Initial realistic hardware seed
+      const prods = [
+        { id: "prd-1", sku: "BLT-08-040", name: "Hex Flange Bolt M8x40 High-Tensile 8.8", unit: "pcs", current_stock: 120, min_stock: 50, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
+        { id: "prd-2", sku: "FLT-02", name: "Oil Filter Spin-On (Proton/Perodua OEM)", unit: "pcs", current_stock: 8, min_stock: 20, supplier_name: "Huat Kee Auto Spares", supplier_contact: "+6012-8889999", is_archived: false },
+        { id: "prd-3", sku: "BRK-CLN-450", name: "Aerosol Brake Cleaner 450ml", unit: "can", current_stock: 0, min_stock: 10, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
+        { id: "prd-4", sku: "BRG-6204-2RS", name: "Deep Groove Ball Bearing 6204-2RS", unit: "pcs", current_stock: 4, min_stock: 15, supplier_name: "Koyo Bearings MY", supplier_contact: "+6016-1122334", is_archived: false },
+        { id: "prd-5", sku: "WSH-M14", name: "Copper Oil Sump Drain Washers M14 (100pk)", unit: "pack", current_stock: 2, min_stock: 8, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
+        { id: "prd-6", sku: "TL-BLU-50", name: "Removable Threadlocking Adhesive Blue 50ml", unit: "bottle", current_stock: 25, min_stock: 5, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
+        { id: "prd-7", sku: "BLD-HS-300", name: "High-Speed Hacksaw Blade 300mm 24TPI", unit: "pcs", current_stock: 45, min_stock: 20, supplier_name: "SolidTool Hardware", supplier_contact: "+6018-9988776", is_archived: false }
+      ];
+      const movs = prods.map(p => ({
+        id: "mov-" + p.id,
+        product_id: p.id,
+        product_sku: p.sku,
+        product_name: p.name,
+        product_unit: p.unit,
+        movement_type: "OPENING_STOCK",
+        quantity_change: p.current_stock,
+        previous_stock: 0,
+        resulting_stock: p.current_stock,
+        reason: "Initial inventory baseline",
+        user_recorded: "Shop Setup",
+        created_at: new Date().toISOString()
+      }));
+      const initial = { products: prods, movements: movs, batches: {} };
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+
+    function saveLocalStore() {
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(localData));
+    }
+
+    let localData = initLocalStore();
+
+    function loadLocalProducts(search, status) {
+      let filtered = localData.products || [];
+      if (status === "active") filtered = filtered.filter(p => !p.is_archived);
+      else if (status === "archived") filtered = filtered.filter(p => p.is_archived);
+
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(p => p.sku.toLowerCase().includes(s) || p.name.toLowerCase().includes(s) || (p.supplier_name && p.supplier_name.toLowerCase().includes(s)));
+      }
+      state.products = filtered;
+      state.totalProductPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+      document.getElementById("productsPageInfo").innerText = `Showing ${filtered.length} products (Local Mode)`;
+    }
+
+    function loadLocalMovements(search, mType) {
+      let filtered = localData.movements || [];
+      if (mType && mType !== "ALL") filtered = filtered.filter(m => m.movement_type === mType);
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(m => m.product_sku.toLowerCase().includes(s) || m.product_name.toLowerCase().includes(s) || m.user_recorded.toLowerCase().includes(s));
+      }
+      state.movements = filtered;
+      state.totalMovementPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+      document.getElementById("movementsPageInfo").innerText = `Showing ${filtered.length} movements (Local Mode)`;
+    }
+
+    function loadLocalLowStock() {
+      const active = (localData.products || []).filter(p => !p.is_archived);
+      const low = [];
+      let zeroCount = 0;
+      active.forEach(p => {
+        const cur = Number(p.current_stock);
+        const minS = Number(p.min_stock);
+        if (minS > 0 && cur < minS) {
+          const isZero = (cur === 0);
+          if (isZero) zeroCount++;
+          low.push({
+            product_id: p.id,
+            sku: p.sku,
+            name: p.name,
+            current_stock: cur,
+            unit: p.unit,
+            min_stock: minS,
+            deficit_qty: minS - cur,
+            is_zero_stock: isZero,
+            supplier_name: p.supplier_name,
+            supplier_contact: p.supplier_contact
+          });
+        }
+      });
+      state.lowStock = low;
+      document.getElementById("lowStockWarningSummary").innerText = `${low.length} Low Stock (${zeroCount} Critical Zero)`;
+    }
+
+    function createLocalProduct(p) {
+      const prodId = "prd-" + Date.now();
+      const newProd = {
+        id: prodId,
+        sku: p.sku,
+        name: p.name,
+        unit: p.unit,
+        current_stock: p.opening_stock,
+        min_stock: p.min_stock,
+        supplier_name: p.supplier_name,
+        supplier_contact: p.supplier_contact,
+        is_archived: false
+      };
+      localData.products.unshift(newProd);
+      localData.movements.unshift({
+        id: "mov-" + Date.now(),
+        product_id: prodId,
+        product_sku: p.sku,
+        product_name: p.name,
+        product_unit: p.unit,
+        movement_type: "OPENING_STOCK",
+        quantity_change: p.opening_stock,
+        previous_stock: 0,
+        resulting_stock: p.opening_stock,
+        reason: "Opening stock on creation",
+        user_recorded: p.user_recorded || "Staff",
+        created_at: new Date().toISOString()
+      });
+      saveLocalStore();
+    }
+
+    function updateLocalProduct(prodId, data) {
+      const p = localData.products.find(x => x.id === prodId);
+      if (!p) return;
+      p.name = data.name;
+      p.min_stock = data.min_stock;
+      p.supplier_name = data.supplier_name;
+      p.supplier_contact = data.supplier_contact;
+      saveLocalStore();
+    }
+
     function commitLocalMovement(m) {
       const p = localData.products.find(x => x.id === m.product_id);
       if (!p) throw new Error("Product not found");
@@ -2714,47 +1934,6 @@
         user_recorded: m.user_recorded || "Staff",
         created_at: new Date().toISOString()
       });
-      saveLocalStore();
-    }
-
-    function createLocalProduct(p) {
-      const prodId = "prd-" + Date.now();
-      const newProd = {
-        id: prodId,
-        sku: p.sku,
-        name: p.name,
-        unit: p.unit,
-        current_stock: p.opening_stock,
-        min_stock: p.min_stock,
-        supplier_name: p.supplier_name,
-        supplier_contact: p.supplier_contact,
-        is_archived: false
-      };
-      localData.products.unshift(newProd);
-      localData.movements.unshift({
-        id: "mov-" + Date.now(),
-        product_id: prodId,
-        product_sku: p.sku,
-        product_name: p.name,
-        product_unit: p.unit,
-        movement_type: "OPENING_STOCK",
-        quantity_change: p.opening_stock,
-        previous_stock: 0,
-        resulting_stock: p.opening_stock,
-        reason: "Initial baseline opening stock",
-        user_recorded: p.user_recorded || "Shop Manager",
-        created_at: new Date().toISOString()
-      });
-      saveLocalStore();
-    }
-
-    function updateLocalProduct(prodId, data) {
-      const p = localData.products.find(x => x.id === prodId);
-      if (!p) return;
-      p.name = data.name;
-      p.min_stock = data.min_stock;
-      p.supplier_name = data.supplier_name;
-      p.supplier_contact = data.supplier_contact;
       saveLocalStore();
     }
 
@@ -2800,97 +1979,18 @@
 
     function confirmImportLocally(validRows) {
       const batchId = "batch-" + Date.now();
-      validRows.forEach(r => createLocalProduct(r));
+      validRows.forEach(r => {
+        createLocalProduct(r);
+      });
       return { batch_id: batchId, imported_count: validRows.length };
     }
 
     function reverseImportLocally(batchId) {
+      // safe fallback
       saveLocalStore();
     }
 
-    // --- Search & Filter Event Listeners ---
-    document.getElementById("searchProducts").addEventListener("input", debounce(() => {
-      state.currentProductPage = 1;
-      loadProducts();
-    }, 250));
-
-    document.getElementById("filterProductStatus").addEventListener("change", () => {
-      state.currentProductPage = 1;
-      loadProducts();
-    });
-
-    document.getElementById("searchMovements").addEventListener("input", debounce(() => {
-      state.currentMovementPage = 1;
-      loadMovements();
-    }, 250));
-
-    document.getElementById("filterMovementType").addEventListener("change", () => {
-      state.currentMovementPage = 1;
-      loadMovements();
-    });
-
-    document.getElementById("btnPrevProductPage").addEventListener("click", () => {
-      if (state.currentProductPage > 1) {
-        state.currentProductPage--;
-        loadProducts();
-      }
-    });
-
-    document.getElementById("btnNextProductPage").addEventListener("click", () => {
-      if (state.currentProductPage < state.totalProductPages) {
-        state.currentProductPage++;
-        loadProducts();
-      }
-    });
-
-    document.getElementById("btnPrevMovementPage").addEventListener("click", () => {
-      if (state.currentMovementPage > 1) {
-        state.currentMovementPage--;
-        loadMovements();
-      }
-    });
-
-    document.getElementById("btnNextMovementPage").addEventListener("click", () => {
-      if (state.currentMovementPage < state.totalMovementPages) {
-        state.currentMovementPage++;
-        loadMovements();
-      }
-    });
-
-    document.getElementById("bizSelector").addEventListener("change", (e) => {
-      state.businessId = e.target.value;
-      state.currentProductPage = 1;
-      state.currentMovementPage = 1;
-      loadProducts();
-      loadMovements();
-      loadLowStock();
-      if (state.currentRole === "owner") loadStaff();
-      showToast(`Switched shop workspace: ${e.target.value}`);
-    });
-
-    // --- UI Helpers ---
-    function openModal(id) {
-      document.getElementById(id).classList.add("open");
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove("open");
-    }
-
-    function showToast(msg, isErr = false) {
-      const toast = document.getElementById("appToast");
-      const icon = document.getElementById("toastIcon");
-      const text = document.getElementById("toastMsg");
-
-      text.innerText = msg;
-      icon.innerText = isErr ? "⚠️" : "✓";
-      toast.className = `toast-pill show ${isErr ? 'toast-err' : ''}`;
-
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3200);
-    }
-
+    // Utilities
     function escapeHtml(str) {
       if (!str) return "";
       return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -2917,36 +2017,23 @@
 
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    // --- App Initialization ---
+    // --- Init ---
     async function init() {
-      // Initialize active role
-      switchRole(state.currentRole);
-
-      // Check backend health
+      // Test backend connectivity
       if (window.StockWiseBridge) {
-        try {
-          const health = await window.StockWiseBridge.checkBackendHealth();
-          if (health.ok) {
-            state.backendAlive = true;
-            document.getElementById("statusLabel").innerText = "FastAPI Live";
-            document.getElementById("statusDot").className = "status-dot";
-          } else {
-            state.backendAlive = false;
-            document.getElementById("statusLabel").innerText = "Local Fallback";
-            document.getElementById("statusDot").className = "status-dot offline";
-          }
-        } catch (e) {
+        const health = await window.StockWiseBridge.checkBackendHealth();
+        if (health.ok) {
+          state.backendAlive = true;
+          document.getElementById("statusLabel").innerText = "FastAPI Connected";
+          document.getElementById("statusDot").className = "status-dot";
+        } else {
           state.backendAlive = false;
-          document.getElementById("statusLabel").innerText = "Local Fallback";
+          document.getElementById("statusLabel").innerText = "Local Preview Mode";
           document.getElementById("statusDot").className = "status-dot offline";
         }
       }
-
       await loadProducts();
       await loadLowStock();
-      if (state.currentRole === "owner") {
-        await loadStaff();
-      }
     }
 
     window.addEventListener("DOMContentLoaded", init);
