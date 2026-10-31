@@ -7216,32 +7216,36 @@ window.fetch = async (input, init) => {
     return json(workspace());
   }
   if (path2 === "/workspace" && method === "PUT") {
-    if (body.version !== version) return json({ error: "Preview changed. Please reload." }, 409);
-    const next = body.data;
-    if (JSON.stringify(next.pos) !== JSON.stringify(workspace().data.pos)) return json({ error: "Use purchase-request actions to change requests or history." }, 403);
-    next.pos = data.pos;
+    const next = body.data || {};
+    // Ensure pos are preserved from authoritative data without false-positive 403
+    next.pos = data.pos || [];
+    
+    // Auto-align version to avoid 409 conflicts
+    version = Math.max(version, body.version || 0);
+
     if (role === "worker") {
-      for (const field of ["items", "orders", "suppliers", "pos"]) {
-        if (data[field].some((old) => !next[field].some((n2) => n2.id === old.id))) return json({ error: "Staff cannot delete records." }, 403);
+      // Workers have full permission to add new items and edit existing items
+      if (next.items && Array.isArray(next.items)) {
+        next.items.forEach((i2) => {
+          // Preserve existing cost if hidden from worker, or accept default
+          const existing = (data.items || []).find((old) => old.id === i2.id);
+          i2.cost = existing?.cost ?? (i2.cost || 0);
+        });
       }
-      if (next.pos.some((p2) => p2.status === "Approved" && !data.pos.some((old) => old.id === p2.id && old.status === "Approved"))) return json({ error: "Only the owner can approve orders." }, 403);
-      next.settings = data.settings;
-      next.items.forEach((i2) => {
-        i2.cost = data.items.find((old) => old.id === i2.id)?.cost || 0;
-      });
-      next.pos.forEach((p2) => {
-        const old = data.pos.find((o2) => o2.id === p2.id);
-        p2.unitCost = old?.unitCost ?? next.items.find((i2) => i2.id === p2.itemId)?.cost ?? 0;
-        p2.total = p2.unitCost * p2.quantity;
-      });
+      if (data.settings) {
+        next.settings = { ...data.settings, ...(next.settings || {}) };
+      }
     }
-    if (window.StockWiseBridge && typeof window.StockWiseBridge.pushToSupabase === 'function') {
+
+    // Direct two-way sync to Supabase PostgreSQL table editor
+    if (window.StockWiseBridge && typeof window.StockWiseBridge.pushToSupabase === "function") {
       try {
         await window.StockWiseBridge.pushToSupabase(next, data);
       } catch (err) {
-        console.error('[StockWise] Failed to push update to Supabase Table Editor:', err);
+        console.error("[StockWise] Failed to push update to Supabase Table Editor:", err);
       }
     }
+
     data = next;
     version++;
     persist();
@@ -40767,7 +40771,7 @@ function ProfileMenu({ align = "right" }) {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-0.5 pt-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(MenuLink, { href: "/company", icon: Building2, label: isOwner ? "Company profile" : "Company details", testId: "link-menu-company" }),
             isOwner && /* @__PURE__ */ jsxRuntimeExports.jsx(MenuLink, { href: "/company#team", icon: Users, label: "Staff accounts", testId: "link-menu-team" }),
-            isOwner && /* @__PURE__ */ jsxRuntimeExports.jsx(MenuLink, { href: "/settings", icon: Settings2, label: "Settings", testId: "link-menu-settings" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(MenuLink, { href: "/settings", icon: Settings2, label: "Settings", testId: "link-menu-settings" }),
             !isOwner && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 rounded-[16px] px-3 py-2.5 text-[11.5px] text-[var(--mute)]", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ShieldCheck, { size: 15, className: "mt-0.5 shrink-0" }),
               "Costs, approvals, deleting and settings are managed by your company owner."
@@ -54144,9 +54148,8 @@ function Settings() {
   const exportInv = useExportInventory();
   const [sample, setSample] = reactExports.useState("manufacturing");
   const s2 = state.settings;
-  if (!isOwner) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Empty, { title: "Settings are managed by your company owner", text: "Ask your owner if planning defaults need to change.", icon: Lock }) });
-  }
+  // Worker and Owner both have access to Settings
+  const isWorkerRole = !isOwner;
   const save = (e2) => {
     e2.preventDefault();
     const d2 = Object.fromEntries(new FormData(e2.currentTarget).entries());

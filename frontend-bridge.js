@@ -1037,6 +1037,7 @@
           <a class="sw-tab-item" data-tab="pos" href="#/procurement">Purchase Orders (<span id="sw-count-pos">${config.stats.pos}</span>)</a>
           <a class="sw-tab-item" data-tab="orders" href="#/orders">Demand Orders (<span id="sw-count-orders">${config.stats.orders}</span>)</a>
           <a class="sw-tab-item" data-tab="suppliers" href="#/suppliers">Suppliers (<span id="sw-count-suppliers">${config.stats.suppliers}</span>)</a>
+          <a class="sw-tab-item" data-tab="settings" href="#/settings">⚙ Settings</a>
         </nav>
       </div>
 
@@ -1328,11 +1329,125 @@
     if (modal) modal.classList.remove("open");
   }
 
+
+  // Watch hash change to highlight active tab and inject Supabase Settings panel on #/settings
+  function checkRoute() {
+    const hash = window.location.hash || "#/";
+    document.querySelectorAll(".sw-tab-item").forEach((tab) => {
+      const href = tab.getAttribute("href");
+      if (href === hash || (hash === "#/" && href === "#/")) {
+        tab.classList.add("active");
+      } else {
+        tab.classList.remove("active");
+      }
+    });
+
+    if (hash === "#/settings") {
+      injectSettingsPanels();
+    }
+  }
+
+  function injectSettingsPanels() {
+    setTimeout(() => {
+      // Find the settings page container
+      const mainCol = document.querySelector(".page-head") || document.querySelector("main") || document.querySelector("#root");
+      if (!mainCol || document.getElementById("sw-settings-supabase-panel")) return;
+
+      const panel = document.createElement("div");
+      panel.id = "sw-settings-supabase-panel";
+      panel.style.cssText = "max-width: 1320px; margin: 16px auto; padding: 0 24px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;";
+      panel.innerHTML = `
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 22px;">⚡</span>
+              <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Supabase Live PostgreSQL & Cloud Sync</h3>
+                <span style="font-size: 12.5px; color: #64748b;">Direct two-way synchronization with Supabase Table Editor.</span>
+              </div>
+            </div>
+            <span class="sw-status-pill ${config.isConnected ? "connected" : "unconfigured"}">
+              <span class="sw-status-dot"></span>
+              <span>${config.isConnected ? "Connected (Live Database)" : "Not Configured"}</span>
+            </span>
+          </div>
+
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin: 14px 0; font-size: 13px; color: #334155;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span><strong>Connected Endpoint:</strong> <code>${config.url || "Not configured"}</code></span>
+              <span style="color: #16a34a; font-weight: 600;">Table Editor: public.inventory_items</span>
+            </div>
+            <div style="display: flex; gap: 20px; font-size: 12px; color: #64748b;">
+              <span>Items in DB: <strong>${config.stats.items}</strong></span>
+              <span>Suppliers in DB: <strong>${config.stats.suppliers}</strong></span>
+              <span>Purchase Orders: <strong>${config.stats.pos}</strong></span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="sw-btn-config" id="sw-btn-open-modal-from-settings" style="cursor: pointer;">
+              <span>⚙</span> Configure Supabase Credentials
+            </button>
+            <button type="button" class="sw-btn-text" id="sw-btn-force-sync" style="cursor: pointer;">
+              🔄 Sync Live Records from Supabase
+            </button>
+          </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span style="font-size: 22px;">👷</span>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Worker & Staff Permissions Policy</h3>
+              <span style="font-size: 12.5px; color: #64748b;">Role capabilities and database mutation rules for staff members.</span>
+            </div>
+          </div>
+          <div style="display: grid; gap: 10px; font-size: 13px; color: #334155;">
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+              <span style="color: #16a34a; font-weight: bold; font-size: 15px;">✓</span>
+              <div>
+                <strong>Add & Edit Inventory Items:</strong> Workers can add new items or edit existing items without restriction. All item mutations immediately update the Supabase PostgreSQL Table Editor.
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+              <span style="color: #16a34a; font-weight: bold; font-size: 15px;">✓</span>
+              <div>
+                <strong>Stock Adjustments (+/-):</strong> Workers can perform Receive, Consume, and Set stock operations, calling the atomic PostgreSQL stored procedure <code>adjust_inventory_stock</code> with row-level locks.
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;">
+              <span style="color: #2563eb; font-weight: bold; font-size: 15px;">ℹ</span>
+              <div>
+                <strong>Commercial Cost Privacy (PDPA):</strong> Unit costs and purchase order financial totals are protected from non-owner worker screens while keeping overall inventory counts and valuations synchronized.
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (mainCol.parentNode) {
+        mainCol.parentNode.insertBefore(panel, mainCol.nextSibling);
+      } else {
+        document.body.appendChild(panel);
+      }
+
+      document.getElementById("sw-btn-open-modal-from-settings")?.addEventListener("click", openModal);
+      document.getElementById("sw-btn-force-sync")?.addEventListener("click", async () => {
+        showToast("Syncing latest records from Supabase PostgreSQL...");
+        await pullFromSupabase();
+        location.reload();
+      });
+    }, 250);
+  }
+
+  window.addEventListener("hashchange", checkRoute);
+
   // Run on DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       injectDOM();
       syncLiveCounts();
+      checkRoute();
     });
   } else {
     injectDOM();
