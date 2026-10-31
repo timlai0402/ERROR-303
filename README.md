@@ -2,7 +2,7 @@
 
 # StockWise
 
-> A simple, reliable inventory tracker for independent small hardware shops and auto-mechanics. Turn manual spreadsheets and paper logs into a dependable stock tracking and restocking workflow.
+> An intelligent, human-in-loop inventory and predictive procurement automation product designed to help calculate available stock in order to eliminate stockouts, prevent costly overstocking, and automate supplier reordering.
 
 ---
 
@@ -23,147 +23,160 @@
 | ----------------- | ---------------------------------------------- |
 | GitHub Repository | https://github.com/timlai0402/ERROR-303.git    |
 | Live Demo         | https://stock-wise.replit.app                  |
-| Slide Deck        | [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
-| Demo Video        | [https://youtu.be/QjNjUeEtulU](https://youtu.be/QjNjUeEtulU) |
-| Pitch Video       | [https://youtu.be/PdYZQNNhst0](https://youtu.be/PdYZQNNhst0) |
-
+| Slide Deck        |    [SDC2026_ERROR 303_Slide_Desk.pdf](<submission/SDC2026_ERROR 303_Slide_Desk.pdf>) |
+| Demo Video        |[https://youtu.be/QjNjUeEtulU](https://youtu.be/QjNjUeEtulU)|
+|Pitch Video        |    [https://youtu.be/PdYZQNNhst0](https://youtu.be/PdYZQNNhst0)          |
 ---
 
 ## Overview
 
 ### Problem
 
-Independent hardware stores and auto-mechanic workshops that currently use paper logs or spreadsheets struggle to answer three basic daily questions:
-1. **What stock do I have?**
-2. **What stock came in or went out?**
-3. **What needs restocking?**
-
-**Specific Real SME Pain Point:** In auto-mechanic and small hardware workshops, fast-moving non-expiry maintenance items (such as oil filters, brake cleaners, hex flange bolts, and ball bearings) frequently run out unnoticed midway through a customer repair job. Spreadsheet recount errors, delayed tallying, and unrecorded counter sales cause sudden stockouts, stalled vehicle repairs, lost customer goodwill, and frantic last-minute retail purchasing at inflated prices.
+Malaysian micro, small, and medium enterprises (MSMEs) in manufacturing, retail, and F&B still rely heavily on paper logs, fragmented WhatsApp messages, and static spreadsheets to track inventory. Manual tracking cannot adapt dynamically to fluctuating customer demand, supplier lead times, or market price volatility, resulting in frequent stockouts (baseline 25%) and costly overstocking. Inefficient manual procurement consumes hours of owners' evenings and creates avoidable material and packaging waste.
 
 ### Solution
 
-**StockWise Hardware Edition** is a focused, dependable inventory tracker designed specifically for independent hardware shops and mechanics dealing with non-expiry inventory. The core promise is:
-> *“Know what you have, record stock changes, and see what needs restocking.”*
+**StockWise AI** is an automation product built to sit within the Orbyte SME business hub. It maps incoming customer orders directly against bills of materials (BOM), current stock reserves, and supplier lead times. StockWise AI blends deterministic algorithms (for exact reorder quantities and safety stock calculations) with Generative AI (to interpret supplier risk and explain restocking justifications in plain language). Built on strict human-in-the-loop governance, no capital or purchase order is committed without manager sign-off, leaving an immutable audit trail.
 
-It automates the complete operational workflow from trigger to visible outcome:
-**Trigger &rarr; Connected Data &rarr; Decision Logic &rarr; Human Approval &rarr; Visible Outcome &rarr; Scale**.
+### Key Features
 
-### 6-Step Operational Journey (Live Demo)
+ **Automated BOM & Shortage Detection** — Automatically extracts raw material needs from incoming orders and flags potential stock deficits before production stalls.
+- **Deterministic Reorder Engine + AI Insights** — Computes exact Reorder Points (ROP) and Economic Order Quantities (EOQ) mathematically, paired with GenAI summaries highlighting price trends and lead-time risks.
+- **5-Step Orbyte Journey with Human Approval** — Triggers work from order events, pulls connected inventory data, runs decision logic, enforces mandatory manager approval, and logs actions into an activity ledger.
+- **Supplier & Lead-Time Coordinator** — Compares multi-vendor price catalogues and delivery lead times to recommend optimal restocking schedules.
+- **PDPA & Role-Based Access Control (RBAC)** — Designed for Malaysian SMEs to protect supplier commercial terms and limit purchase approvals to authorized managers.
 
-1. **Trigger:** A counter sale or repair service consumes stock of a fast-moving item (e.g., Oil Filter `FLT-02`), dropping current physical stock below minimum threshold.
-2. **Connected Data:** The system instantly connects the SKU, current physical balance, fixed unit (`pcs`), minimum threshold (`20 pcs`), and supplier contact (*Huat Kee Auto Spares, +6012-8889999*).
-3. **Decision Logic:** Deterministic rule flags the product as `LOW STOCK` and computes the exact replenishment deficit (`12 pcs`) without AI hallucinations.
-4. **Human Approval:** Shop manager reviews delivery note `DO-4481` and authorizes the replenishment quantity.
-5. **Visible Outcome:** Atomic stock movement (+12 pcs) updates physical inventory to 20, writes to the immutable ledger, and clears the alert.
-6. **Scale:** The shop scales catalog to 1,000+ hardware items with column-matched CSV validation and tenant isolation.
+### Tech Stack
 
-### Core Features
+| Layer         | Technology                   |
+| ------------- | ---------------------------- |
+| Frontend      | HTML5                        |
+| Hosting / Dev | Replit                       |
 
-1. **Product List:**
-   - Searchable, paginated catalog with SKU uniqueness per business.
-   - Preserves leading zeros in SKUs (e.g., `00142`).
-   - Fixed stock units (`pcs`, `box`, `set`, `kg`, `meter`, `roll`, `pack`, `pair`, `can`, `bottle`).
-   - Disallows unit changes once stock movements exist to prevent ledger corruption.
-   - Product archiving support.
+---
 
-2. **Stock Movements (Immutable Audit Ledger):**
-   - Atomic recording of `OPENING_STOCK`, `STOCK_IN`, `STOCK_OUT`, and `CORRECTION`.
-   - Concurrency-safe row locking (`FOR UPDATE` / thread locks).
-   - Rejects movements that would produce negative stock.
-   - Idempotency key protection prevents duplicate submissions on double-clicks.
+## Project Structure
 
-3. **Low-Stock List:**
-   - Real-time detection of products where `current_stock < min_stock`.
-   - Minimum stock of 0 disables alerts.
-   - Highlights critical zero-stock (`OUT_OF_STOCK`) items.
-   - 1-click **Stock In** replenishment directly from the low-stock row.
-
-4. **Deterministic CSV Import & Export (Zero AI):**
-   - 6-step import wizard: Template download &rarr; Column matching &rarr; Strict validation &rarr; Row-by-row error preview &rarr; Confirmation &rarr; Batch summary.
-   - Validates required fields, nonnegative numbers, supported units, file duplicates, and catalog collision.
-   - Safe import batch reversal: Allowed only when products have no subsequent stock activity.
-   - Direct CSV export with leading-zero preservation.
+```
+├── src/
+│   ├── stockwise-updated                      # html web application        
+├── submission/              
+│   ├── SDC2026_ERROR 303_Preliminary.pdf      # Preliminary submission
+│   ├── SDC2026_ERROR 303_Replit_POU.pdf       # Replit proof of use
+│   ├── SDC2026_ERROR 303_Slide_Desk.pdf       # Slide Desk pdf    
+│   └── SDC2026_ERROR 303_TechDeclaration.pdf  # Technology declaration
+|
+├── LICENSE
+|
+└── README.md
+```
 
 ### Architecture
 
 ```
-                  HARDWARE SHOP OPERATIONAL JOURNEY
- ┌──────────────────────┐         ┌────────────────────────────────────────────────────────┐
- │ 1. Trigger           │ ──────► │ 2. Connected Data Ingestion                            │
- │ (Counter Sale / Job) │         │    (SKU ◄─► Current Balance ◄─► Threshold ◄─► Supplier)│
- └──────────────────────┘         └───────────────────────────┬────────────────────────────┘
-                                                              │
-                                                              ▼
-                                     ┌─────────────────────────────────────────┐
-                                     │ 3. Deterministic Decision Logic         │
-                                     │    • Current < Min Threshold Check      │
-                                     │    • Exact Deficit Replenishment Qty    │
-                                     └────────────────────┬────────────────────┘
-                                                          │
-                                                          ▼
- ┌───────────────────────────┐       ┌─────────────────────────────────────────┐
- │ 5. Visible Outcome        │ ◄──── │ 4. Human Approval Gate                  │
- │ • Atomic Stock Update     │       │    (Manager verifies Delivery Order &   │
- │ • Immutable Movement Log  │       │     approves Stock In replenishment)    │
- └─────────────┬─────────────┘       └─────────────────────────────────────────┘
-               │
+                                  ORBYTE BUSINESS HUB
+ ┌────────────────┐         ┌─────────────────────────────────────────────────────────┐
+ │ Incoming Order │ ──────► │ 1. Trigger & Connected Data Ingestion                   │
+ └────────────────┘         │    (Order Items ◄─► Bill of Materials ◄─► Stock Levels) │
+                            └────────────────────────────┬────────────────────────────┘
+                                                         │
+                                                         ▼
+                                    ┌────────────────────────────────────────┐
+                                    │ 2. Dual Decision Engine                │
+                                    │    • Deterministic: ROP & EOQ Formulas │
+                                    │    • GenAI: Disruption & Risk Rationale│
+                                    └────────────────────┬───────────────────┘
+                                                         │
+                                                         ▼
+ ┌───────────────────────────┐      ┌────────────────────────────────────────┐
+ │ Manager Review & Approval │ ◄─── │ 3. Human-in-the-Loop Gate              │
+ └─────────────┬─────────────┘      │    (Restock Quantity, Cost, Vendor)    │
+               │                    └────────────────────────────────────────┘
                ▼
- ┌─────────────────────────────────────────────────────────────────────────────┐
- │ 6. Scale: Bulk CSV Import with Safe Reversal & Multi-Tenant Business RLS   │
- └─────────────────────────────────────────────────────────────────────────────┘
+ ┌────────────────────────────────────────────────────────────────────────────┐
+ │ 4. Visible Outcome & Audit Log                                             │
+ │    • Generated PO dispatched to supplier                                   │
+ │    • Action and timestamp committed to immutable Activity Ledger           │
+ └────────────────────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## Tech Stack
-
-| Layer            | Technology                                              |
-| ---------------- | ------------------------------------------------------- |
-| **Frontend**     | Responsive Vanilla Web Application (Clean, Fast, Zero Build Step) |
-| **Backend API**  | FastAPI (Python 3.11), Pydantic v2                      |
-| **Database**     | Supabase PostgreSQL with Row-Level Security (RLS) & RPC |
-| **Dev / Server** | `serve` (port 3000) & Uvicorn (port 8000)               |
 
 ---
 
 ## How to Run
 
-### Option 1 — Run Web Frontend
-```bash
-npm run dev
-# Serves the frontend at http://localhost:3000
-```
+### Option 1 — Run on Replit (Recommended)
 
-### Option 2 — Run Backend API
-```bash
-npm run backend
-# Starts FastAPI server at http://localhost:8000
-# Interactive API Documentation: http://localhost:8000/docs
-```
+1. Open the [StockWise Replit Project](https://stock-wise.replit.app)
+2. Sign in using the email and password provided below
 
-### Option 3 — Run Automated Tests
-```bash
-backend/.venv/Scripts/pytest backend/tests
-# Runs 23 automated tests covering:
-# - Product CRUD & SKU uniqueness
-# - Atomic movements & negative stock prevention
-# - Idempotent double-click protection
-# - Low-stock alerts & zero-stock labeling
-# - Non-AI CSV validation, import & safe batch reversal
-# - CSV inventory export & business isolation
-```
+email : [error303xmun@gmail.com] 
+password : [123qweasd]
+
+
+### Option 2 — Run Locally
+1. Clone the repository in Visual Studio Code
+git clone [https://github.com/timlai0402/ERROR-303.git]
+
+2. Open the folder
+
+3. Click Run and start debugging
+
 
 ---
+
+## How We Use Replit 
+
+Replit served as the primary cloud-native development environment and staging platform for Team ERROR 303:
+
+- **Collaborative Development:** Our team utilized Replit Multiplayer to co-develop the UI dashboard, integrate modular components, and debug live state across distributed devices.
+- **Rapid Prototyping & Staging:** Replit's instant preview and web container hosted our functional interactive MVP during Phase 1 testing and judging review.
+
+📄 Proof of use: [`submission/SDC2026_ERROR 303_Replit_POU.pdf`]([submission/REPLIT PROOF OF USE.pdf](<submission/SDC2026_ERROR 303_REPLIT PROOF OF USE.pdf>))
+
+---
+
+## Challenges & Learnings
+
+- **Overcoming the Non-Technical Learning Curve with AI-Assisted Debugging:**
+
+Challenge: Entering the hackathon with no prior coding background, interpreting cryptic browser console errors, syntax bugs, and broken layout alignments in Replit was initially overwhelming and stalled development.
+
+Learning: We learned to treat AI tools (such as Replit AI and KrackedDevs AI) not as automatic code generators, but as patient 24/7 technical mentors. By pasting raw error logs into the AI, asking it to explain why something broke, and iteratively testing small code changes, we built a working understanding of web structure, learned how to isolate bugs, and successfully brought the interactive dashboard to life from scratch.
+
+- **Overcoming Git & Cloud Deployment WorkflowsChallenge:**
+As beginners to software version control, managing concurrent branches, avoiding merge conflicts, and synchronizing code between Replit and GitHub created friction during fast-paced prototyping. 
+
+Learning: We developed disciplined Git hygiene—committing small, testable updates, isolating features into separate files, and automating staging deployments directly through Replit’s environment. This transformed version control from an intimidating blocker into an essential safety net for experimentation. 
+
+
+## Future Improvements
+
+- [ ] Add WhatsApp notification webhooks so SME owners can approve pending stock orders directly from their phones.
+- [ ] Connect directly to Orbyte's unified SME Hub APIs for automated supplier e-invoicing and purchase order syncing.
 
 ## Team
 
-| Name                  | Role                           | GitHub                                       |
-| --------------------- | ------------------------------ | -------------------------------------------- |
-| Timothy Lai Yong Fong | Team Leader / Idea pitching    | [@timlai0402](https://github.com/timlai0402) |
-| Zayn Koh Hao Xiang    | Frontend & UI/UX Design        | [@zayn0214](https://github.com/zayn0214)     |
-| Chong Zhen Xi         | Documentation & Making slides  | [@Ben-newbie](https://github.com/Ben-newbie) |
+| Name                  | Role                           | GitHub                                             |
+| --------------------- | ------------------------------ | -------------------------------------------------- |
+| Timothy Lai Yong Fong | Team Leader / Idea pitching    | [@timlai0402](https://github.com/timlai0402)       |
+| Zayn Koh Hao Xiang    | Frontend & UI/UX Design        | [@zayn0214](https://github.com/username)           |
+| Chong Zhen Xi         | Documentation & Making slides  | [Ben-newbie@](https://github.com/Ben-newbie)       |
 
 ---
+
+## Submission Checklist
+
+- [x] Team name, domain (Domain 1 / Domain 2) and SDG track filled in
+- [x] Slide deck link added
+- [ ] Demo video link added
+- [x] Replit used, with proof of use in `submission/`
+- [ ] RunPod used, with proof of use in `submission/`
+- [x] Preliminary submission completed (`SDC2026_TeamName_Preliminary.pdf`)
+- [x] Technology declaration completed (`SDC2026_TeamName_TechDeclaration.pdf`)
+- [x] Submission files renamed with your team name (replace `TeamName`)
+- [x] "How to Run" steps verified
+- [x] No API keys or secrets committed to the repository
 
 ## License
 

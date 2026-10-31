@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import inventory, procurement, forecasting, market, workspace, hardware
+from app.routers import inventory, procurement, forecasting, market, workspace
 from app.services.ai_advisor import ai_advisor
 from app.services.market_news import market_news
 from app.db.supabase_client import db
 
 app = FastAPI(
-    title="StockWise — Small Hardware Shop Inventory Tracker",
-    description="Simple, reliable inventory tracker for independent hardware shops and mechanics answering: What stock do I have? What came in or went out? What needs restocking?",
-    version="3.0.0"
+    title="StockWise AI — Procurement & Inventory Engine",
+    description="Statistical Forecasting, KrackedDevs GenAI Restocking Rationale, NewsAPI Market Feeds, and Supabase Database Backend.",
+    version="2.1.0"
 )
 
 # CORS configuration for Frontend integration
@@ -21,10 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register Hardware Shop core inventory routers
-app.include_router(hardware.router, prefix="/api")
-
-# Register legacy routers safely for backward compatibility
+# Register routers with /api prefix
 app.include_router(inventory.router, prefix="/api")
 app.include_router(procurement.router, prefix="/api")
 app.include_router(forecasting.router, prefix="/api")
@@ -35,19 +32,9 @@ app.include_router(workspace.router, prefix="/api")
 def root():
     return {
         "product": "StockWise AI",
-        "sub_product": "StockWise Hardware Inventory Tracker",
         "team": "ERROR 303",
         "status": "operational",
         "docs_url": "/docs",
-        "purpose": "Know what you have, record stock changes, and see what needs restocking.",
-        "core_features": [
-            "1. Product list with SKU uniqueness, fixed units, searching, pagination, and archiving",
-            "2. Atomic stock movements (Stock In, Stock Out, Stock Correction) with negative stock rejection",
-            "3. Deterministic low-stock alerts and zero-stock indicators",
-            "4. Non-AI CSV import with full column matching, strict validation, and safe reversal",
-            "5. Direct CSV product inventory export",
-            "6. 1-Click Operational SME Journey Demo"
-        ],
         "features": [
             "FastAPI Business Logic",
             "KrackedDevs Chief Procurement AI Rationale",
