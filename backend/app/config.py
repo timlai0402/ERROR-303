@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
+    # KrackedDevs API (LiteLLM Proxy / OpenAI-compatible)
+    KRACKED_API_KEY: str = ""
+    KRACKED_BASE_URL: str = "https://litellm.rapidscreen.io/v1"
+    KRACKED_MODEL: str = "gpt-5.5"
+
     # NewsAPI
     NEWS_API_KEY: str = ""
 

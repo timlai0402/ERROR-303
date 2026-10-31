@@ -1,21 +1,88 @@
+import os
 import json
+import httpx
 from typing import Dict, Any, List, Optional
 from app.config import settings
 
 class AIAdvisorService:
     def __init__(self):
-        self.api_key = settings.GEMINI_API_KEY
-        self.model_name = settings.GEMINI_MODEL
-        self.client = None
+        # KrackedDevs settings (LiteLLM proxy / OpenAI-compatible endpoint)
+        self.kracked_api_key = getattr(settings, "KRACKED_API_KEY", "") or os.getenv("KRACKED_API_KEY", "")
+        self.kracked_base_url = (getattr(settings, "KRACKED_BASE_URL", "") or os.getenv("KRACKED_BASE_URL", "https://litellm.rapidscreen.io/v1")).rstrip("/")
+        self.kracked_model = getattr(settings, "KRACKED_MODEL", "") or os.getenv("KRACKED_MODEL", "gpt-5.5")
 
-        if self.api_key:
-            try:
-                # Prefer google.genai if available, fallback to google.generativeai
-                from google import genai
-                self.client = genai.Client(api_key=self.api_key)
-                print(f"[AI Advisor] Google GenAI client initialized with model: {self.model_name}")
-            except Exception as e:
-                print(f"[AI Advisor] Could not initialize google.genai ({e}). Checking alternative...")
+        # Fallback Gemini settings
+        self.gemini_api_key = getattr(settings, "GEMINI_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
+        self.gemini_model = getattr(settings, "GEMINI_MODEL", "") or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
+        if self.is_kracked_configured():
+            print(f"[AI Advisor] KrackedDevs API configured (URL: {self.kracked_base_url}, Model: {self.kracked_model})")
+        elif self.gemini_api_key:
+            print(f"[AI Advisor] Gemini API configured (Model: {self.gemini_model})")
+        else:
+            print("[AI Advisor] No active API key found. Using deterministic rule-based synthesis.")
+
+    def is_kracked_configured(self) -> bool:
+        return bool(self.kracked_api_key and self.kracked_api_key != "your_actual_key")
+
+    async def _call_kracked(self, prompt: str) -> Optional[Dict[str, Any]]:
+        url = f"{self.kracked_base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.kracked_api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": self.kracked_model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are the Chief Procurement AI for StockWise, an automated inventory control system for Malaysian SMEs. Respond strictly in valid JSON format without markdown code blocks."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "temperature": 0.2
+        }
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"].strip()
+
+            # Clean markdown code fences if wrapped
+            if "```" in content:
+                lines = [line for line in content.splitlines() if not line.strip().startswith("```")]
+                content = "\n".join(lines).strip()
+
+            parsed = json.loads(content)
+            return {
+                "action_recommendation": parsed.get("action_recommendation", "ORDER_ROUTINE"),
+                "executive_rationale": parsed.get("executive_rationale", ""),
+                "supply_risk_level": parsed.get("supply_risk_level", "LOW"),
+                "supplier_negotiation_tip": parsed.get("supplier_negotiation_tip", "")
+            }
+
+    async def _call_gemini(self, prompt: str) -> Optional[Dict[str, Any]]:
+        from google import genai
+        client = genai.Client(api_key=self.gemini_api_key)
+        response = client.models.generate_content(
+            model=self.gemini_model,
+            contents=prompt
+        )
+        text = response.text.strip()
+        if "```" in text:
+            lines = [line for line in text.splitlines() if not line.strip().startswith("```")]
+            text = "\n".join(lines).strip()
+        parsed = json.loads(text)
+        return {
+            "action_recommendation": parsed.get("action_recommendation", "ORDER_ROUTINE"),
+            "executive_rationale": parsed.get("executive_rationale", ""),
+            "supply_risk_level": parsed.get("supply_risk_level", "LOW"),
+            "supplier_negotiation_tip": parsed.get("supplier_negotiation_tip", "")
+        }
 
     async def explain_restocking_decision(
         self,
@@ -40,7 +107,6 @@ class AIAdvisorService:
         signals_text = "; ".join(market_signals) if market_signals else "No immediate supply disruptions reported."
 
         prompt = f"""
-You are the Chief Procurement AI for StockWise, an automated inventory control system for Malaysian SMEs.
 Analyze the following restocking request and return a JSON object with your assessment.
 
 Item: {item_name} ({item_id})
@@ -60,28 +126,25 @@ Respond strictly with valid JSON with keys:
 - "supplier_negotiation_tip": 1 actionable tip (e.g. bulk tier or lead time buffer)
 """
 
-        # If live Gemini client is available, run prompt
-        if self.client:
+        # 1. Primary: KrackedDevs API
+        if self.is_kracked_configured():
             try:
-                response = self.client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt
-                )
-                text = response.text.strip()
-                # Clean markdown blocks if returned
-                if text.startswith("```json"):
-                    text = text.replace("```json", "").replace("```", "").strip()
-                parsed = json.loads(text)
-                return {
-                    "action_recommendation": parsed.get("action_recommendation", "ORDER_ROUTINE"),
-                    "executive_rationale": parsed.get("executive_rationale", ""),
-                    "supply_risk_level": parsed.get("supply_risk_level", "LOW"),
-                    "supplier_negotiation_tip": parsed.get("supplier_negotiation_tip", "")
-                }
+                res = await self._call_kracked(prompt)
+                if res:
+                    return res
+            except Exception as e:
+                print(f"[AI Advisor] KrackedDevs API call failed: {e}. Falling back...")
+
+        # 2. Secondary: Gemini API
+        if self.gemini_api_key:
+            try:
+                res = await self._call_gemini(prompt)
+                if res:
+                    return res
             except Exception as e:
                 print(f"[AI Advisor] Gemini API call failed: {e}. Falling back to rule-based synthesis.")
 
-        # High-precision deterministic fallback if Gemini key is not yet configured
+        # 3. High-precision deterministic fallback
         if available <= 0 or deficit > 0:
             rec = "ORDER_IMMEDIATELY"
             risk = "HIGH"
@@ -115,4 +178,3 @@ Respond strictly with valid JSON with keys:
         }
 
 ai_advisor = AIAdvisorService()
-

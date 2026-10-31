@@ -3,7 +3,7 @@
      UI source: artifacts/stockwise/src. Rebuild: node scripts/export-html.mjs
      No server, real accounts, credentials or company data are embedded. -->
 <html lang="en"><head>
-<script src="/frontend-bridge.js"></script>
+<script src="frontend-bridge.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StockWise — Updated Offline Preview</title>
@@ -7168,8 +7168,17 @@ function workspace() {
   return { version, data: visible, costsHidden: role === "worker", valuation: { total, byCategory } };
 }
 const json = (value, status2 = 200) => new Response(JSON.stringify(value), { status: status2, headers: { "Content-Type": "application/json" } });
+const _systemFetch = window.__nativeFetch || window.fetch;
 window.fetch = async (input, init) => {
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
+  // Pass through external network requests (Supabase, FastAPI, etc.) to native fetch
+  const isExternal = /^https?:\/\//i.test(url) && !url.includes("offline.invalid");
+  if (isExternal && !url.includes(window.location.host + "/api")) {
+    if (typeof _systemFetch === "function") {
+      return _systemFetch(input, init);
+    }
+  }
   const path2 = new URL(url, "https://offline.invalid").pathname.replace(/^.*?\/api/, "");
   const method = init?.method || "GET";
   const body = typeof init?.body === "string" ? JSON.parse(init.body) : {};
@@ -7250,6 +7259,11 @@ window.fetch = async (input, init) => {
       return new Response(null, { status: 204 });
     }
     return json(team);
+  }
+  if (typeof _systemFetch === "function") {
+    try {
+      return await _systemFetch(input, init);
+    } catch (e) {}
   }
   return json({ error: "Unavailable in this offline preview." }, 404);
 };

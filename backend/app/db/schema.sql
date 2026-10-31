@@ -114,3 +114,102 @@ CREATE TABLE IF NOT EXISTS public.restock_decisions (
     projected_stock NUMERIC(12,2) NOT NULL,
     generated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc', now())
 );
+
+-- =============================================================================
+-- Stored Procedures / Atomic Postgres RPCs
+-- =============================================================================
+
+-- 8. Atomic Inventory Stock Adjustment with Row-Level Lock
+CREATE OR REPLACE FUNCTION public.adjust_inventory_stock(
+    p_item_id UUID,
+    p_type TEXT,
+    p_quantity NUMERIC
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_item RECORD;
+    v_new_stock NUMERIC;
+BEGIN
+    SELECT * INTO v_item FROM public.inventory_items 
+    WHERE id = p_item_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Item % not found', p_item_id;
+    END IF;
+
+    IF p_type = 'RECEIVE' THEN
+        v_new_stock := v_item.physical_stock + p_quantity;
+    ELSIF p_type = 'CONSUME' THEN
+        IF v_item.physical_stock < p_quantity THEN
+            RAISE EXCEPTION 'Insufficient physical stock: current %, requested %', v_item.physical_stock, p_quantity;
+        END IF;
+        v_new_stock := v_item.physical_stock - p_quantity;
+    ELSIF p_type = 'SET' THEN
+        IF p_quantity < 0 THEN
+            RAISE EXCEPTION 'Physical stock cannot be set to a negative number';
+        END IF;
+        v_new_stock := p_quantity;
+    ELSE
+        RAISE EXCEPTION 'Invalid adjustment type: %', p_type;
+    END IF;
+
+    UPDATE public.inventory_items
+    SET physical_stock = v_new_stock, updated_at = timezone('utc', now())
+    WHERE id = p_item_id
+    RETURNING to_jsonb(inventory_items.*) INTO v_item;
+
+    RETURN v_item;
+END;
+$$;
+
+-- 9. Atomic Purchase Order Receiving & Stock Increment
+CREATE OR REPLACE FUNCTION public.receive_purchase_order(
+    p_po_id UUID,
+    p_actor_id TEXT DEFAULT 'usr-worker',
+    p_actor_name TEXT DEFAULT 'Warehouse Staff',
+    p_actor_role TEXT DEFAULT 'WORKER',
+    p_note TEXT DEFAULT 'Shipment received and verified'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_po RECORD;
+    v_item RECORD;
+BEGIN
+    SELECT * INTO v_po FROM public.purchase_orders 
+    WHERE id = p_po_id FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Purchase Order % not found', p_po_id;
+    END IF;
+
+    IF v_po.status = 'RECEIVED' THEN
+        RAISE EXCEPTION 'Purchase Order % is already marked as RECEIVED', p_po_id;
+    END IF;
+
+    -- Increment inventory physical stock
+    UPDATE public.inventory_items
+    SET physical_stock = physical_stock + v_po.quantity, updated_at = timezone('utc', now())
+    WHERE id = v_po.item_id;
+
+    -- Update PO Status
+    UPDATE public.purchase_orders
+    SET status = 'RECEIVED', updated_at = timezone('utc', now())
+    WHERE id = p_po_id
+    RETURNING to_jsonb(purchase_orders.*) INTO v_po;
+
+    -- Insert Audit Event atomically inside same transaction
+    INSERT INTO public.purchase_order_events (
+        purchase_order_id, action, status, actor_id, actor_name, role, quantity, reason
+    ) VALUES (
+        p_po_id, 'RECEIVED', 'RECEIVED', p_actor_id, p_actor_name, p_actor_role, (v_po->>'quantity')::numeric, p_note
+    );
+
+    RETURN v_po;
+END;
+$$;
