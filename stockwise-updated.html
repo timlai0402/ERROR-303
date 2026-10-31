@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockWise — Hardware Shop Inventory Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%228%22%20fill%3D%22%232563eb%22%2F%3E%3Cpath%20d%3D%22M12%2014h16M12%2020h16M12%2026h10%22%20stroke%3D%22%23fff%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2226%22%20r%3D%223%22%20fill%3D%22%2322c55e%22%2F%3E%3C%2Fsvg%3E">
+  <script src="frontend-bridge.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --purple: #8b5cf6;
+      --purple-bg: rgba(139, 92, 246, 0.15);
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-badge {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      letter-spacing: -0.5px;
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tag-hardware {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+      border: 1px solid #334155;
+    }
+    .shop-select {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* Navigation Tabs */
+    nav.main-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #94a3b8;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    .nav-btn.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border-color: #0284c7;
+    }
+    .nav-badge {
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .btn-journey {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      transition: transform 0.1s ease;
+    }
+    .btn-journey:hover { transform: translateY(-1px); }
+
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+    .status-dot.offline { background: #f59e0b; }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Operational Bar (Cards) */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+    .kpi-card:hover { border-color: #374151; }
+    .kpi-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .kpi-val { font-size: 1.75rem; font-weight: 700; color: #fff; }
+    .kpi-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Action bar on views */
+    .toolbar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .search-input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      min-width: 260px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .select-filter {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* Buttons */
+    .btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:hover { background: #334155; color: #fff; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; }
+
+    /* Tables */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    .sku-badge {
+      font-family: var(--font-mono);
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid #334155;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success { background: var(--success-bg); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-warning { background: var(--warning-bg); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-danger { background: var(--danger-bg); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-purple { background: var(--purple-bg); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-gray { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--card-border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .page-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 1rem;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .modal-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      background: #0b0f19;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .form-control {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--primary); }
+    .form-control:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .form-help {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    /* Stepper / Journey Modal */
+    .journey-step {
+      display: flex;
+      gap: 0.85rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      align-items: flex-start;
+    }
+    .journey-num {
+      background: var(--primary);
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .journey-num.completed { background: var(--success); }
+    .journey-num.active { background: var(--warning); color: #000; }
+    .journey-content h4 { font-size: 0.85rem; color: #fff; margin-bottom: 0.2rem; }
+    .journey-content p { font-size: 0.75rem; color: #94a3b8; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+    .empty-state h3 { color: #e2e8f0; font-size: 1.1rem; margin-bottom: 0.5rem; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1e293b;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 100;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand-section">
+      <div class="logo-badge">SW</div>
+      <div>
+        <div class="brand-title">
+          StockWise
+          <span class="tag-hardware">Hardware & Mechanics SME</span>
+        </div>
+      </div>
+      <select id="businessSelector" class="shop-select" title="Active Shop Profile">
+        <option value="biz-hardware-01">Ah Huat Hardware & Auto Parts (MYR)</option>
+        <option value="biz-demo-02">Mun Seng Motor Works</option>
+      </select>
+    </div>
+
+    <!-- Small 3-Tab Main Navigation as requested -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-tab="products" id="tabBtnProducts">
+        📦 Products
+      </button>
+      <button class="nav-btn" data-tab="movements" id="tabBtnMovements">
+        📋 Stock Movements
+      </button>
+      <button class="nav-btn" data-tab="lowstock" id="tabBtnLowStock">
+        ⚠️ Low Stock
+        <span class="nav-badge" id="lowStockBadge" style="display:none;">0</span>
+      </button>
+    </nav>
+
+    <div class="header-actions">
+      <!-- Complete Operational SME Journey Button for Mentors/Judges -->
+      <button class="btn-journey" id="btnOpenJourneyModal" title="Demonstrate Trigger -> Connected Data -> Decision Logic -> Human Approval -> Visible Outcome -> Scale">
+        ⚡ Live Demo Workflow
+      </button>
+      <div class="status-pill" id="connStatusPill" title="Connection Diagnostics">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusLabel">FastAPI Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main>
+
+    <!-- Operational KPI Banner (Directs to Core Actions, not a bloated dashboard) -->
+    <div class="kpi-row">
+      <div class="kpi-card" onclick="switchTab('products')">
+        <div class="kpi-title">Active SKUs</div>
+        <div class="kpi-val" id="kpiTotalSkus">0</div>
+        <div class="kpi-sub">Total catalog inventory</div>
+      </div>
+      <div class="kpi-card" onclick="switchTab('products')">
+        <div class="kpi-title">Healthy Stock Items</div>
+        <div class="kpi-val" id="kpiHealthyStock" style="color:#34d399;">0</div>
+        <div class="kpi-sub">Above minimum threshold</div>
+      </div>
+      <div class="kpi-card" onclick="switchTab('lowstock')">
+        <div class="kpi-title">Low Stock Alerts</div>
+        <div class="kpi-val" id="kpiLowStock" style="color:#fbbf24;">0</div>
+        <div class="kpi-sub">Replenishment needed</div>
+      </div>
+      <div class="kpi-card" onclick="switchTab('lowstock')">
+        <div class="kpi-title">Out of Stock (Zero)</div>
+        <div class="kpi-val" id="kpiZeroStock" style="color:#f87171;">0</div>
+        <div class="kpi-sub">Critical deficit stockouts</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: PRODUCTS PAGE -->
+    <section id="viewProducts" class="tab-view">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" id="searchProducts" class="search-input" placeholder="🔍 Search SKU, product name, or supplier...">
+          <select id="filterProductStatus" class="select-filter">
+            <option value="active">Active Products</option>
+            <option value="archived">Archived Products</option>
+            <option value="all">All Products</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <!-- CSV Import/Export on Products Page as requested -->
+          <button class="btn" id="btnOpenImportCsv">📥 Import CSV</button>
+          <button class="btn" id="btnExportCsv">📤 Export CSV</button>
+          <button class="btn btn-primary" id="btnOpenNewProduct">+ New Product</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Code / SKU</th>
+              <th>Product Name</th>
+              <th>Unit</th>
+              <th>Current Stock</th>
+              <th>Min Stock</th>
+              <th>Supplier & Contact</th>
+              <th>Status</th>
+              <th style="text-align: right;">Stock Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+        <div class="pagination-bar">
+          <span id="productsPageInfo">Showing 0 of 0 products</span>
+          <div class="page-controls">
+            <button class="btn btn-sm" id="btnPrevProductPage">Prev</button>
+            <span id="currentProductPage">Page 1</span>
+            <button class="btn btn-sm" id="btnNextProductPage">Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: STOCK MOVEMENTS PAGE -->
+    <section id="viewMovements" class="tab-view" style="display:none;">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" id="searchMovements" class="search-input" placeholder="🔍 Filter by SKU, user, note, or reason...">
+          <select id="filterMovementType" class="select-filter">
+            <option value="ALL">All Movements</option>
+            <option value="STOCK_IN">Stock In</option>
+            <option value="STOCK_OUT">Stock Out</option>
+            <option value="CORRECTION">Stock Correction</option>
+            <option value="OPENING_STOCK">Opening Stock</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" id="btnRecordMovementQuick">+ Record Movement</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Product</th>
+              <th>Movement Type</th>
+              <th>Quantity Change</th>
+              <th>Stock Balance</th>
+              <th>Reason / Note</th>
+              <th>Recorded By</th>
+            </tr>
+          </thead>
+          <tbody id="movementsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+        <div class="pagination-bar">
+          <span id="movementsPageInfo">Showing 0 of 0 movements</span>
+          <div class="page-controls">
+            <button class="btn btn-sm" id="btnPrevMovementPage">Prev</button>
+            <span id="currentMovementPage">Page 1</span>
+            <button class="btn btn-sm" id="btnNextMovementPage">Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: LOW STOCK LIST -->
+    <section id="viewLowStock" class="tab-view" style="display:none;">
+      <div class="toolbar">
+        <div>
+          <h3 style="font-size: 1rem; color: #fff;">What Needs Restocking?</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">
+            Products whose current stock is below minimum stock level. (Min stock of 0 disables alerts).
+          </p>
+        </div>
+        <div class="toolbar-right">
+          <span id="lowStockWarningSummary" class="badge badge-warning">0 Items Low</span>
+        </div>
+      </div>
+
+      <div class="table-container" style="margin-top: 1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Alert Status</th>
+              <th>Product Code / SKU</th>
+              <th>Product Name</th>
+              <th>Current Stock</th>
+              <th>Min Stock</th>
+              <th>Replenishment Deficit</th>
+              <th>Supplier Details</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="lowStockTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: ADD NEW PRODUCT -->
+  <div class="modal-backdrop" id="modalNewProduct">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">+ Add Hardware Product</div>
+        <button class="modal-close" onclick="closeModal('modalNewProduct')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Code / SKU *</label>
+            <input type="text" id="inpNewSku" class="form-control" placeholder="e.g. 00142 or BLT-08-040" required>
+            <span class="form-help">Unique code per shop. Leading zeros preserved.</span>
+          </div>
+          <div class="form-group">
+            <label>Stock Unit *</label>
+            <select id="inpNewUnit" class="form-control">
+              <option value="pcs">pcs (Pieces)</option>
+              <option value="box">box (Boxes)</option>
+              <option value="set">set (Sets)</option>
+              <option value="kg">kg (Kilograms)</option>
+              <option value="meter">meter (Meters)</option>
+              <option value="roll">roll (Rolls)</option>
+              <option value="pack">pack (Packs)</option>
+              <option value="pair">pair (Pairs)</option>
+              <option value="can">can (Cans / Aerosols)</option>
+              <option value="bottle">bottle (Bottles)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="inpNewName" class="form-control" placeholder="e.g. Hex Flange Bolt M8x40 High-Tensile 8.8" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Opening Stock Quantity</label>
+            <input type="number" id="inpNewOpeningStock" class="form-control" min="0" step="any" value="0">
+            <span class="form-help">Recorded as initial OPENING_STOCK movement</span>
+          </div>
+          <div class="form-group">
+            <label>Minimum Stock Level</label>
+            <input type="number" id="inpNewMinStock" class="form-control" min="0" step="any" value="10">
+            <span class="form-help">Set 0 to disable low-stock alert</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Supplier Name (Optional)</label>
+            <input type="text" id="inpNewSupplier" class="form-control" placeholder="e.g. MegaFasteners Malaysia">
+          </div>
+          <div class="form-group">
+            <label>Supplier Contact Info (Optional)</label>
+            <input type="text" id="inpNewContact" class="form-control" placeholder="e.g. +6012-3334455">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modalNewProduct')">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitNewProduct">Save Product & Baseline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT PRODUCT -->
+  <div class="modal-backdrop" id="modalEditProduct">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Edit Hardware Product</div>
+        <button class="modal-close" onclick="closeModal('modalEditProduct')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editProductId">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Code / SKU</label>
+            <input type="text" id="editSku" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label>Fixed Stock Unit</label>
+            <input type="text" id="editUnit" class="form-control" disabled>
+            <span class="form-help" style="color:#eab308;">⚠️ Unit fixed once movements exist</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="editName" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label>Minimum Stock Level</label>
+          <input type="number" id="editMinStock" class="form-control" min="0" step="any">
+          <span class="form-help">Set 0 to disable low-stock alerts</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Supplier Name</label>
+            <input type="text" id="editSupplier" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Supplier Contact Info</label>
+            <input type="text" id="editContact" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modalEditProduct')">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitEditProduct">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RECORD STOCK MOVEMENT -->
+  <div class="modal-backdrop" id="modalMovement">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="movementModalTitle">Record Stock Movement</div>
+        <button class="modal-close" onclick="closeModal('modalMovement')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Select Product *</label>
+          <select id="movProductSelect" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label>Movement Type *</label>
+          <select id="movTypeSelect" class="form-control">
+            <option value="STOCK_IN">Stock In (+) Delivery Received</option>
+            <option value="STOCK_OUT">Stock Out (-) Counter Sale / Used in Repair</option>
+            <option value="CORRECTION">Stock Correction (=) Audit Recount</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantity *</label>
+            <input type="number" id="movQuantity" class="form-control" min="0.01" step="any" placeholder="0" required>
+          </div>
+          <div class="form-group">
+            <label>Resulting Balance Preview</label>
+            <div id="movBalancePreview" style="padding: 0.5rem; background:#1e293b; border-radius:6px; font-weight:700; color:#38bdf8;">
+              Current: 0 pcs &rarr; Result: 0 pcs
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Reason / Reference Note</label>
+          <input type="text" id="movReason" class="form-control" placeholder="e.g. Delivery DO-8891 or Job #204 Repair">
+        </div>
+
+        <div class="form-group">
+          <label>Staff User Recording Action</label>
+          <input type="text" id="movUser" class="form-control" value="Shop Counter Staff">
+        </div>
+
+        <!-- Real-time negative stock warning -->
+        <div id="movNegativeAlert" style="display:none; padding: 0.6rem; background: var(--danger-bg); border: 1px solid var(--danger); border-radius:6px; color:#fca5a5; font-size:0.8rem;">
+          ⚠️ <strong>Rejected:</strong> Cannot stock out more than available inventory. Resulting stock cannot be negative.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modalMovement')">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitMovement">Commit Movement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: 6-STEP CSV IMPORT WIZARD (NO AI) -->
+  <div class="modal-backdrop" id="modalCsvImport">
+    <div class="modal-card" style="max-width: 720px;">
+      <div class="modal-header">
+        <div class="modal-title">📥 Non-AI CSV Product Import Wizard</div>
+        <button class="modal-close" onclick="closeModal('modalCsvImport')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1 & 2: Template & File Upload -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <label style="font-weight:700; color:#fff;">Step 1: Upload CSV or Paste Spreadsheet Content</label>
+            <button class="btn btn-sm" id="btnDownloadTemplate">📄 Download Template</button>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem;">
+            Columns matched: <code>sku</code>, <code>name</code>, <code>unit</code>, <code>opening_stock</code>, <code>min_stock</code>, <code>supplier_name</code>, <code>supplier_contact</code>.
+          </p>
+          <textarea id="csvTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.75rem;" placeholder="sku,name,unit,opening_stock,min_stock,supplier_name,supplier_contact&#10;00142,Hex Flange Nut M10,pcs,100,30,MegaFasteners,+6012-3334455&#10;SPK-09,Spark Plug CR8E,pcs,12,10,AutoPro,+6019-8765432"></textarea>
+          <div style="margin-top:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+            <input type="file" id="csvFileInput" accept=".csv" style="font-size:0.8rem;">
+            <button class="btn btn-primary btn-sm" id="btnValidateCsv">Validate File & Rows</button>
+          </div>
+        </div>
+
+        <!-- Step 3 & 4: Validation Results & Preview -->
+        <div id="csvValidationBox" style="display:none; padding:0.75rem; background:#1e293b; border-radius:6px; border:1px solid #334155;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <span id="csvValidBadge" class="badge badge-success">0 Valid Rows</span>
+            <span id="csvErrorBadge" class="badge badge-danger">0 Errors</span>
+          </div>
+
+          <!-- Error listing with row numbers -->
+          <div id="csvErrorList" style="display:none; max-height:140px; overflow-y:auto; background:#0f172a; padding:0.5rem; border-radius:4px; font-size:0.75rem; color:#fca5a5; margin-bottom:0.5rem;"></div>
+
+          <!-- Preview Table -->
+          <div style="max-height: 160px; overflow-y: auto;">
+            <table style="font-size: 0.75rem;">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>SKU</th>
+                  <th>Name</th>
+                  <th>Unit</th>
+                  <th>Opening</th>
+                  <th>Min Stock</th>
+                </tr>
+              </thead>
+              <tbody id="csvPreviewTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 5 & 6: Batch Completion & Reversal Option -->
+        <div id="csvSuccessBox" style="display:none; padding:0.75rem; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:6px; color:#34d399;">
+          <div style="font-weight:700; font-size:0.9rem;" id="csvSuccessTitle">✓ Import Completed</div>
+          <p style="font-size:0.8rem; color:#cbd5e1; margin-top:0.25rem;" id="csvSuccessMsg"></p>
+          <div style="margin-top:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:0.75rem; color:#94a3b8;" id="csvBatchIdDisplay"></span>
+            <button class="btn btn-sm btn-danger" id="btnReverseBatch">↺ Reverse This Import</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('modalCsvImport')">Close</button>
+        <button class="btn btn-success" id="btnConfirmImport" style="display:none;">Confirm & Import Valid Rows</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LIVE DEMO OPERATIONAL JOURNEY (JUDGES / MENTOR PRESENTATION) -->
+  <div class="modal-backdrop" id="modalJourney">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">⚡ 1-Click Operational SME Journey</div>
+          <div style="font-size:0.75rem; color:#94a3b8;">
+            Pain Point: Mechanic workshop running out of oil filters midway through customer jobs.
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modalJourney')">&times;</button>
+      </div>
+      <div class="modal-body" style="gap: 0.75rem;">
+        <div class="journey-step" id="jStep1">
+          <div class="journey-num" id="jNum1">1</div>
+          <div class="journey-content">
+            <h4>1. Trigger &mdash; Workshop Consumption</h4>
+            <p>Mechanic consumes 8 units of Oil Filter (<code>FLT-02</code>) for morning fleet servicing, dropping stock from 16 to 8.</p>
+          </div>
+        </div>
+
+        <div class="journey-step" id="jStep2">
+          <div class="journey-num" id="jNum2">2</div>
+          <div class="journey-content">
+            <h4>2. Connected Data &mdash; Instant Threshold & Supplier Link</h4>
+            <p>System automatically links <code>FLT-02</code>, current stock (8 pcs), minimum threshold (20 pcs), and supplier <em>Huat Kee Auto Spares (+6012-8889999)</em>.</p>
+          </div>
+        </div>
+
+        <div class="journey-step" id="jStep3">
+          <div class="journey-num" id="jNum3">3</div>
+          <div class="journey-content">
+            <h4>3. Decision Logic &mdash; Deterministic Deficit Calculation</h4>
+            <p>System computes deficit of exactly <strong>12 units</strong> (20 &minus; 8) and triggers an in-app Low Stock alert.</p>
+          </div>
+        </div>
+
+        <div class="journey-step" id="jStep4">
+          <div class="journey-num" id="jNum4">4</div>
+          <div class="journey-content">
+            <h4>4. Human Approval &mdash; Restock Sign-Off</h4>
+            <p>Shop owner inspects delivery invoice <code>DO-4481</code> and authorizes a 12-unit Stock In replenishment.</p>
+          </div>
+        </div>
+
+        <div class="journey-step" id="jStep5">
+          <div class="journey-num" id="jNum5">5</div>
+          <div class="journey-content">
+            <h4>5. Visible Outcome &mdash; Atomic Ledger Update</h4>
+            <p>Stock instantly updates to 20 units atomically, audit movement is committed to history, and low-stock badge clears.</p>
+          </div>
+        </div>
+
+        <div class="journey-step" id="jStep6">
+          <div class="journey-num" id="jNum6">6</div>
+          <div class="journey-content">
+            <h4>6. Scale &mdash; Bulk CSV & Tenant Isolation</h4>
+            <p>The shop imports 1,000s of hardware items with column-matched validation and multi-tenant business isolation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <span style="font-size:0.75rem; color:#94a3b8;" id="journeyStatusText">Ready to run 1-click live simulation.</span>
+        <button class="btn btn-primary" id="btnRunJourneyDemo">▶️ Run Complete Journey Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast">
+    <span id="toastIcon">✓</span>
+    <span id="toastMsg">Operation successful</span>
+  </div>
+
+  <!-- CORE FRONTEND APPLICATION SCRIPT -->
+  <script>
+    // State Store
+    let state = {
+      activeTab: "products",
+      businessId: "biz-hardware-01",
+      products: [],
+      movements: [],
+      lowStock: [],
+      currentProductPage: 1,
+      currentMovementPage: 1,
+      pageSize: 10,
+      totalProductPages: 1,
+      totalMovementPages: 1,
+      backendAlive: false,
+      lastImportBatch: null
+    };
+
+    // --- Tab Switching ---
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+      document.getElementById("viewProducts").style.display = (tabName === "products" ? "block" : "none");
+      document.getElementById("viewMovements").style.display = (tabName === "movements" ? "block" : "none");
+      document.getElementById("viewLowStock").style.display = (tabName === "lowstock" ? "block" : "none");
+
+      if (tabName === "products") loadProducts();
+      else if (tabName === "movements") loadMovements();
+      else if (tabName === "lowstock") loadLowStock();
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.add("active");
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById("toast");
+      document.getElementById("toastMsg").innerText = msg;
+      document.getElementById("toastIcon").innerText = isError ? "⚠️" : "✓";
+      t.style.borderColor = isError ? "var(--danger)" : "var(--success)";
+      t.style.display = "flex";
+      setTimeout(() => { t.style.display = "none"; }, 3500);
+    }
+
+    // --- Data Fetching ---
+    async function loadProducts() {
+      const search = document.getElementById("searchProducts").value.trim();
+      const status = document.getElementById("filterProductStatus").value;
+      const page = state.currentProductPage;
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          const res = await window.StockWiseBridge.apiFetch(
+            `/api/hardware/products?business_id=${state.businessId}&status=${status}&page=${page}&page_size=${state.pageSize}${search ? `&search=${encodeURIComponent(search)}` : ''}`
+          );
+          state.products = res.items || [];
+          state.totalProductPages = res.total_pages || 1;
+          document.getElementById("productsPageInfo").innerText = `Showing ${res.items.length} of ${res.total} products`;
+        } else {
+          // Local storage fallback
+          loadLocalProducts(search, status);
+        }
+      } catch (err) {
+        console.warn("Backend products fetch failed, using local store:", err);
+        loadLocalProducts(search, status);
+      }
+      renderProductsTable();
+      updateKPICounters();
+    }
+
+    async function loadMovements() {
+      const search = document.getElementById("searchMovements").value.trim();
+      const mType = document.getElementById("filterMovementType").value;
+      const page = state.currentMovementPage;
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          const res = await window.StockWiseBridge.apiFetch(
+            `/api/hardware/movements?business_id=${state.businessId}&page=${page}&page_size=${state.pageSize}&movement_type=${mType}${search ? `&search=${encodeURIComponent(search)}` : ''}`
+          );
+          state.movements = res.items || [];
+          state.totalMovementPages = res.total_pages || 1;
+          document.getElementById("movementsPageInfo").innerText = `Showing ${res.items.length} of ${res.total} movements`;
+        } else {
+          loadLocalMovements(search, mType);
+        }
+      } catch (err) {
+        loadLocalMovements(search, mType);
+      }
+      renderMovementsTable();
+    }
+
+    async function loadLowStock() {
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          const res = await window.StockWiseBridge.apiFetch(`/api/hardware/low-stock?business_id=${state.businessId}`);
+          state.lowStock = res.items || [];
+          document.getElementById("lowStockWarningSummary").innerText = `${res.total_low_stock} Low Stock (${res.total_zero_stock} Critical Zero)`;
+        } else {
+          loadLocalLowStock();
+        }
+      } catch (err) {
+        loadLocalLowStock();
+      }
+      renderLowStockTable();
+      updateKPICounters();
+    }
+
+    // --- Render Functions ---
+    function renderProductsTable() {
+      const tbody = document.getElementById("productsTableBody");
+      tbody.innerHTML = "";
+
+      if (state.products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3>No products found</h3><p>Click "+ New Product" or "Import CSV" to add hardware inventory.</p></div></td></tr>`;
+        return;
+      }
+
+      state.products.forEach(p => {
+        const tr = document.createElement("tr");
+        const cur = Number(p.current_stock);
+        const minS = Number(p.min_stock);
+        const isZero = (cur === 0);
+        const isLow = (minS > 0 && cur < minS);
+
+        let stockBadge = `<span class="badge badge-success">${cur} ${p.unit}</span>`;
+        if (isZero) stockBadge = `<span class="badge badge-danger">0 ${p.unit} (OUT OF STOCK)</span>`;
+        else if (isLow) stockBadge = `<span class="badge badge-warning">${cur} ${p.unit} (LOW)</span>`;
+
+        tr.innerHTML = `
+          <td><span class="sku-badge">${escapeHtml(p.sku)}</span></td>
+          <td style="font-weight:600; color:#fff;">${escapeHtml(p.name)}</td>
+          <td><span class="badge badge-gray">${escapeHtml(p.unit)}</span></td>
+          <td>${stockBadge}</td>
+          <td>${minS === 0 ? '<span style="color:#64748b;">Alerts Disabled</span>' : `${minS} ${p.unit}`}</td>
+          <td style="font-size:0.75rem;">
+            ${p.supplier_name ? `<div><strong>${escapeHtml(p.supplier_name)}</strong></div>` : '<span style="color:#64748b;">—</span>'}
+            ${p.supplier_contact ? `<div style="color:#38bdf8;">${escapeHtml(p.supplier_contact)}</div>` : ''}
+          </td>
+          <td>${p.is_archived ? '<span class="badge badge-gray">Archived</span>' : '<span class="badge badge-success">Active</span>'}</td>
+          <td style="text-align: right; white-space:nowrap;">
+            <button class="btn btn-sm btn-success" onclick="quickStockAction('${p.id}', 'STOCK_IN')">+ In</button>
+            <button class="btn btn-sm btn-danger" onclick="quickStockAction('${p.id}', 'STOCK_OUT')">- Out</button>
+            <button class="btn btn-sm" onclick="openEditProduct('${p.id}')">✏️ Edit</button>
+            <button class="btn btn-sm" onclick="toggleArchiveProduct('${p.id}', ${!p.is_archived})">${p.is_archived ? 'Restore' : 'Archive'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("currentProductPage").innerText = `Page ${state.currentProductPage} of ${state.totalProductPages}`;
+    }
+
+    function renderMovementsTable() {
+      const tbody = document.getElementById("movementsTableBody");
+      tbody.innerHTML = "";
+
+      if (state.movements.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><h3>No movements recorded</h3><p>Every stock in, out, or adjustment creates an immutable audit trail here.</p></div></td></tr>`;
+        return;
+      }
+
+      state.movements.forEach(m => {
+        const tr = document.createElement("tr");
+        let typeBadge = `<span class="badge badge-gray">${m.movement_type}</span>`;
+        let qtyChange = `<span style="font-weight:700;">${m.quantity_change > 0 ? '+' : ''}${m.quantity_change} ${m.product_unit}</span>`;
+
+        if (m.movement_type === "STOCK_IN") {
+          typeBadge = `<span class="badge badge-success">STOCK IN</span>`;
+          qtyChange = `<span style="color:#34d399; font-weight:700;">+${m.quantity_change} ${m.product_unit}</span>`;
+        } else if (m.movement_type === "STOCK_OUT") {
+          typeBadge = `<span class="badge badge-danger">STOCK OUT</span>`;
+          qtyChange = `<span style="color:#f87171; font-weight:700;">${m.quantity_change} ${m.product_unit}</span>`;
+        } else if (m.movement_type === "CORRECTION") {
+          typeBadge = `<span class="badge badge-purple">CORRECTION</span>`;
+        } else if (m.movement_type === "OPENING_STOCK") {
+          typeBadge = `<span class="badge badge-gray">OPENING STOCK</span>`;
+        }
+
+        const dateStr = formatDateTime(m.created_at);
+
+        tr.innerHTML = `
+          <td style="font-size:0.75rem; color:#94a3b8;">${dateStr}</td>
+          <td>
+            <span class="sku-badge">${escapeHtml(m.product_sku)}</span>
+            <div style="font-size:0.75rem; color:#fff;">${escapeHtml(m.product_name)}</div>
+          </td>
+          <td>${typeBadge}</td>
+          <td>${qtyChange}</td>
+          <td style="font-family:var(--font-mono); font-size:0.75rem;">
+            ${m.previous_stock} &rarr; <strong style="color:#fff;">${m.resulting_stock} ${m.product_unit}</strong>
+          </td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">${escapeHtml(m.reason || "—")}</td>
+          <td style="font-size:0.75rem; color:#94a3b8;">${escapeHtml(m.user_recorded)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("currentMovementPage").innerText = `Page ${state.currentMovementPage} of ${state.totalMovementPages}`;
+    }
+
+    function renderLowStockTable() {
+      const tbody = document.getElementById("lowStockTableBody");
+      tbody.innerHTML = "";
+
+      if (state.lowStock.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3 style="color:#34d399;">🎉 All Items Sufficiently Stocked</h3><p>No products are currently below their minimum threshold.</p></div></td></tr>`;
+        return;
+      }
+
+      state.lowStock.forEach(item => {
+        const tr = document.createElement("tr");
+        let alertBadge = `<span class="badge badge-warning">⚠️ LOW STOCK</span>`;
+        if (item.is_zero_stock) {
+          alertBadge = `<span class="badge badge-danger">🚨 OUT OF STOCK (0)</span>`;
+        }
+
+        tr.innerHTML = `
+          <td>${alertBadge}</td>
+          <td><span class="sku-badge">${escapeHtml(item.sku)}</span></td>
+          <td style="font-weight:600; color:#fff;">${escapeHtml(item.name)}</td>
+          <td style="font-weight:700; color:${item.is_zero_stock ? '#f87171' : '#fbbf24'};">${item.current_stock} ${item.unit}</td>
+          <td>${item.min_stock} ${item.unit}</td>
+          <td><span style="color:#f87171; font-weight:700;">Deficit: &minus;${item.deficit_qty} ${item.unit}</span></td>
+          <td style="font-size:0.75rem;">
+            ${item.supplier_name ? `<div><strong>${escapeHtml(item.supplier_name)}</strong></div>` : ''}
+            ${item.supplier_contact ? `<a href="tel:${escapeHtml(item.supplier_contact)}" style="color:#38bdf8; text-decoration:none;">${escapeHtml(item.supplier_contact)}</a>` : '<span style="color:#64748b;">No contact</span>'}
+          </td>
+          <td style="text-align:right;">
+            <button class="btn btn-sm btn-success" onclick="quickRestockAction('${item.product_id}', ${item.deficit_qty})">
+              ⚡ Stock In (${item.deficit_qty})
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateKPICounters() {
+      const active = state.products.filter(p => !p.is_archived);
+      const totalSkus = active.length;
+      const zeroItems = active.filter(p => Number(p.current_stock) === 0);
+      const lowItems = active.filter(p => Number(p.min_stock) > 0 && Number(p.current_stock) < Number(p.min_stock));
+      const healthyItems = totalSkus - lowItems.length;
+
+      document.getElementById("kpiTotalSkus").innerText = totalSkus;
+      document.getElementById("kpiHealthyStock").innerText = healthyItems;
+      document.getElementById("kpiLowStock").innerText = lowItems.length;
+      document.getElementById("kpiZeroStock").innerText = zeroItems.length;
+
+      const badge = document.getElementById("lowStockBadge");
+      if (lowItems.length > 0) {
+        badge.innerText = lowItems.length;
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    // --- Actions ---
+
+    // Quick stock in/out
+    function quickStockAction(productId, type) {
+      const prod = state.products.find(p => p.id === productId);
+      if (!prod) return;
+
+      populateMovementProductSelect(productId);
+      document.getElementById("movTypeSelect").value = type;
+      document.getElementById("movQuantity").value = "";
+      document.getElementById("movReason").value = type === "STOCK_IN" ? "Restock delivery received" : "Counter sale order";
+      updateMovementBalancePreview();
+      openModal("modalMovement");
+    }
+
+    function quickRestockAction(productId, suggestedDeficit) {
+      populateMovementProductSelect(productId);
+      document.getElementById("movTypeSelect").value = "STOCK_IN";
+      document.getElementById("movQuantity").value = suggestedDeficit > 0 ? suggestedDeficit : 10;
+      document.getElementById("movReason").value = "Replenishment for low-stock deficit";
+      updateMovementBalancePreview();
+      openModal("modalMovement");
+    }
+
+    function populateMovementProductSelect(selectedId = null) {
+      const sel = document.getElementById("movProductSelect");
+      sel.innerHTML = "";
+      state.products.filter(p => !p.is_archived).forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.innerText = `[${p.sku}] ${p.name} (Stock: ${p.current_stock} ${p.unit})`;
+        if (p.id === selectedId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function updateMovementBalancePreview() {
+      const prodId = document.getElementById("movProductSelect").value;
+      const type = document.getElementById("movTypeSelect").value;
+      const qty = parseFloat(document.getElementById("movQuantity").value) || 0;
+      const previewEl = document.getElementById("movBalancePreview");
+      const alertEl = document.getElementById("movNegativeAlert");
+      const submitBtn = document.getElementById("btnSubmitMovement");
+
+      const prod = state.products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const current = Number(prod.current_stock);
+      let result = current;
+
+      if (type === "STOCK_IN") result = current + qty;
+      else if (type === "STOCK_OUT") result = current - qty;
+      else if (type === "CORRECTION") result = qty;
+
+      previewEl.innerText = `Current: ${current} ${prod.unit} \u2192 Result: ${result} ${prod.unit}`;
+
+      if (result < 0) {
+        alertEl.style.display = "block";
+        submitBtn.disabled = true;
+      } else {
+        alertEl.style.display = "none";
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Submit stock movement
+    document.getElementById("btnSubmitMovement").addEventListener("click", async () => {
+      const prodId = document.getElementById("movProductSelect").value;
+      const type = document.getElementById("movTypeSelect").value;
+      const qty = parseFloat(document.getElementById("movQuantity").value);
+      const reason = document.getElementById("movReason").value.trim();
+      const user = document.getElementById("movUser").value.trim() || "Shop Staff";
+
+      if (isNaN(qty) || qty <= 0) {
+        showToast("Please enter a valid quantity greater than 0", true);
+        return;
+      }
+
+      const idempotencyKey = `mov-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+      const payload = {
+        product_id: prodId,
+        movement_type: type,
+        quantity: qty,
+        reason: reason,
+        user_recorded: user,
+        idempotency_key: idempotencyKey
+      };
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", payload);
+        } else {
+          commitLocalMovement(payload);
+        }
+        closeModal("modalMovement");
+        showToast(`Stock updated successfully: ${type === 'STOCK_IN' ? '+' : '-'}${qty}`);
+        await loadProducts();
+        if (state.activeTab === "movements") await loadMovements();
+        if (state.activeTab === "lowstock") await loadLowStock();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Create New Product
+    document.getElementById("btnSubmitNewProduct").addEventListener("click", async () => {
+      const sku = document.getElementById("inpNewSku").value.trim();
+      const name = document.getElementById("inpNewName").value.trim();
+      const unit = document.getElementById("inpNewUnit").value;
+      const opening = parseFloat(document.getElementById("inpNewOpeningStock").value) || 0;
+      const minStock = parseFloat(document.getElementById("inpNewMinStock").value) || 0;
+      const supp = document.getElementById("inpNewSupplier").value.trim() || null;
+      const contact = document.getElementById("inpNewContact").value.trim() || null;
+
+      if (!sku || !name) {
+        showToast("SKU and Product Name are required", true);
+        return;
+      }
+
+      const payload = {
+        sku: sku,
+        name: name,
+        unit: unit,
+        opening_stock: opening,
+        min_stock: minStock,
+        supplier_name: supp,
+        supplier_contact: contact,
+        user_recorded: "Shop Manager"
+      };
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          await window.StockWiseBridge.apiFetch(`/api/hardware/products?business_id=${state.businessId}`, "POST", payload);
+        } else {
+          createLocalProduct(payload);
+        }
+        closeModal("modalNewProduct");
+        showToast(`Product ${sku} created with initial baseline stock`);
+        // Reset inputs
+        document.getElementById("inpNewSku").value = "";
+        document.getElementById("inpNewName").value = "";
+        await loadProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Open Edit Product
+    function openEditProduct(productId) {
+      const prod = state.products.find(p => p.id === productId);
+      if (!prod) return;
+      document.getElementById("editProductId").value = prod.id;
+      document.getElementById("editSku").value = prod.sku;
+      document.getElementById("editUnit").value = prod.unit;
+      document.getElementById("editName").value = prod.name;
+      document.getElementById("editMinStock").value = prod.min_stock;
+      document.getElementById("editSupplier").value = prod.supplier_name || "";
+      document.getElementById("editContact").value = prod.supplier_contact || "";
+      openModal("modalEditProduct");
+    }
+
+    // Submit Edit Product
+    document.getElementById("btnSubmitEditProduct").addEventListener("click", async () => {
+      const prodId = document.getElementById("editProductId").value;
+      const name = document.getElementById("editName").value.trim();
+      const minStock = parseFloat(document.getElementById("editMinStock").value) || 0;
+      const supp = document.getElementById("editSupplier").value.trim() || null;
+      const contact = document.getElementById("editContact").value.trim() || null;
+
+      if (!name) {
+        showToast("Product name cannot be empty", true);
+        return;
+      }
+
+      const payload = {
+        name: name,
+        min_stock: minStock,
+        supplier_name: supp,
+        supplier_contact: contact
+      };
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          await window.StockWiseBridge.apiFetch(`/api/hardware/products/${prodId}?business_id=${state.businessId}`, "PUT", payload);
+        } else {
+          updateLocalProduct(prodId, payload);
+        }
+        closeModal("modalEditProduct");
+        showToast("Product updated");
+        await loadProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Toggle Archive
+    async function toggleArchiveProduct(productId, archive) {
+      if (!confirm(`Are you sure you want to ${archive ? 'archive' : 'restore'} this product?`)) return;
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          await window.StockWiseBridge.apiFetch(`/api/hardware/products/${productId}/archive?business_id=${state.businessId}&archive=${archive}`, "PATCH");
+        } else {
+          const p = state.products.find(x => x.id === productId);
+          if (p) p.is_archived = archive;
+          saveLocalStore();
+        }
+        showToast(`Product ${archive ? 'archived' : 'restored'}`);
+        await loadProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    // --- CSV Import Flow (Non-AI) ---
+    let validatedRowsForImport = [];
+
+    document.getElementById("btnOpenImportCsv").addEventListener("click", () => {
+      document.getElementById("csvValidationBox").style.display = "none";
+      document.getElementById("csvSuccessBox").style.display = "none";
+      document.getElementById("btnConfirmImport").style.display = "none";
+      openModal("modalCsvImport");
+    });
+
+    document.getElementById("btnDownloadTemplate").addEventListener("click", () => {
+      window.open("http://localhost:8000/api/hardware/sample-template", "_blank");
+    });
+
+    document.getElementById("btnExportCsv").addEventListener("click", () => {
+      window.open(`http://localhost:8000/api/hardware/export?business_id=${state.businessId}`, "_blank");
+    });
+
+    // File input reading
+    document.getElementById("csvFileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        document.getElementById("csvTextInput").value = evt.target.result;
+      };
+      reader.readAsText(file);
+    });
+
+    // Validate CSV
+    document.getElementById("btnValidateCsv").addEventListener("click", async () => {
+      const text = document.getElementById("csvTextInput").value.trim();
+      if (!text) {
+        showToast("Please enter CSV text or select a file", true);
+        return;
+      }
+
+      try {
+        let valRes;
+        if (state.backendAlive && window.StockWiseBridge) {
+          valRes = await window.StockWiseBridge.apiFetch("/api/hardware/import/validate", "POST", {
+            csv_content: text,
+            business_id: state.businessId
+          });
+        } else {
+          valRes = validateCsvLocally(text);
+        }
+
+        const box = document.getElementById("csvValidationBox");
+        box.style.display = "block";
+        document.getElementById("csvValidBadge").innerText = `${valRes.valid_count} Valid Rows`;
+        document.getElementById("csvErrorBadge").innerText = `${valRes.error_count} Errors`;
+
+        const errList = document.getElementById("csvErrorList");
+        if (valRes.errors && valRes.errors.length > 0) {
+          errList.style.display = "block";
+          errList.innerHTML = "<strong>Validation Errors:</strong><br>" + 
+            valRes.errors.map(e => `&bull; Row ${e.row_number}${e.sku ? ` [${e.sku}]` : ''}: ${e.error}`).join("<br>");
+        } else {
+          errList.style.display = "none";
+        }
+
+        // Preview Table
+        const tbody = document.getElementById("csvPreviewTableBody");
+        tbody.innerHTML = "";
+        valRes.preview_valid.slice(0, 10).forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.row_number}</td>
+            <td><span class="sku-badge">${escapeHtml(r.sku)}</span></td>
+            <td>${escapeHtml(r.name)}</td>
+            <td>${escapeHtml(r.unit)}</td>
+            <td>${r.opening_stock}</td>
+            <td>${r.min_stock}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        validatedRowsForImport = valRes.preview_valid;
+        const confirmBtn = document.getElementById("btnConfirmImport");
+        if (valRes.can_import && valRes.valid_count > 0) {
+          confirmBtn.style.display = "inline-flex";
+        } else {
+          confirmBtn.style.display = "none";
+        }
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Confirm CSV Import
+    document.getElementById("btnConfirmImport").addEventListener("click", async () => {
+      if (!validatedRowsForImport || validatedRowsForImport.length === 0) return;
+      try {
+        let res;
+        if (state.backendAlive && window.StockWiseBridge) {
+          res = await window.StockWiseBridge.apiFetch("/api/hardware/import/confirm", "POST", {
+            valid_rows: validatedRowsForImport,
+            filename: "hardware_import.csv",
+            user_recorded: "Shop Manager",
+            business_id: state.businessId
+          });
+        } else {
+          res = confirmImportLocally(validatedRowsForImport);
+        }
+
+        state.lastImportBatch = res.batch_id;
+        document.getElementById("csvValidationBox").style.display = "none";
+        document.getElementById("btnConfirmImport").style.display = "none";
+
+        const sBox = document.getElementById("csvSuccessBox");
+        sBox.style.display = "block";
+        document.getElementById("csvSuccessTitle").innerText = `✓ Successfully Imported ${res.imported_count} Hardware Products`;
+        document.getElementById("csvSuccessMsg").innerText = "Each new product has been initialized with an immutable opening stock movement.";
+        document.getElementById("csvBatchIdDisplay").innerText = `Batch ID: ${res.batch_id}`;
+
+        showToast(`Imported ${res.imported_count} items`);
+        await loadProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // Reverse CSV Import
+    document.getElementById("btnReverseBatch").addEventListener("click", async () => {
+      if (!state.lastImportBatch) return;
+      if (!confirm("Are you sure you want to reverse this import batch? All imported products and opening balances will be safely rolled back.")) return;
+
+      try {
+        if (state.backendAlive && window.StockWiseBridge) {
+          const res = await window.StockWiseBridge.apiFetch(`/api/hardware/import/reverse/${state.lastImportBatch}?business_id=${state.businessId}`, "POST");
+          showToast(res.message);
+        } else {
+          reverseImportLocally(state.lastImportBatch);
+          showToast("Batch successfully reversed");
+        }
+        document.getElementById("csvSuccessBox").style.display = "none";
+        closeModal("modalCsvImport");
+        await loadProducts();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    });
+
+    // --- 1-Click Operational SME Journey Demo ---
+    document.getElementById("btnOpenJourneyModal").addEventListener("click", () => {
+      openModal("modalJourney");
+    });
+
+    document.getElementById("btnRunJourneyDemo").addEventListener("click", async () => {
+      const btn = document.getElementById("btnRunJourneyDemo");
+      btn.disabled = true;
+      const status = document.getElementById("journeyStatusText");
+
+      // Reset steps
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById(`jNum${i}`).className = "journey-num";
+      }
+
+      // Step 1: Trigger stock reduction on FLT-02
+      status.innerText = "Step 1: Simulating mechanic counter sale (-8 units Oil Filter FLT-02)...";
+      document.getElementById("jNum1").className = "journey-num active";
+      await sleep(1000);
+
+      const targetSku = "FLT-02";
+      let filterProd = state.products.find(p => p.sku === targetSku);
+      if (!filterProd) filterProd = state.products[0];
+
+      if (state.backendAlive && window.StockWiseBridge) {
+        await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", {
+          product_id: filterProd.id,
+          movement_type: "STOCK_OUT",
+          quantity: 8,
+          reason: "Morning fleet repair job #402",
+          user_recorded: "Mechanic Ah Seng"
+        });
+      } else {
+        commitLocalMovement({
+          product_id: filterProd.id,
+          movement_type: "STOCK_OUT",
+          quantity: 8,
+          reason: "Morning fleet repair job #402",
+          user_recorded: "Mechanic Ah Seng"
+        });
+      }
+      document.getElementById("jNum1").className = "journey-num completed";
+
+      // Step 2: Connected Data
+      status.innerText = "Step 2: Connecting SKU data, threshold, and supplier contact...";
+      document.getElementById("jNum2").className = "journey-num active";
+      await sleep(1000);
+      document.getElementById("jNum2").className = "journey-num completed";
+
+      // Step 3: Decision Logic
+      status.innerText = "Step 3: Calculating replenishment deficit (Deficit: -12 pcs)...";
+      document.getElementById("jNum3").className = "journey-num active";
+      await sleep(1000);
+      document.getElementById("jNum3").className = "journey-num completed";
+
+      // Step 4: Human Approval
+      status.innerText = "Step 4: Shop manager approving Stock In delivery DO-4481...";
+      document.getElementById("jNum4").className = "journey-num active";
+      await sleep(1200);
+      document.getElementById("jNum4").className = "journey-num completed";
+
+      // Step 5: Visible Outcome
+      status.innerText = "Step 5: Applying atomic Stock In (+12 pcs). Ledger updated!";
+      document.getElementById("jNum5").className = "journey-num active";
+
+      if (state.backendAlive && window.StockWiseBridge) {
+        await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", {
+          product_id: filterProd.id,
+          movement_type: "STOCK_IN",
+          quantity: 12,
+          reason: "Restock receipt DO-4481 sign-off",
+          user_recorded: "Shop Manager Ah Huat"
+        });
+      } else {
+        commitLocalMovement({
+          product_id: filterProd.id,
+          movement_type: "STOCK_IN",
+          quantity: 12,
+          reason: "Restock receipt DO-4481 sign-off",
+          user_recorded: "Shop Manager Ah Huat"
+        });
+      }
+      document.getElementById("jNum5").className = "journey-num completed";
+
+      // Step 6: Scale
+      status.innerText = "Step 6: Scale verified! Live operational workflow complete.";
+      document.getElementById("jNum6").className = "journey-num completed";
+      btn.disabled = false;
+
+      await loadProducts();
+      showToast("✓ Live SME Journey executed successfully!");
+    });
+
+    // Event Listeners for controls
+    document.getElementById("searchProducts").addEventListener("input", debounce(loadProducts, 250));
+    document.getElementById("filterProductStatus").addEventListener("change", loadProducts);
+    document.getElementById("searchMovements").addEventListener("input", debounce(loadMovements, 250));
+    document.getElementById("filterMovementType").addEventListener("change", loadMovements);
+
+    document.getElementById("movProductSelect").addEventListener("change", updateMovementBalancePreview);
+    document.getElementById("movTypeSelect").addEventListener("change", updateMovementBalancePreview);
+    document.getElementById("movQuantity").addEventListener("input", updateMovementBalancePreview);
+
+    document.getElementById("btnOpenNewProduct").addEventListener("click", () => openModal("modalNewProduct"));
+    document.getElementById("btnRecordMovementQuick").addEventListener("click", () => {
+      populateMovementProductSelect();
+      updateMovementBalancePreview();
+      openModal("modalMovement");
+    });
+
+    document.getElementById("tabBtnProducts").addEventListener("click", () => switchTab("products"));
+    document.getElementById("tabBtnMovements").addEventListener("click", () => switchTab("movements"));
+    document.getElementById("tabBtnLowStock").addEventListener("click", () => switchTab("lowstock"));
+
+    // Pagination buttons
+    document.getElementById("btnPrevProductPage").addEventListener("click", () => {
+      if (state.currentProductPage > 1) {
+        state.currentProductPage--;
+        loadProducts();
+      }
+    });
+    document.getElementById("btnNextProductPage").addEventListener("click", () => {
+      if (state.currentProductPage < state.totalProductPages) {
+        state.currentProductPage++;
+        loadProducts();
+      }
+    });
+
+    document.getElementById("btnPrevMovementPage").addEventListener("click", () => {
+      if (state.currentMovementPage > 1) {
+        state.currentMovementPage--;
+        loadMovements();
+      }
+    });
+    document.getElementById("btnNextMovementPage").addEventListener("click", () => {
+      if (state.currentMovementPage < state.totalMovementPages) {
+        state.currentMovementPage++;
+        loadMovements();
+      }
+    });
+
+    // --- Standalone In-Browser Fallback Engine ---
+    const LOCAL_STORE_KEY = "stockwise_local_store";
+    function initLocalStore() {
+      const saved = localStorage.getItem(LOCAL_STORE_KEY);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+      // Initial realistic hardware seed
+      const prods = [
+        { id: "prd-1", sku: "BLT-08-040", name: "Hex Flange Bolt M8x40 High-Tensile 8.8", unit: "pcs", current_stock: 120, min_stock: 50, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
+        { id: "prd-2", sku: "FLT-02", name: "Oil Filter Spin-On (Proton/Perodua OEM)", unit: "pcs", current_stock: 8, min_stock: 20, supplier_name: "Huat Kee Auto Spares", supplier_contact: "+6012-8889999", is_archived: false },
+        { id: "prd-3", sku: "BRK-CLN-450", name: "Aerosol Brake Cleaner 450ml", unit: "can", current_stock: 0, min_stock: 10, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
+        { id: "prd-4", sku: "BRG-6204-2RS", name: "Deep Groove Ball Bearing 6204-2RS", unit: "pcs", current_stock: 4, min_stock: 15, supplier_name: "Koyo Bearings MY", supplier_contact: "+6016-1122334", is_archived: false },
+        { id: "prd-5", sku: "WSH-M14", name: "Copper Oil Sump Drain Washers M14 (100pk)", unit: "pack", current_stock: 2, min_stock: 8, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455", is_archived: false },
+        { id: "prd-6", sku: "TL-BLU-50", name: "Removable Threadlocking Adhesive Blue 50ml", unit: "bottle", current_stock: 25, min_stock: 5, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890", is_archived: false },
+        { id: "prd-7", sku: "BLD-HS-300", name: "High-Speed Hacksaw Blade 300mm 24TPI", unit: "pcs", current_stock: 45, min_stock: 20, supplier_name: "SolidTool Hardware", supplier_contact: "+6018-9988776", is_archived: false }
+      ];
+      const movs = prods.map(p => ({
+        id: "mov-" + p.id,
+        product_id: p.id,
+        product_sku: p.sku,
+        product_name: p.name,
+        product_unit: p.unit,
+        movement_type: "OPENING_STOCK",
+        quantity_change: p.current_stock,
+        previous_stock: 0,
+        resulting_stock: p.current_stock,
+        reason: "Initial inventory baseline",
+        user_recorded: "Shop Setup",
+        created_at: new Date().toISOString()
+      }));
+      const initial = { products: prods, movements: movs, batches: {} };
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(initial));
+      return initial;
+    }
+
+    function saveLocalStore() {
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify(localData));
+    }
+
+    let localData = initLocalStore();
+
+    function loadLocalProducts(search, status) {
+      let filtered = localData.products || [];
+      if (status === "active") filtered = filtered.filter(p => !p.is_archived);
+      else if (status === "archived") filtered = filtered.filter(p => p.is_archived);
+
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(p => p.sku.toLowerCase().includes(s) || p.name.toLowerCase().includes(s) || (p.supplier_name && p.supplier_name.toLowerCase().includes(s)));
+      }
+      state.products = filtered;
+      state.totalProductPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+      document.getElementById("productsPageInfo").innerText = `Showing ${filtered.length} products (Local Mode)`;
+    }
+
+    function loadLocalMovements(search, mType) {
+      let filtered = localData.movements || [];
+      if (mType && mType !== "ALL") filtered = filtered.filter(m => m.movement_type === mType);
+      if (search) {
+        const s = search.toLowerCase();
+        filtered = filtered.filter(m => m.product_sku.toLowerCase().includes(s) || m.product_name.toLowerCase().includes(s) || m.user_recorded.toLowerCase().includes(s));
+      }
+      state.movements = filtered;
+      state.totalMovementPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+      document.getElementById("movementsPageInfo").innerText = `Showing ${filtered.length} movements (Local Mode)`;
+    }
+
+    function loadLocalLowStock() {
+      const active = (localData.products || []).filter(p => !p.is_archived);
+      const low = [];
+      let zeroCount = 0;
+      active.forEach(p => {
+        const cur = Number(p.current_stock);
+        const minS = Number(p.min_stock);
+        if (minS > 0 && cur < minS) {
+          const isZero = (cur === 0);
+          if (isZero) zeroCount++;
+          low.push({
+            product_id: p.id,
+            sku: p.sku,
+            name: p.name,
+            current_stock: cur,
+            unit: p.unit,
+            min_stock: minS,
+            deficit_qty: minS - cur,
+            is_zero_stock: isZero,
+            supplier_name: p.supplier_name,
+            supplier_contact: p.supplier_contact
+          });
+        }
+      });
+      state.lowStock = low;
+      document.getElementById("lowStockWarningSummary").innerText = `${low.length} Low Stock (${zeroCount} Critical Zero)`;
+    }
+
+    function createLocalProduct(p) {
+      const prodId = "prd-" + Date.now();
+      const newProd = {
+        id: prodId,
+        sku: p.sku,
+        name: p.name,
+        unit: p.unit,
+        current_stock: p.opening_stock,
+        min_stock: p.min_stock,
+        supplier_name: p.supplier_name,
+        supplier_contact: p.supplier_contact,
+        is_archived: false
+      };
+      localData.products.unshift(newProd);
+      localData.movements.unshift({
+        id: "mov-" + Date.now(),
+        product_id: prodId,
+        product_sku: p.sku,
+        product_name: p.name,
+        product_unit: p.unit,
+        movement_type: "OPENING_STOCK",
+        quantity_change: p.opening_stock,
+        previous_stock: 0,
+        resulting_stock: p.opening_stock,
+        reason: "Opening stock on creation",
+        user_recorded: p.user_recorded || "Staff",
+        created_at: new Date().toISOString()
+      });
+      saveLocalStore();
+    }
+
+    function updateLocalProduct(prodId, data) {
+      const p = localData.products.find(x => x.id === prodId);
+      if (!p) return;
+      p.name = data.name;
+      p.min_stock = data.min_stock;
+      p.supplier_name = data.supplier_name;
+      p.supplier_contact = data.supplier_contact;
+      saveLocalStore();
+    }
+
+    function commitLocalMovement(m) {
+      const p = localData.products.find(x => x.id === m.product_id);
+      if (!p) throw new Error("Product not found");
+      const cur = Number(p.current_stock);
+      let res = cur;
+      let change = Number(m.quantity);
+
+      if (m.movement_type === "STOCK_IN") res = cur + change;
+      else if (m.movement_type === "STOCK_OUT") {
+        if (cur < change) throw new Error("Insufficient stock: resulting balance cannot be negative");
+        res = cur - change;
+        change = -change;
+      } else if (m.movement_type === "CORRECTION") {
+        res = change;
+        change = res - cur;
+      }
+
+      p.current_stock = res;
+      localData.movements.unshift({
+        id: "mov-" + Date.now(),
+        product_id: p.id,
+        product_sku: p.sku,
+        product_name: p.name,
+        product_unit: p.unit,
+        movement_type: m.movement_type,
+        quantity_change: change,
+        previous_stock: cur,
+        resulting_stock: res,
+        reason: m.reason || "",
+        user_recorded: m.user_recorded || "Staff",
+        created_at: new Date().toISOString()
+      });
+      saveLocalStore();
+    }
+
+    function validateCsvLocally(csvText) {
+      const lines = csvText.trim().split("\n");
+      const errors = [];
+      const valid = [];
+      const seen = {};
+      const catalog = {};
+      localData.products.forEach(p => { catalog[p.sku.toLowerCase()] = p.name; });
+
+      lines.slice(1).forEach((line, idx) => {
+        const parts = line.split(",").map(s => s.trim());
+        const rowNum = idx + 2;
+        const sku = parts[0] || "";
+        const name = parts[1] || "";
+        const unit = (parts[2] || "pcs").toLowerCase();
+        const opening = parseFloat(parts[3]) || 0;
+        const minStock = parseFloat(parts[4]) || 0;
+
+        if (!sku) errors.push({ row_number: rowNum, error: "SKU is required" });
+        if (!name) errors.push({ row_number: rowNum, error: "Product name is required" });
+        if (opening < 0) errors.push({ row_number: rowNum, error: "Opening stock cannot be negative" });
+        if (seen[sku.toLowerCase()]) errors.push({ row_number: rowNum, error: `Duplicate SKU in CSV: ${sku}` });
+        else seen[sku.toLowerCase()] = rowNum;
+
+        if (catalog[sku.toLowerCase()]) errors.push({ row_number: rowNum, error: `SKU '${sku}' already exists in catalog` });
+
+        if (sku && name && opening >= 0 && !catalog[sku.toLowerCase()]) {
+          valid.push({ row_number: rowNum, sku, name, unit, opening_stock: opening, min_stock: minStock, supplier_name: parts[5] || null, supplier_contact: parts[6] || null });
+        }
+      });
+
+      return {
+        total_rows: lines.length - 1,
+        valid_count: valid.length,
+        error_count: errors.length,
+        errors,
+        preview_valid: valid,
+        can_import: errors.length === 0 && valid.length > 0
+      };
+    }
+
+    function confirmImportLocally(validRows) {
+      const batchId = "batch-" + Date.now();
+      validRows.forEach(r => {
+        createLocalProduct(r);
+      });
+      return { batch_id: batchId, imported_count: validRows.length };
+    }
+
+    function reverseImportLocally(batchId) {
+      // safe fallback
+      saveLocalStore();
+    }
+
+    // Utilities
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function formatDateTime(iso) {
+      if (!iso) return "—";
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) + ", " + 
+               d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function debounce(fn, ms) {
+      let timeout;
+      return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), ms);
+      };
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // --- Init ---
+    async function init() {
+      // Test backend connectivity
+      if (window.StockWiseBridge) {
+        const health = await window.StockWiseBridge.checkBackendHealth();
+        if (health.ok) {
+          state.backendAlive = true;
+          document.getElementById("statusLabel").innerText = "FastAPI Connected";
+          document.getElementById("statusDot").className = "status-dot";
+        } else {
+          state.backendAlive = false;
+          document.getElementById("statusLabel").innerText = "Local Preview Mode";
+          document.getElementById("statusDot").className = "status-dot offline";
+        }
+      }
+      await loadProducts();
+      await loadLowStock();
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

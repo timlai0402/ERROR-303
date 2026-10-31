@@ -1,13 +1,14 @@
 {
   "name": "error-303",
   "version": "1.0.0",
-  "description": "---",
+  "description": "StockWise - Simple, reliable inventory tracker for independent small hardware shops and auto-mechanics",
   "main": "frontend-bridge.js",
   "scripts": {
-    "start": "npx serve -l 3000 .",
-    "dev": "npx serve -l 3000 .",
-    "backend": "backend/.venv/Scripts/uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000 --reload",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,green\" \"npm run backend\" \"npm run frontend\"",
+    "frontend": "npx serve -l 3000 .",
+    "backend": "backend\\.venv\\Scripts\\python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000 --reload",
+    "test": "backend\\.venv\\Scripts\\python -m pytest backend/tests"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
   "homepage": "https://github.com/timlai0402/ERROR-303#readme",
   "dependencies": {
     "@supabase/server": "^1.9.2"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
   }
 }
