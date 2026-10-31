@@ -9,21 +9,16 @@
  *    - "⚙ Supabase Config" button
  *    - Dynamic Nav Tabs: Overview & Restock, Inventory (N), Purchase Orders (N), Demand Orders (N), Suppliers (N)
  *    - Amber Alert Banner: "Supabase API Keys Needed" with "Configure Now" trigger
- * 3. Direct PostgREST connectivity to Supabase tables:
- *    - inventory_items, suppliers, purchase_orders, purchase_order_events, demand_orders
- * 4. Direct execution of PostgreSQL Atomic Stored RPC Procedures:
+ * 3. Two-Way Live Database Synchronization:
+ *    - When an inventory item is added/edited in the UI, pushes immediately to PostgreSQL `inventory_items` table editor.
+ *    - When the app loads, pulls live records from PostgreSQL `inventory_items` and `suppliers`.
+ * 4. Direct PostgREST connectivity & Atomic Stored RPC Procedures:
  *    - adjust_inventory_stock(p_item_id, p_type, p_quantity)
  *    - receive_purchase_order(p_po_id, p_actor_id, p_actor_name, p_actor_role, p_note)
- * 5. Automatic Fallback to local offline cache or FastAPI backend (:8000).
+ * 5. Resilient fallback to local offline storage if offline.
  */
 
 (function () {
-  // Capture native browser fetch immediately before anything can overwrite it
-  const nativeFetch = typeof window !== "undefined" && window.fetch ? window.fetch.bind(window) : null;
-  if (typeof window !== "undefined" && !window.__nativeFetch && nativeFetch) {
-    window.__nativeFetch = nativeFetch;
-  }
-
   const STORAGE_KEY = "stockwise_supabase_config";
   const DEFAULT_CONFIG = {
     url: "https://qrqcjxlexwvvgvisnphx.supabase.co",
@@ -46,6 +41,9 @@
     return sessionStorage.getItem("stockwise_role") || "owner";
   })();
 
+  // Cache supplier mapping (name -> uuid)
+  let supplierUuidMap = {};
+
   // Expose bridge globally
   window.StockWiseBridge = {
     getConfig: () => ({ ...config }),
@@ -56,11 +54,13 @@
     closeModal,
     rpcAdjustStock,
     rpcReceivePurchaseOrder,
+    pushToSupabase,
+    pullFromSupabase,
   };
 
   // --- 1. Supabase Direct API Engine ---
 
-  async function sbRequest(endpoint, method = "GET", body = null, useSecret = false) {
+  async function sbRequest(endpoint, method = "GET", body = null, useSecret = false, prefer = "return=representation") {
     if (!config.url || !config.anonKey) {
       throw new Error("Supabase credentials not configured.");
     }
@@ -72,7 +72,7 @@
       apikey: key,
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=representation",
+      Prefer: prefer,
     };
 
     const options = { method, headers };
@@ -80,8 +80,8 @@
       options.body = JSON.stringify(body);
     }
 
-    const fetcher = (typeof window !== "undefined" && window.__nativeFetch) || nativeFetch || (typeof window !== "undefined" && window.fetch ? window.fetch.bind(window) : fetch);
-    const res = await fetcher(fullUrl, options);
+    const nativeFetch = window.__nativeFetch || window.fetch;
+    const res = await nativeFetch(fullUrl, options);
     const text = await res.text();
     let data;
     try {
@@ -91,7 +91,7 @@
     }
 
     if (!res.ok) {
-      const msg = (data && data.message) ? data.message : (data && data.error) ? data.error : res.statusText;
+      const msg = (data && data.message) ? data.message : (data && data.error) ? data.error : (data && data.hint) ? data.hint : res.statusText;
       const err = new Error(msg);
       err.status = res.status;
       err.data = data;
@@ -100,9 +100,178 @@
     return data;
   }
 
+  // --- 2. Live Database Synchronization (Two-Way with Supabase Table Editor) ---
+
+  // Pull records from Supabase PostgreSQL tables into app data
+  async function pullFromSupabase(currentData) {
+    if (!config.isConnected || !config.url || !config.anonKey) return null;
+    try {
+      console.log("[Supabase Sync] Pulling live records from PostgreSQL...");
+      const [sbItems, sbSuppliers, sbPos, sbOrders] = await Promise.all([
+        sbRequest("inventory_items?select=*,supplier:suppliers(*)", "GET").catch(() => []),
+        sbRequest("suppliers?select=*&order=name.asc", "GET").catch(() => []),
+        sbRequest("purchase_orders?select=*&order=created_at.desc", "GET").catch(() => []),
+        sbRequest("demand_orders?select=*&order=due_date.asc", "GET").catch(() => []),
+      ]);
+
+      // Cache supplier UUIDs
+      supplierUuidMap = {};
+      if (Array.isArray(sbSuppliers)) {
+        sbSuppliers.forEach((s) => {
+          if (s.name && s.id) supplierUuidMap[s.name] = s.id;
+        });
+      }
+
+      const merged = structuredClone(currentData || {});
+
+      // Map Supabase inventory_items to React workspace items
+      if (Array.isArray(sbItems) && sbItems.length > 0) {
+        merged.items = sbItems.map((row) => ({
+          id: row.sku || row.id,
+          name: row.name,
+          category: row.category,
+          unit: row.unit,
+          physical: Number(row.physical_stock || 0),
+          reserved: Number(row.reserved_stock || 0),
+          reorder: Number(row.reorder_point || 10),
+          safety: Number(row.safety_stock || 5),
+          cost: Number(row.unit_cost || 0),
+          supplier: row.supplier?.name || "Unassigned",
+          lead: Number(row.supplier?.lead_days || 5),
+          minOrder: Number(row.min_order_qty || 1),
+          daily: Number(row.daily_usage || 0),
+          initialDemand: Number(row.daily_usage || 0) * 30,
+        }));
+      }
+
+      // Map Supabase suppliers
+      if (Array.isArray(sbSuppliers) && sbSuppliers.length > 0) {
+        merged.suppliers = sbSuppliers.map((s) => ({
+          id: s.code || s.id,
+          name: s.name,
+          items: s.items_desc || "",
+          lead: Number(s.lead_days || 5),
+          reliability: Number(s.reliability || 95),
+          terms: s.terms || "Net 30",
+        }));
+      }
+
+      // Update stats and badges
+      config.stats = {
+        items: merged.items?.length || 0,
+        suppliers: merged.suppliers?.length || 0,
+        pos: sbPos?.length || (merged.pos?.length || 0),
+        orders: sbOrders?.length || (merged.orders?.length || 0),
+      };
+      updateUIBadges();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+
+      console.log(`[Supabase Sync] Pulled ${config.stats.items} inventory items and ${config.stats.suppliers} suppliers from PostgreSQL.`);
+      return merged;
+    } catch (e) {
+      console.warn("[Supabase Sync] Failed to pull from live PostgreSQL:", e);
+      return null;
+    }
+  }
+
+  // Push new or edited items & suppliers to Supabase PostgreSQL Table Editor
+  async function pushToSupabase(nextData, oldData) {
+    if (!config.isConnected || !config.url || !config.anonKey) return;
+    if (!nextData || !nextData.items) return;
+
+    try {
+      console.log("[Supabase Sync] Syncing updates to PostgreSQL Table Editor...");
+
+      // 1. Ensure all suppliers in nextData exist in Supabase
+      if (Array.isArray(nextData.suppliers)) {
+        for (const s of nextData.suppliers) {
+          if (!supplierUuidMap[s.name]) {
+            try {
+              const res = await sbRequest(
+                "suppliers",
+                "POST",
+                {
+                  code: s.id || `SUP-${Math.floor(Math.random() * 900 + 100)}`,
+                  name: s.name,
+                  items_desc: s.items || "",
+                  lead_days: Number(s.lead || 5),
+                  reliability: Number(s.reliability || 95),
+                  terms: s.terms || "Net 30",
+                },
+                false,
+                "resolution=merge-duplicates,return=representation"
+              );
+              if (res && res[0]) supplierUuidMap[s.name] = res[0].id;
+            } catch (err) {
+              console.warn(`[Supabase] Could not auto-insert supplier "${s.name}":`, err.message);
+            }
+          }
+        }
+      }
+
+      // 2. Format inventory items for Supabase PostgreSQL schema
+      const itemsPayload = nextData.items.map((item) => {
+        const skuCode = String(item.id || "").trim();
+        return {
+          sku: skuCode,
+          name: String(item.name || "").trim(),
+          category: item.category || "General",
+          unit: item.unit || "units",
+          physical_stock: Number(item.physical || 0),
+          reserved_stock: Number(item.reserved || 0),
+          reorder_point: Number(item.reorder || 10),
+          safety_stock: Number(item.safety || 5),
+          unit_cost: Number(item.cost || 0),
+          daily_usage: Number(item.daily || 0),
+          min_order_qty: Number(item.minOrder || 1),
+          supplier_id: supplierUuidMap[item.supplier] || null,
+          updated_at: new Date().toISOString(),
+        };
+      });
+
+      // 3. Upsert items in bulk into Supabase inventory_items table
+      if (itemsPayload.length > 0) {
+        await sbRequest(
+          "inventory_items?on_conflict=sku",
+          "POST",
+          itemsPayload,
+          false,
+          "resolution=merge-duplicates,return=representation"
+        );
+        console.log(`[Supabase Table Editor] Successfully upserted ${itemsPayload.length} items into public.inventory_items!`);
+        showToast(`✓ Synced ${itemsPayload.length} item(s) to Supabase Table Editor`);
+      }
+
+      // 4. Handle deletions: remove items from Supabase if removed from workspace
+      if (oldData && Array.isArray(oldData.items)) {
+        const deleted = oldData.items.filter((old) => !nextData.items.some((curr) => curr.id === old.id));
+        for (const del of deleted) {
+          try {
+            await sbRequest(`inventory_items?sku=eq.${encodeURIComponent(del.id)}`, "DELETE");
+            console.log(`[Supabase Table Editor] Deleted item ${del.id} from public.inventory_items`);
+          } catch (delErr) {
+            console.warn(`[Supabase] Could not delete item ${del.id}:`, delErr.message);
+          }
+        }
+      }
+
+      // 5. Update counts
+      config.stats.items = nextData.items.length;
+      if (nextData.suppliers) config.stats.suppliers = nextData.suppliers.length;
+      updateUIBadges();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    } catch (e) {
+      console.error("[Supabase Table Editor] Upsert failed:", e);
+      showToast(`⚠️ Supabase sync error: ${e.message}`, 4000);
+      throw e;
+    }
+  }
+
+  // --- 3. Stored RPC Procedures ---
+
   // Atomic Stored Procedure 1: adjust_inventory_stock
   async function rpcAdjustStock(itemId, type, quantity) {
-    console.log(`[Supabase RPC] adjust_inventory_stock(${itemId}, ${type}, ${quantity})`);
+    console.log(`[Supabase RPC] Calling adjust_inventory_stock(${itemId}, ${type}, ${quantity})`);
     return await sbRequest("rpc/adjust_inventory_stock", "POST", {
       p_item_id: itemId,
       p_type: type, // 'RECEIVE', 'CONSUME', or 'SET'
@@ -112,7 +281,7 @@
 
   // Atomic Stored Procedure 2: receive_purchase_order
   async function rpcReceivePurchaseOrder(poId, note = "Shipment received and verified") {
-    console.log(`[Supabase RPC] receive_purchase_order(${poId})`);
+    console.log(`[Supabase RPC] Calling receive_purchase_order(${poId})`);
     const actorName = activeRole === "owner" ? "Operations Owner" : "Warehouse Staff";
     const actorRole = activeRole === "owner" ? "OWNER" : "WORKER";
     const actorId = activeRole === "owner" ? "usr-owner" : "usr-worker";
@@ -126,9 +295,8 @@
         p_note: note,
       });
     } catch (e) {
-      // If RPC procedure is not deployed yet in PostgreSQL, fallback to atomic PostgREST update
       if (e.status === 404 || (e.message && e.message.includes("Could not find the function"))) {
-        console.warn("[Supabase] RPC receive_purchase_order not found in DB. Executing direct table update fallback.");
+        console.warn("[Supabase] RPC receive_purchase_order not found in DB. Executing transactional table update fallback.");
         return await fallbackReceivePO(poId, note, actorId, actorName, actorRole);
       }
       throw e;
@@ -136,18 +304,15 @@
   }
 
   async function fallbackReceivePO(poId, note, actorId, actorName, actorRole) {
-    // 1. Get PO
     const pos = await sbRequest(`purchase_orders?id=eq.${poId}&select=*`, "GET");
     if (!pos || !pos.length) throw new Error("Purchase Order not found");
     const po = pos[0];
 
-    // 2. Mark PO as RECEIVED
     await sbRequest(`purchase_orders?id=eq.${poId}`, "PATCH", {
       status: "RECEIVED",
       updated_at: new Date().toISOString(),
     });
 
-    // 3. Increment Item physical stock
     const items = await sbRequest(`inventory_items?id=eq.${po.item_id}&select=*`, "GET");
     if (items && items.length) {
       const item = items[0];
@@ -158,7 +323,6 @@
       });
     }
 
-    // 4. Record audit event
     await sbRequest("purchase_order_events", "POST", {
       purchase_order_id: poId,
       action: "RECEIVED",
@@ -173,7 +337,8 @@
     return { ...po, status: "RECEIVED" };
   }
 
-  // Test and Diagnose all Supabase endpoints and stored procedures
+  // --- 4. Diagnostics & Testing ---
+
   async function testConnection(testUrl, testKey) {
     const originalUrl = config.url;
     const originalKey = config.anonKey;
@@ -198,7 +363,6 @@
 
     const startTime = performance.now();
     try {
-      // 1. Test tables
       const [items, suppliers, pos, orders] = await Promise.allSettled([
         sbRequest("inventory_items?select=id", "GET"),
         sbRequest("suppliers?select=id", "GET"),
@@ -230,7 +394,7 @@
         results.tables.demand_orders.error = orders.reason.message;
       }
 
-      // 2. Test adjust_inventory_stock RPC procedure
+      // Test RPC 1: adjust_inventory_stock
       try {
         await sbRequest("rpc/adjust_inventory_stock", "POST", {
           p_item_id: "00000000-0000-0000-0000-000000000000",
@@ -239,7 +403,7 @@
         });
         results.rpcs.adjust_inventory_stock = { ok: true, detail: "Verified (Atomic)" };
       } catch (err) {
-        if (err.status === 400 && err.message && (err.message.toLowerCase().includes("not found") || err.message.includes("Item"))) {
+        if (err.status === 400 && err.message && err.message.includes("not found")) {
           results.rpcs.adjust_inventory_stock = { ok: true, detail: "Available & Validating" };
         } else if (err.status === 404) {
           results.rpcs.adjust_inventory_stock = { ok: false, detail: "Procedure not installed" };
@@ -248,20 +412,14 @@
         }
       }
 
-      // 3. Test receive_purchase_order RPC procedure
+      // Test RPC 2: receive_purchase_order
       try {
         await sbRequest("rpc/receive_purchase_order", "POST", {
           p_po_id: "00000000-0000-0000-0000-000000000000",
-          p_actor_id: "usr-diag",
-          p_actor_name: "Diagnostics",
-          p_actor_role: "OWNER",
-          p_note: "Health check",
         });
         results.rpcs.receive_purchase_order = { ok: true, detail: "Verified (Atomic)" };
       } catch (err) {
-        if (err.status === 400 && err.message && (err.message.toLowerCase().includes("not found") || err.message.includes("Purchase order"))) {
-          results.rpcs.receive_purchase_order = { ok: true, detail: "Available & Validating" };
-        } else if (err.status === 404) {
+        if (err.status === 404) {
           results.rpcs.receive_purchase_order = { ok: false, detail: "Procedure not deployed (Fallback active)" };
         } else {
           results.rpcs.receive_purchase_order = { ok: true, detail: "Available & Validating" };
@@ -280,9 +438,9 @@
     return results;
   }
 
-  // Seed initial sample inventory & suppliers into Supabase PostgreSQL
+  // Seed sample initial data into Supabase PostgreSQL
   async function seedDatabase() {
-    console.log("[Supabase] Seeding sample data into live database...");
+    console.log("[Supabase] Seeding sample data into PostgreSQL Table Editor...");
     const sampleSuppliers = [
       { code: "SUP-01", name: "Everyday Wholesale", items_desc: "General merchandise, drinkware", lead_days: 5, reliability: 96.0, terms: "Net 30" },
       { code: "SUP-02", name: "FreshFields Foods", items_desc: "Fresh ingredients, perishables", lead_days: 2, reliability: 94.0, terms: "Net 14" },
@@ -291,8 +449,7 @@
       { code: "SUP-05", name: "CleanWorks Supply", items_desc: "Cleaning and facility supplies", lead_days: 4, reliability: 93.0, terms: "Net 14" },
     ];
 
-    // Insert/upsert suppliers first
-    const createdSuppliers = await sbRequest("suppliers?on_conflict=code", "POST", sampleSuppliers);
+    const createdSuppliers = await sbRequest("suppliers", "POST", sampleSuppliers, false, "resolution=merge-duplicates,return=representation");
     const supMap = {};
     if (Array.isArray(createdSuppliers)) {
       createdSuppliers.forEach((s) => (supMap[s.name] = s.id));
@@ -305,19 +462,18 @@
       { sku: "RAW-004", name: "Fastener Screws M6", category: "Hardware", unit: "packs", physical_stock: 500.0, reserved_stock: 100.0, reorder_point: 400.0, safety_stock: 200.0, unit_cost: 0.12, daily_usage: 30.0, min_order_qty: 250.0, supplier_id: supMap["Precision Parts Ltd"] || null },
     ];
 
-    await sbRequest("inventory_items?on_conflict=sku", "POST", sampleItems);
+    await sbRequest("inventory_items?on_conflict=sku", "POST", sampleItems, false, "resolution=merge-duplicates,return=representation");
     await syncLiveCounts();
   }
 
-  // Sync row counts and update UI tabs
   async function syncLiveCounts() {
     if (!config.isConnected) return;
     try {
       const [items, suppliers, pos, orders] = await Promise.all([
-        sbRequest("inventory_items?select=*", "GET"),
-        sbRequest("suppliers?select=*", "GET"),
-        sbRequest("purchase_orders?select=*", "GET"),
-        sbRequest("demand_orders?select=*", "GET"),
+        sbRequest("inventory_items?select=id", "GET").catch(() => []),
+        sbRequest("suppliers?select=id", "GET").catch(() => []),
+        sbRequest("purchase_orders?select=id", "GET").catch(() => []),
+        sbRequest("demand_orders?select=id", "GET").catch(() => []),
       ]);
 
       config.stats = {
@@ -326,65 +482,6 @@
         pos: pos?.length || 0,
         orders: orders?.length || 0,
       };
-
-      // Sync into StockWise app state if items exist
-      if (items && items.length > 0) {
-        try {
-          const appKey = "stockwise-html-preview-v1";
-          const current = JSON.parse(localStorage.getItem(appKey) || "{}");
-          if (!current.data) current.data = {};
-
-          const supLookup = {};
-          (suppliers || []).forEach((s) => { supLookup[s.id] = s.name; });
-
-          current.data.items = items.map((it) => ({
-            id: it.id,
-            name: it.name,
-            category: it.category || "General",
-            physical: Number(it.physical_stock || 0),
-            reserved: Number(it.reserved_stock || 0),
-            reorder: Number(it.reorder_point || 0),
-            safety: Number(it.safety_stock || 0),
-            cost: Number(it.unit_cost || 0),
-            unit: it.unit || "units",
-            supplier: supLookup[it.supplier_id] || "Default Supplier",
-            lead: 5,
-            minOrder: Number(it.min_order_qty || 1),
-            daily: Number(it.daily_usage || 0),
-            initialDemand: Number(it.daily_usage || 0) * 30,
-          }));
-
-          if (suppliers && suppliers.length > 0) {
-            current.data.suppliers = suppliers.map((s) => ({
-              id: s.id,
-              name: s.name,
-              code: s.code,
-              leadTimeDays: s.lead_days || 5,
-              reliability: Number(s.reliability || 95),
-              contact: s.items_desc || "",
-              terms: s.terms || "Net 30",
-            }));
-          }
-
-          if (pos && pos.length > 0) {
-            current.data.pos = pos.map((p) => ({
-              id: p.id,
-              poNumber: p.po_number,
-              itemId: p.item_id,
-              supplierId: p.supplier_id,
-              quantity: Number(p.quantity),
-              unitCost: Number(p.unit_cost),
-              total: Number(p.total_cost),
-              status: p.status,
-              createdAt: p.created_at,
-            }));
-          }
-
-          localStorage.setItem(appKey, JSON.stringify(current));
-        } catch (e) {
-          console.warn("[StockWise] App cache sync warning:", e);
-        }
-      }
 
       updateUIBadges();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
@@ -399,13 +496,44 @@
     updateUIBadges();
   }
 
-  // --- 2. Inject UI Components (Miro Style) ---
+  function showToast(message, duration = 3000) {
+    let toast = document.getElementById("sw-bridge-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "sw-bridge-toast";
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10001;
+        background: #0f172a;
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.2s ease;
+        pointer-events: none;
+      `;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(10px)";
+    }, duration);
+  }
+
+  // --- 5. UI Elements & Modal ---
 
   const STYLES = `
-    /* Hide legacy offline notice */
     #offline-notice { display: none !important; }
 
-    /* Top Master Bar */
     #sw-topbar-wrapper {
       position: sticky;
       top: 0;
@@ -520,7 +648,6 @@
       gap: 12px;
     }
 
-    /* Role Switcher Pill */
     .sw-role-toggle {
       display: flex;
       background: #f1f5f9;
@@ -548,7 +675,6 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    /* Supabase Config Button */
     .sw-btn-config {
       display: inline-flex;
       align-items: center;
@@ -570,7 +696,6 @@
       color: #0f172a;
     }
 
-    /* Navigation Tabs */
     .sw-nav-tabs {
       display: flex;
       gap: 28px;
@@ -593,17 +718,13 @@
       white-space: nowrap;
     }
 
-    .sw-tab-item:hover {
-      color: #1e293b;
-    }
-
+    .sw-tab-item:hover { color: #1e293b; }
     .sw-tab-item.active {
       color: #4f46e5;
       font-weight: 700;
       border-bottom-color: #4f46e5;
     }
 
-    /* Warning Banner */
     #sw-warning-banner {
       max-width: 1320px;
       margin: 16px auto 0 auto;
@@ -669,11 +790,8 @@
       box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
     }
 
-    .sw-btn-configure-now:hover {
-      background: #b45309;
-    }
+    .sw-btn-configure-now:hover { background: #b45309; }
 
-    /* Credential Modal */
     #sw-modal-overlay {
       display: none;
       position: fixed;
@@ -687,9 +805,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    #sw-modal-overlay.open {
-      display: flex;
-    }
+    #sw-modal-overlay.open { display: flex; }
 
     .sw-modal-card {
       background: #ffffff;
@@ -758,9 +874,7 @@
       overflow-y: auto;
     }
 
-    .sw-form-group {
-      margin-bottom: 16px;
-    }
+    .sw-form-group { margin-bottom: 16px; }
 
     .sw-form-label {
       display: block;
@@ -805,12 +919,8 @@
       transition: all 0.15s;
     }
 
-    .sw-btn-text:hover {
-      background: #f1f5f9;
-      color: #1e293b;
-    }
+    .sw-btn-text:hover { background: #f1f5f9; color: #1e293b; }
 
-    /* Diagnostics Table */
     .sw-diag-box {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -836,9 +946,7 @@
       border-bottom: 1px dashed #e2e8f0;
     }
 
-    .sw-diag-row:last-child {
-      border-bottom: none;
-    }
+    .sw-diag-row:last-child { border-bottom: none; }
 
     .sw-diag-badge {
       font-weight: 600;
@@ -847,15 +955,8 @@
       border-radius: 9999px;
     }
 
-    .sw-diag-badge.ok {
-      background: #dcfce7;
-      color: #15803d;
-    }
-
-    .sw-diag-badge.warn {
-      background: #fef3c7;
-      color: #b45309;
-    }
+    .sw-diag-badge.ok { background: #dcfce7; color: #15803d; }
+    .sw-diag-badge.warn { background: #fef3c7; color: #b45309; }
 
     .sw-modal-footer {
       padding: 16px 24px;
@@ -878,9 +979,7 @@
       transition: background 0.15s;
     }
 
-    .sw-btn-primary:hover {
-      background: #1d4ed8;
-    }
+    .sw-btn-primary:hover { background: #1d4ed8; }
 
     .sw-btn-danger {
       background: transparent;
@@ -893,13 +992,10 @@
       cursor: pointer;
     }
 
-    .sw-btn-danger:hover {
-      background: #fef2f2;
-    }
+    .sw-btn-danger:hover { background: #fef2f2; }
   `;
 
   function injectDOM() {
-    // Inject styles
     const styleEl = document.createElement("style");
     styleEl.innerHTML = STYLES;
     document.head.appendChild(styleEl);
@@ -1038,31 +1134,25 @@
     `;
 
     document.body.appendChild(modal);
-
-    // Bind Event Handlers
     bindEvents();
   }
 
   function bindEvents() {
-    // Open Modal Triggers
     document.getElementById("sw-open-config-btn")?.addEventListener("click", openModal);
     document.getElementById("sw-banner-config-btn")?.addEventListener("click", openModal);
     document.getElementById("sw-status-pill")?.addEventListener("click", openModal);
 
-    // Close Modal
     document.getElementById("sw-modal-close-btn")?.addEventListener("click", closeModal);
     document.getElementById("sw-modal-overlay")?.addEventListener("click", (e) => {
       if (e.target.id === "sw-modal-overlay") closeModal();
     });
 
-    // Quick Fill Defaults
     document.getElementById("sw-btn-load-defaults")?.addEventListener("click", () => {
       document.getElementById("sw-input-url").value = DEFAULT_CONFIG.url;
       document.getElementById("sw-input-key").value = DEFAULT_CONFIG.anonKey;
       document.getElementById("sw-input-secret").value = DEFAULT_CONFIG.secretKey;
     });
 
-    // Seed Data
     document.getElementById("sw-btn-seed-data")?.addEventListener("click", async () => {
       const msg = document.getElementById("sw-diag-msg");
       msg.style.color = "#2563eb";
@@ -1078,12 +1168,10 @@
       }
     });
 
-    // Test Only
     document.getElementById("sw-btn-test-only")?.addEventListener("click", async () => {
       await runModalDiagnostics();
     });
 
-    // Save & Connect
     document.getElementById("sw-btn-save-conn")?.addEventListener("click", async () => {
       const url = document.getElementById("sw-input-url").value.trim();
       const key = document.getElementById("sw-input-key").value.trim();
@@ -1091,7 +1179,7 @@
 
       const msg = document.getElementById("sw-diag-msg");
       msg.style.color = "#2563eb";
-      msg.textContent = "Verifying connection and RPC functions...";
+      msg.textContent = "Verifying connection and pulling live tables...";
 
       const diag = await testConnection(url, key);
       if (diag.ok) {
@@ -1119,7 +1207,6 @@
       }
     });
 
-    // Disconnect
     document.getElementById("sw-btn-disconnect")?.addEventListener("click", () => {
       saveConfig({ isConnected: false });
       updateUIBadges();
@@ -1127,7 +1214,6 @@
       location.reload();
     });
 
-    // Role Switcher Click
     document.querySelectorAll(".sw-role-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const role = btn.dataset.role;
@@ -1135,17 +1221,13 @@
         activeRole = role;
         document.querySelectorAll(".sw-role-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-
-        // Sync with existing preview app if present
         try {
-          const keys = ["stockwise", "stockwise-role"];
-          keys.forEach((k) => sessionStorage.setItem(k + "-role", role));
+          ["stockwise", "stockwise-role"].forEach((k) => sessionStorage.setItem(k + "-role", role));
         } catch {}
         location.reload();
       });
     });
 
-    // Nav Tabs Active indicator
     document.querySelectorAll(".sw-tab-item").forEach((tab) => {
       tab.addEventListener("click", () => {
         document.querySelectorAll(".sw-tab-item").forEach((t) => t.classList.remove("active"));
@@ -1176,24 +1258,18 @@
       elItems.textContent = `${res.tables.inventory_items.count} rows (Live)`;
       elItems.className = "sw-diag-badge ok";
     } else {
-      elItems.textContent = "Error: " + (res.tables.inventory_items.error || "Failed");
+      elItems.textContent = "Error: " + res.tables.inventory_items.error;
       elItems.className = "sw-diag-badge warn";
     }
 
     if (res.tables.suppliers.ok) {
       elSuppliers.textContent = `${res.tables.suppliers.count} rows (Live)`;
       elSuppliers.className = "sw-diag-badge ok";
-    } else {
-      elSuppliers.textContent = "Error: " + (res.tables.suppliers.error || "Failed");
-      elSuppliers.className = "sw-diag-badge warn";
     }
 
     if (res.tables.purchase_orders.ok) {
       elPos.textContent = `${res.tables.purchase_orders.count} rows (Live)`;
       elPos.className = "sw-diag-badge ok";
-    } else {
-      elPos.textContent = "Error: " + (res.tables.purchase_orders.error || "Failed");
-      elPos.className = "sw-diag-badge warn";
     }
 
     elRpc1.textContent = res.rpcs.adjust_inventory_stock.detail;
@@ -1252,61 +1328,14 @@
     if (modal) modal.classList.remove("open");
   }
 
-  // --- 3. Seamless App Fetch Interceptor for Stored RPCs & Tables ---
-
-  function setupFetchInterceptor() {
-    const prevFetch = window.fetch;
-    window.fetch = async function (input, init) {
-      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-
-      // Direct Stock Adjustment Hook -> Trigger Postgres RPC adjust_inventory_stock
-      if (config.isConnected && url.includes("/inventory/adjust") && init?.method === "POST") {
-        try {
-          const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
-          console.log("[Bridge] Intercepted stock adjustment -> routing to Supabase RPC");
-          const rpcRes = await rpcAdjustStock(body.itemId || body.item_id, body.type || body.adjust_type, body.quantity);
-          await syncLiveCounts();
-          return new Response(JSON.stringify({ success: true, result: rpcRes }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
-        } catch (err) {
-          console.error("[Bridge] RPC adjust_inventory_stock failed:", err);
-        }
-      }
-
-      // Direct PO Receiving Hook -> Trigger Postgres RPC receive_purchase_order
-      if (config.isConnected && (url.includes("/po/receive") || (url.includes("/purchase-requests/action") && init?.body?.includes('"receive"')))) {
-        try {
-          const body = typeof init.body === "string" ? JSON.parse(init.body) : init.body;
-          const poId = body.poId || body.id || body.po_id;
-          console.log("[Bridge] Intercepted PO receiving -> routing to Supabase RPC");
-          const rpcRes = await rpcReceivePurchaseOrder(poId, body.note || "Shipment verified");
-          await syncLiveCounts();
-          return new Response(JSON.stringify({ success: true, result: rpcRes }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
-        } catch (err) {
-          console.error("[Bridge] RPC receive_purchase_order failed:", err);
-        }
-      }
-
-      // Normal backend / simulation request flow
-      return prevFetch(input, init);
-    };
-  }
-
   // Run on DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       injectDOM();
-      setupFetchInterceptor();
       syncLiveCounts();
     });
   } else {
     injectDOM();
-    setupFetchInterceptor();
     syncLiveCounts();
   }
 })();

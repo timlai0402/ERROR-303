@@ -7196,12 +7196,25 @@ window.fetch = async (input, init) => {
       data = applyPurchaseAction(data, body, role === "worker" ? worker : owner);
       version++;
       persist();
+      if (window.StockWiseBridge && typeof window.StockWiseBridge.pushToSupabase === "function") {
+        window.StockWiseBridge.pushToSupabase(data).catch(() => {});
+      }
       return json(workspace());
     } catch (error) {
       return json({ error: error instanceof Error ? error.message : "Preview action failed." }, error instanceof ProcurementError ? error.status : 400);
     }
   }
-  if (path2 === "/workspace" && method === "GET") return json(workspace());
+  if (path2 === "/workspace" && method === "GET") {
+    if (window.StockWiseBridge && typeof window.StockWiseBridge.pullFromSupabase === "function") {
+      try {
+        const live = await window.StockWiseBridge.pullFromSupabase(data);
+        if (live) data = live;
+      } catch (err) {
+        console.warn("[StockWise] Live pull error:", err);
+      }
+    }
+    return json(workspace());
+  }
   if (path2 === "/workspace" && method === "PUT") {
     if (body.version !== version) return json({ error: "Preview changed. Please reload." }, 409);
     const next = body.data;
@@ -7221,6 +7234,13 @@ window.fetch = async (input, init) => {
         p2.unitCost = old?.unitCost ?? next.items.find((i2) => i2.id === p2.itemId)?.cost ?? 0;
         p2.total = p2.unitCost * p2.quantity;
       });
+    }
+    if (window.StockWiseBridge && typeof window.StockWiseBridge.pushToSupabase === 'function') {
+      try {
+        await window.StockWiseBridge.pushToSupabase(next, data);
+      } catch (err) {
+        console.error('[StockWise] Failed to push update to Supabase Table Editor:', err);
+      }
     }
     data = next;
     version++;
