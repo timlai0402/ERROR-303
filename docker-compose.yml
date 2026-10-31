@@ -11,7 +11,8 @@ services:
       - API_PORT=8000
       - SUPABASE_URL=${SUPABASE_URL:-}
       - SUPABASE_KEY=${SUPABASE_KEY:-}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - KRACKED_API_KEY=${KRACKED_API_KEY:-}
+      - KRACKED_BASE_URL=${KRACKED_BASE_URL:-https://litellm.rapidscreen.io/v1}
+      - KRACKED_MODEL=${KRACKED_MODEL:-gpt-5.5}
       - NEWS_API_KEY=${NEWS_API_KEY:-}
     restart: unless-stopped
-

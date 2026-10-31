@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.inventory_engine import inventory_engine
 from app.services.forecasting import forecaster
+from app.services.ai_advisor import ai_advisor
+from app.services.market_news import market_news
 
 client = TestClient(app)
 
@@ -12,6 +14,15 @@ def test_root():
     data = response.json()
     assert data["product"] == "StockWise AI"
     assert "FastAPI Business Logic" in data["features"]
+    assert "KrackedDevs Chief Procurement AI Rationale" in data["features"]
+
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["kracked_ai"]["configured"] is True
+    assert data["news_api"]["configured"] is True
 
 def test_inventory_list():
     response = client.get("/api/inventory")
@@ -22,11 +33,9 @@ def test_inventory_list():
     assert "status" in items[0]
 
 def test_deterministic_eoq_rop():
-    # Test EOQ: D=1000, S=50, H=2.0 -> sqrt(2 * 1000 * 50 / 2) = sqrt(50000) ~= 223.61
     eoq = inventory_engine.calculate_eoq(annual_demand=1000, order_setup_cost=50, unit_cost=10, holding_pct=0.20)
     assert round(eoq, 1) == 223.6
 
-    # Test ROP: daily=10, lead=5, safety=20 -> (10 * 5) + 20 = 70
     rop = inventory_engine.calculate_rop(daily_demand=10, lead_time_days=5, safety_stock=20)
     assert rop == 70.0
 
@@ -45,6 +54,26 @@ def test_statistical_forecasting():
     assert res["reorder_point_calculated"] > 0
     assert "upper" in res["confidence_interval_95"]
 
+def test_market_signals():
+    response = client.get("/api/market/signals?query=logistics")
+    assert response.status_code == 200
+    data = response.json()
+    assert "signals" in data
+    assert len(data["signals"]) > 0
+    first = data["signals"][0]
+    assert "title" in first
+    assert "sentiment" in first
+    assert "supply_risk" in first
+
+def test_market_assess_item():
+    response = client.get("/api/market/assess-item/RAW-001")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["item_id"] == "RAW-001"
+    assert "ai_risk_assessment" in data
+    assert "restock_decision" in data
+    assert "executive_rationale" in data["restock_decision"]
+
 def test_workspace_sync():
     response = client.get("/api/workspace")
     assert response.status_code == 200
@@ -54,7 +83,6 @@ def test_workspace_sync():
     assert "valuation" in data
 
 def test_procurement_human_approval_flow():
-    # 1. Create a draft PO
     create_res = client.post("/api/purchase-requests/action", json={
         "action": "create",
         "itemId": "RAW-001",
@@ -66,8 +94,9 @@ def test_procurement_human_approval_flow():
     po = create_res.json()["po"]
     po_id = po["id"]
     assert po["status"] == "Draft"
+    assert "aiRationale" in po
+    assert len(po["aiRationale"]) > 0
 
-    # 2. Submit for manager approval
     submit_res = client.post("/api/purchase-requests/action", json={
         "id": po_id,
         "action": "submit"
@@ -75,11 +104,9 @@ def test_procurement_human_approval_flow():
     assert submit_res.status_code == 200
     assert submit_res.json()["status"] == "Pending"
 
-    # 3. Manager approves (Human gate)
     approve_res = client.post("/api/purchase-requests/action", json={
         "id": po_id,
         "action": "approve"
     })
     assert approve_res.status_code == 200
     assert approve_res.json()["status"] == "Approved"
-

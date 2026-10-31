@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 from app.db.supabase_client import db
 from app.services.ai_advisor import ai_advisor
+from app.services.market_news import market_news
 from app.services.inventory_engine import inventory_engine
 from app.models.schemas import PurchaseOrderCreate, PurchaseOrderAction, PurchaseOrderResponse
 
@@ -24,11 +25,16 @@ async def create_purchase_order(payload: PurchaseOrderCreate):
     total = round(payload.quantity * unit_cost, 2)
     supplier = payload.supplier or item.get("supplier", "Unknown")
 
-    # Generate GenAI explanation
+    # Fetch live NewsAPI context for category
+    signals = await market_news.fetch_supply_chain_news(f"{item.get('category', '')} supply price", page_size=2)
+    headlines = [s["title"] for s in signals]
+
+    # Generate KrackedDevs LLM explanation fused with NewsAPI signals
     ai_eval = await ai_advisor.explain_restocking_decision(
         item=item,
         rec_quantity=payload.quantity,
-        deficit=0.0
+        deficit=0.0,
+        market_signals=headlines
     )
 
     po = {
@@ -45,7 +51,7 @@ async def create_purchase_order(payload: PurchaseOrderCreate):
         "createdByName": "Inventory Manager",
         "createdAt": datetime.utcnow().isoformat(),
         "aiRationale": ai_eval.get("executive_rationale", ""),
-        "aiRiskLevel": ai_eval.get("supply_risk_level", "Low"),
+        "aiRiskLevel": ai_eval.get("supply_risk_level", "LOW"),
         "additionalReason": payload.additionalReason or payload.reason
     }
 
@@ -72,8 +78,12 @@ async def handle_procurement_action(action: PurchaseOrderAction):
         qty = action.quantity or float(item.get("minOrder", 10))
         total = round(qty * unit_cost, 2)
         
-        # AI decision rationale
-        ai_eval = await ai_advisor.explain_restocking_decision(item, qty)
+        # NewsAPI signals
+        signals = await market_news.fetch_supply_chain_news(f"{item.get('category', '')} supply price", page_size=2)
+        headlines = [s["title"] for s in signals]
+
+        # KrackedDevs AI decision rationale
+        ai_eval = await ai_advisor.explain_restocking_decision(item, qty, market_signals=headlines)
 
         po = {
             "id": po_id,
@@ -89,7 +99,7 @@ async def handle_procurement_action(action: PurchaseOrderAction):
             "createdByName": "Requester",
             "createdAt": datetime.utcnow().isoformat(),
             "aiRationale": ai_eval.get("executive_rationale", ""),
-            "aiRiskLevel": ai_eval.get("supply_risk_level", "Low"),
+            "aiRiskLevel": ai_eval.get("supply_risk_level", "LOW"),
             "additionalReason": action.additionalReason or action.reason
         }
         db.save_purchase_order(po)
@@ -144,4 +154,3 @@ async def handle_procurement_action(action: PurchaseOrderAction):
 
     db.save_purchase_order(po)
     return {"ok": True, "status": po["status"], "po": po}
-
