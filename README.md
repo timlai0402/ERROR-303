@@ -142,7 +142,7 @@ Replit served as the primary cloud-native development environment and staging pl
 
 Challenge: Entering the hackathon with no prior coding background, interpreting cryptic browser console errors, syntax bugs, and broken layout alignments in Replit was initially overwhelming and stalled development.
 
-Learning: We learned to treat AI tools (such as Replit AI and Gemini) not as automatic code generators, but as patient 24/7 technical mentors. By pasting raw error logs into the AI, asking it to explain why something broke, and iteratively testing small code changes, we built a working understanding of web structure, learned how to isolate bugs, and successfully brought the interactive dashboard to life from scratch.
+Learning: We learned to treat AI tools (such as Replit AI and KrackedDevs AI) not as automatic code generators, but as patient 24/7 technical mentors. By pasting raw error logs into the AI, asking it to explain why something broke, and iteratively testing small code changes, we built a working understanding of web structure, learned how to isolate bugs, and successfully brought the interactive dashboard to life from scratch.
 
 - **Overcoming Git & Cloud Deployment WorkflowsChallenge:**
 As beginners to software version control, managing concurrent branches, avoiding merge conflicts, and synchronizing code between Replit and GitHub created friction during fast-paced prototyping. 
