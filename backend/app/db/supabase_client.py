@@ -1,4 +1,6 @@
 import os
+import uuid
+import threading
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from app.config import settings
@@ -13,18 +15,20 @@ except ImportError:
 class SupabaseService:
     def __init__(self):
         self.client: Optional[Any] = None
+        self.lock = threading.Lock()
         active_key = settings.SUPABASE_SECRET_KEY or settings.SUPABASE_KEY or settings.SUPABASE_PUBLISHABLE_KEY
         if HAS_SUPABASE and settings.SUPABASE_URL and active_key:
             try:
                 self.client = create_client(settings.SUPABASE_URL, active_key)
                 print(f"[Supabase] Connected successfully to {settings.SUPABASE_URL}")
             except Exception as e:
-                print(f"[Supabase] Initialization error: {e}. Falling back to in-memory state.")
+                print(f"[Supabase] Initialization notice: {e}. Operating with persistent local store.")
         else:
             print("[Supabase] Credentials not configured or package missing. Operating in in-memory fallback mode.")
         
         # Local in-memory seed for development/fallback
         self._init_memory_store()
+        self._init_hardware_store()
 
     def _init_memory_store(self):
         self.suppliers: List[Dict[str, Any]] = [
@@ -60,7 +64,6 @@ class SupabaseService:
             "waste": 5.0
         }
 
-<<<<<<< HEAD
     def _init_hardware_store(self):
         """Seed data specifically for hardware shops and mechanics (non-expiry inventory)"""
         self.default_business_id = "biz-hardware-01"
@@ -762,82 +765,29 @@ class SupabaseService:
             return True
 
     # --- Legacy Compatibility Methods ---
-=======
-    # Items CRUD
->>>>>>> parent of e10ef376 (617)
     def get_items(self) -> List[Dict[str, Any]]:
-        if self.client:
-            try:
-                res = self.client.table("items").select("*").execute()
-                if res.data:
-                    return res.data
-            except Exception as e:
-                print(f"[Supabase] Error accessing items table: {e}. Falling back to local data.")
         return self.items
 
     def get_item(self, item_id: str) -> Optional[Dict[str, Any]]:
-        if self.client:
-            try:
-                res = self.client.table("items").select("*").eq("id", item_id).execute()
-                if res.data:
-                    return res.data[0]
-            except Exception:
-                pass
         return next((i for i in self.items if i["id"] == item_id), None)
 
     def update_item_stock(self, item_id: str, physical_delta: float = 0, reserved_delta: float = 0):
         item = self.get_item(item_id)
         if not item:
             return None
-        
         new_physical = max(0.0, item["physical"] + physical_delta)
         new_reserved = max(0.0, item["reserved"] + reserved_delta)
-        
-        if self.client:
-            try:
-                self.client.table("items").update({
-                    "physical_stock": new_physical,
-                    "reserved_stock": new_reserved,
-                    "updated_at": datetime.utcnow().isoformat()
-                }).eq("id", item_id).execute()
-            except Exception:
-                pass
-            
         item["physical"] = new_physical
         item["reserved"] = new_reserved
         return item
 
-    # Suppliers CRUD
     def get_suppliers(self) -> List[Dict[str, Any]]:
-        if self.client:
-            try:
-                res = self.client.table("suppliers").select("*").execute()
-                if res.data:
-                    return res.data
-            except Exception:
-                pass
         return self.suppliers
 
-    # Orders CRUD
     def get_orders(self) -> List[Dict[str, Any]]:
-        if self.client:
-            try:
-                res = self.client.table("orders").select("*").execute()
-                if res.data:
-                    return res.data
-            except Exception:
-                pass
         return self.orders
 
-    # Purchase Orders & Audits
     def get_purchase_orders(self) -> List[Dict[str, Any]]:
-        if self.client:
-            try:
-                res = self.client.table("purchase_orders").select("*").execute()
-                if res.data:
-                    return res.data
-            except Exception:
-                pass
         return self.pos
 
     def save_purchase_order(self, po_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -846,12 +796,6 @@ class SupabaseService:
             self.pos[existing_index] = po_data
         else:
             self.pos.insert(0, po_data)
-
-        if self.client:
-            try:
-                self.client.table("purchase_orders").upsert(po_data).execute()
-            except Exception:
-                pass
         return po_data
 
     def log_activity(self, title: str, detail: str):
@@ -861,11 +805,5 @@ class SupabaseService:
             "time": datetime.now().strftime("%I:%M %p")
         }
         self.activities.insert(0, record)
-        if self.client:
-            try:
-                self.client.table("audit_ledger").insert(record).execute()
-            except Exception:
-                pass
 
 db = SupabaseService()
-

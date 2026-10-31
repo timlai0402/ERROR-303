@@ -17,9 +17,9 @@
       /* Apple System Palette */
       --canvas: #F5F5F7;
       --canvas-subtle: #EBEBED;
-      --glass-surface: rgba(255, 255, 255, 0.78);
-      --glass-surface-opaque: rgba(255, 255, 255, 0.94);
-      --glass-surface-hover: rgba(255, 255, 255, 0.9);
+      --glass-surface: rgba(255, 255, 255, 0.76);
+      --glass-surface-opaque: rgba(255, 255, 255, 0.92);
+      --glass-surface-hover: rgba(255, 255, 255, 0.88);
       
       /* Glass Borders & Highlights */
       --glass-border: rgba(255, 255, 255, 0.85);
@@ -48,12 +48,13 @@
       --apple-red-subtle: rgba(255, 59, 48, 0.12);
       --apple-amber: #FF9500;
       --apple-amber-subtle: rgba(255, 149, 0, 0.12);
-      --apple-purple: #5856D6;
+      --apple-chartreuse: #84CC16;
+      --apple-chartreuse-glow: rgba(132, 204, 22, 0.25);
 
       /* Radii */
       --radius-squircle: 22.5%;
-      --radius-card: 20px;
-      --radius-sheet: 24px;
+      --radius-card: 22px;
+      --radius-sheet: 26px;
       --radius-pill: 980px;
       --radius-control: 12px;
       --radius-sm: 8px;
@@ -81,28 +82,6 @@
       flex-direction: column;
       position: relative;
       overflow-x: hidden;
-    }
-
-    /* Minimalist Vector Icons Helper */
-    .icon {
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-      vertical-align: middle;
-      stroke-width: 1.8;
-      stroke: currentColor;
-      fill: none;
-      flex-shrink: 0;
-    }
-
-    .icon-lg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .icon-xl {
-      width: 28px;
-      height: 28px;
     }
 
     /* Ambient Subtle Mesh Depth */
@@ -139,6 +118,7 @@
       transition: all 0.25s ease;
     }
 
+    /* Brand Block with Squircle Logo */
     .brand-identity {
       display: flex;
       align-items: center;
@@ -239,7 +219,7 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
     }
@@ -273,11 +253,11 @@
       color: #FFFFFF;
     }
 
-    /* Header Controls */
+    /* Right Header Controls & Dual-Role Segmented Switcher */
     .header-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     /* Apple Segmented Control for Role Switching */
@@ -288,6 +268,7 @@
       border-radius: var(--radius-pill);
       padding: 3px;
       border: 1px solid rgba(0, 0, 0, 0.04);
+      position: relative;
     }
 
     .role-btn {
@@ -316,6 +297,11 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
+    .role-icon {
+      font-size: 0.95rem;
+    }
+
+    /* Status Indicator Pill */
     .backend-status-pill {
       display: flex;
       align-items: center;
@@ -342,7 +328,7 @@
       box-shadow: 0 0 6px var(--apple-amber);
     }
 
-    .btn-header-action {
+    .btn-journey-pill {
       border: 1px solid rgba(0, 0, 0, 0.1);
       background: #FFFFFF;
       color: var(--text-primary);
@@ -353,12 +339,12 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       transition: all 0.15s ease;
     }
 
-    .btn-header-action:hover {
+    .btn-journey-pill:hover {
       background: var(--apple-dark);
       color: #FFFFFF;
       border-color: var(--apple-dark);
@@ -400,7 +386,7 @@
       border-radius: var(--radius-pill);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       letter-spacing: 0.02em;
     }
 
@@ -411,9 +397,9 @@
     }
 
     .role-badge-staff {
-      background: rgba(88, 86, 214, 0.12);
-      color: var(--apple-purple);
-      border: 1px solid rgba(88, 86, 214, 0.25);
+      background: rgba(132, 204, 22, 0.14);
+      color: #4D7C0F;
+      border: 1px solid rgba(132, 204, 22, 0.28);
     }
 
     .role-banner-desc {
@@ -427,56 +413,19 @@
     }
 
     /* ==========================================================================
-       HOVERING FLOATING ACTION BUTTON (STAFF FAB)
-       ========================================================================== */
-    .staff-fab-button {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 990;
-      background: var(--apple-dark);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: var(--radius-pill);
-      padding: 12px 22px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12);
-      cursor: pointer;
-      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .staff-fab-button:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.3);
-      background: #000000;
-    }
-
-    .staff-fab-button .fab-pulse {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--apple-green);
-      box-shadow: 0 0 8px var(--apple-green);
-    }
-
-    /* ==========================================================================
        MAIN CONTENT CONTAINER
        ========================================================================== */
     main.main-content {
       position: relative;
       z-index: 10;
-      padding: 16px 28px 80px 28px;
+      padding: 16px 28px 48px 28px;
       display: flex;
       flex-direction: column;
       gap: 20px;
       flex: 1;
     }
 
+    /* Summary Metric Tiles (Apple Liquid Glass) */
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -486,9 +435,8 @@
     @media (max-width: 900px) {
       .metric-grid { grid-template-columns: 1fr; }
       .apple-nav-header { flex-direction: column; align-items: stretch; margin: 12px 14px 0 14px; }
-      .main-content { padding: 12px 14px 60px 14px; }
+      .main-content { padding: 12px 14px 32px 14px; }
       .role-banner-wrap { margin: 12px 14px 0 14px; }
-      .staff-fab-button { bottom: 18px; right: 18px; padding: 10px 18px; }
     }
 
     .metric-card {
@@ -534,6 +482,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 0.95rem;
       color: var(--text-primary);
     }
 
@@ -564,7 +513,9 @@
       color: var(--apple-red);
     }
 
-    /* Content Sheet */
+    /* ==========================================================================
+       CONTENT GLASS SHEET
+       ========================================================================== */
     .content-sheet {
       background: var(--glass-surface);
       backdrop-filter: var(--glass-blur);
@@ -578,6 +529,7 @@
       gap: 18px;
     }
 
+    /* Toolbar within Sheet */
     .sheet-toolbar {
       display: flex;
       align-items: center;
@@ -593,6 +545,7 @@
       gap: 10px;
     }
 
+    /* Search Bar with SF Pro style */
     .apple-search-box {
       display: flex;
       align-items: center;
@@ -621,6 +574,10 @@
       width: 100%;
     }
 
+    .apple-search-box input::placeholder {
+      color: var(--text-tertiary);
+    }
+
     .apple-select {
       background: rgba(118, 118, 128, 0.1);
       border: 1px solid rgba(0, 0, 0, 0.05);
@@ -638,7 +595,7 @@
       border-color: var(--apple-blue);
     }
 
-    /* Buttons */
+    /* Apple Buttons */
     .btn {
       border: none;
       border-radius: var(--radius-pill);
@@ -686,18 +643,6 @@
       background: var(--apple-blue-hover);
     }
 
-    .btn-ai-glow {
-      background: linear-gradient(135deg, #1D1D1F 0%, #2A2C30 100%);
-      color: #FFFFFF;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-ai-glow:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    }
-
     .btn-sm {
       padding: 4px 10px;
       font-size: 0.76rem;
@@ -715,7 +660,9 @@
       color: #FFFFFF;
     }
 
-    /* Data Table */
+    /* ==========================================================================
+       DATA TABLE (SERIOUS APPLE MINIMALISM)
+       ========================================================================== */
     .table-container {
       overflow-x: auto;
       border-radius: var(--radius-control);
@@ -748,6 +695,10 @@
       vertical-align: middle;
     }
 
+    table.apple-table tbody tr {
+      transition: background 0.12s ease;
+    }
+
     table.apple-table tbody tr:hover {
       background: rgba(255, 255, 255, 0.95);
     }
@@ -756,6 +707,7 @@
       border-bottom: none;
     }
 
+    /* Badges & Pills */
     .sku-badge {
       font-family: var(--font-mono);
       font-size: 0.76rem;
@@ -773,9 +725,7 @@
       padding: 3px 8px;
       border-radius: var(--radius-pill);
       font-size: 0.76rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+      display: inline-block;
     }
 
     .stock-badge.healthy {
@@ -793,6 +743,7 @@
       color: #B91C1C;
     }
 
+    /* Confidentiality Masking Badge */
     .confidential-badge {
       font-size: 0.73rem;
       font-weight: 600;
@@ -803,7 +754,11 @@
       border: 1px dashed rgba(0, 0, 0, 0.12);
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+    }
+
+    .supplier-visible {
+      font-size: 0.8rem;
     }
 
     .supplier-phone {
@@ -818,6 +773,7 @@
       text-decoration: underline;
     }
 
+    /* Pagination Bar */
     .pagination-bar {
       display: flex;
       align-items: center;
@@ -833,8 +789,32 @@
       gap: 6px;
     }
 
+    /* Staff Interface Floor Counter Callout */
+    .floor-staff-callout {
+      background: rgba(132, 204, 22, 0.08);
+      border: 1px solid rgba(132, 204, 22, 0.25);
+      border-radius: var(--radius-card);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .floor-staff-callout h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #365314;
+    }
+
+    .floor-staff-callout p {
+      font-size: 0.78rem;
+      color: #4D7C0F;
+      margin-top: 2px;
+    }
+
     /* ==========================================================================
-       MODALS & GOOGLE FORM STEP-BY-STEP WIZARD
+       MODALS & DIALOGS (APPLE SHEETS)
        ========================================================================== */
     .modal-backdrop {
       position: fixed;
@@ -842,7 +822,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.28);
+      background: rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
@@ -857,14 +837,14 @@
     }
 
     .modal-card {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: var(--glass-blur);
       -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-sheet);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
       width: 100%;
-      max-width: 600px;
+      max-width: 580px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
@@ -890,9 +870,6 @@
       font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .modal-close-btn {
@@ -904,6 +881,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1.1rem;
       color: var(--text-secondary);
       cursor: pointer;
     }
@@ -929,131 +907,6 @@
       justify-content: flex-end;
       gap: 10px;
       background: rgba(245, 245, 247, 0.5);
-    }
-
-    /* Google Form Style Stepper Cards */
-    .gform-top-accent {
-      height: 6px;
-      background: linear-gradient(90deg, #1D1D1F 0%, #0071E3 50%, #34C759 100%);
-      width: 100%;
-    }
-
-    .gform-stepper {
-      display: flex;
-      border-bottom: 1px solid var(--glass-hairline);
-      background: rgba(0, 0, 0, 0.02);
-    }
-
-    .gform-step-item {
-      flex: 1;
-      padding: 10px 12px;
-      text-align: center;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      border-bottom: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .gform-step-item.active {
-      color: var(--apple-blue);
-      border-bottom-color: var(--apple-blue);
-      background: #FFFFFF;
-    }
-
-    .gform-card-section {
-      background: #FFFFFF;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: var(--radius-card);
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-    }
-
-    .gform-card-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .gform-card-desc {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    /* Camera / Picture Evidence Upload Area */
-    .evidence-dropzone {
-      border: 2px dashed rgba(0, 0, 0, 0.12);
-      border-radius: 14px;
-      padding: 20px;
-      text-align: center;
-      background: rgba(245, 245, 247, 0.5);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .evidence-dropzone:hover {
-      border-color: var(--apple-blue);
-      background: rgba(0, 113, 227, 0.03);
-    }
-
-    .evidence-preview-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      background: #F5F5F7;
-      border-radius: 12px;
-    }
-
-    .evidence-thumb {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-    }
-
-    /* AI Detection Badge */
-    .ai-detected-callout {
-      background: rgba(0, 113, 227, 0.06);
-      border: 1px solid rgba(0, 113, 227, 0.2);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .ai-header-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--apple-blue);
-    }
-
-    .ai-confidence-pill {
-      background: var(--apple-blue);
-      color: #FFFFFF;
-      font-size: 0.7rem;
-      padding: 2px 7px;
-      border-radius: var(--radius-pill);
     }
 
     .form-group {
@@ -1128,7 +981,7 @@
       background: rgba(220, 38, 38, 0.95);
     }
 
-    /* Journey Step Item */
+    /* Journey Modal Steps */
     .journey-step {
       display: flex;
       align-items: flex-start;
@@ -1162,6 +1015,18 @@
       background: var(--apple-blue);
     }
 
+    .journey-content h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .journey-content p {
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
     /* Hide utilities based on role */
     body[data-role="staff"] .owner-only {
       display: none !important;
@@ -1192,36 +1057,36 @@
         <div class="brand-caption">
           <span>Shop:</span>
           <select id="bizSelector" class="biz-selector">
-            <option value="biz-hardware-01">Ah Huat Hardware &amp; Auto Parts</option>
+            <option value="biz-hardware-01">Ah Huat Hardware & Auto Parts</option>
             <option value="biz-other-shop">Other Branch (Isolated)</option>
           </select>
         </div>
       </div>
     </a>
 
-    <!-- Navigation Tabs (With Minimalist Vector Icons) -->
+    <!-- Navigation Tabs -->
     <nav class="nav-tabs">
       <button class="tab-btn active" id="tabBtnProducts" onclick="switchTab('products')">
-        <svg class="icon" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+        <span>📦</span>
         <span id="tabTitleProducts">Products</span>
         <span class="tab-count" id="countProducts">0</span>
       </button>
 
       <button class="tab-btn" id="tabBtnMovements" onclick="switchTab('movements')">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        <span>🔄</span>
         <span>Stock Movements</span>
         <span class="tab-count" id="countMovements">0</span>
       </button>
 
       <button class="tab-btn" id="tabBtnLowStock" onclick="switchTab('lowstock')">
-        <svg class="icon" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>⚠️</span>
         <span>Low Stock</span>
         <span class="tab-count alert" id="countLowStock" style="display:none;">0</span>
       </button>
 
       <!-- Staff Accounts (Owner Only) -->
       <button class="tab-btn owner-only" id="tabBtnStaff" onclick="switchTab('staff')">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>👥</span>
         <span>Staff Accounts</span>
         <span class="tab-count" id="countStaff">2</span>
       </button>
@@ -1229,26 +1094,20 @@
 
     <!-- Header Actions & Role Segmented Switcher -->
     <div class="header-right">
-      <!-- AI SME Scan Button -->
-      <button class="btn-header-action" id="btnOpenSmeScanner" title="Scan legacy spreadsheets or physical invoices">
-        <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-        <span>AI SME Ingest</span>
-      </button>
-
       <!-- 1-Click Operational Journey Presentation Modal -->
-      <button class="btn-header-action" id="btnOpenJourneyModal" title="Open SME Operational Journey Presentation">
-        <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        <span>Demo Journey</span>
+      <button class="btn-journey-pill" id="btnOpenJourneyModal" title="Open SME Operational Journey Presentation">
+        <span>⚡</span>
+        <span>1-Click Demo Journey</span>
       </button>
 
       <!-- Segmented Control for Dual Role Switch -->
       <div class="role-segmented">
         <button class="role-btn active" id="btnRoleOwner" onclick="switchRole('owner')">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"/></svg>
+          <span class="role-icon">👑</span>
           <span>Owner</span>
         </button>
         <button class="role-btn" id="btnRoleStaff" onclick="switchRole('staff')">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="role-icon">👤</span>
           <span>Staff</span>
         </button>
       </div>
@@ -1268,7 +1127,7 @@
     <div class="role-banner">
       <div class="role-banner-left">
         <span class="role-badge-tag role-badge-owner" id="roleBadge">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"/></svg>
+          <span>👑</span>
           <span id="roleBadgeText">Owner Mode</span>
         </span>
         <span class="role-banner-desc" id="roleBannerDesc">
@@ -1284,15 +1143,6 @@
   </div>
 
   <!-- ==========================================================================
-       HOVERING FLOATING ACTION BUTTON (STAFF FAB)
-       ========================================================================== -->
-  <button class="staff-fab-button staff-only" id="btnStaffFab" onclick="openStaffWizardModal()" title="Record Inventory via Step-by-Step Google Form &amp; Camera AI">
-    <span class="fab-pulse"></span>
-    <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-    <span>Record Inventory</span>
-  </button>
-
-  <!-- ==========================================================================
        MAIN CONTENT CONTAINER
        ========================================================================== -->
   <main class="main-content">
@@ -1303,9 +1153,7 @@
       <div class="metric-card" onclick="switchTab('products')">
         <div class="metric-card-top">
           <span class="metric-label">Tracked Hardware Items</span>
-          <div class="metric-icon-bubble">
-            <svg class="icon" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-          </div>
+          <div class="metric-icon-bubble">📦</div>
         </div>
         <div class="metric-val" id="metricTotalSkus">0</div>
         <div class="metric-footer">
@@ -1318,9 +1166,7 @@
       <div class="metric-card" onclick="switchTab('movements')">
         <div class="metric-card-top">
           <span class="metric-label">Stock Movements Ledger</span>
-          <div class="metric-icon-bubble">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-          </div>
+          <div class="metric-icon-bubble">🔄</div>
         </div>
         <div class="metric-val" id="metricTotalMovements">0</div>
         <div class="metric-footer">
@@ -1333,9 +1179,7 @@
       <div class="metric-card alert-card" onclick="switchTab('lowstock')">
         <div class="metric-card-top">
           <span class="metric-label">Restock Radar</span>
-          <div class="metric-icon-bubble" style="color:var(--apple-red); background:rgba(255,59,48,0.1);">
-            <svg class="icon" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
+          <div class="metric-icon-bubble" style="color:var(--apple-red); background:rgba(255,59,48,0.1);">⚠️</div>
         </div>
         <div class="metric-val" id="metricZeroStock">0</div>
         <div class="metric-footer">
@@ -1350,10 +1194,22 @@
          ======================================================================== -->
     <section id="viewProducts" class="tab-view">
       <div class="content-sheet">
+        <!-- Floor staff quick scan callout (Staff mode only) -->
+        <div class="floor-staff-callout staff-only">
+          <div>
+            <h4>Floor Counter Mode &mdash; Fast Hardware Check</h4>
+            <p>Scan or search items to check stock balance. Tap "+ In" or "- Out" to record inventory changes immediately.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="openRecordMovementModal()">+ Record Movement</button>
+          </div>
+        </div>
+
+        <!-- Sheet Toolbar -->
         <div class="sheet-toolbar">
           <div class="toolbar-left">
             <div class="apple-search-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>🔍</span>
               <input type="text" id="searchProducts" placeholder="Search SKU, item name, or supplier...">
             </div>
             <select id="filterProductStatus" class="apple-select owner-only">
@@ -1364,25 +1220,13 @@
           </div>
 
           <div class="toolbar-right">
-            <!-- Owner Actions -->
-            <button class="btn btn-secondary owner-only" id="btnOpenImportCsv">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Import CSV</span>
-            </button>
-            <button class="btn btn-secondary owner-only" id="btnExportCsv">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>Export CSV</span>
-            </button>
-            <button class="btn btn-primary owner-only" id="btnOpenNewProduct">
-              <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>New Product</span>
-            </button>
+            <!-- Owner Only Actions -->
+            <button class="btn btn-secondary owner-only" id="btnOpenImportCsv">📥 Import CSV</button>
+            <button class="btn btn-secondary owner-only" id="btnExportCsv">📤 Export CSV</button>
+            <button class="btn btn-primary owner-only" id="btnOpenNewProduct">+ New Product</button>
 
-            <!-- Staff Action -->
-            <button class="btn btn-primary staff-only" onclick="openStaffWizardModal()">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-              <span>Fast Inventory Record</span>
-            </button>
+            <!-- Staff Only Actions -->
+            <button class="btn btn-primary staff-only" onclick="openRecordMovementModal()">+ Fast Stock Record</button>
           </div>
         </div>
 
@@ -1396,12 +1240,14 @@
                 <th>Stock Unit</th>
                 <th>Current Stock</th>
                 <th class="owner-only">Min Threshold</th>
-                <th>Supplier Details</th>
+                <th>Supplier &amp; Terms</th>
                 <th class="owner-only">Status</th>
                 <th style="text-align: right;">Inventory Action</th>
               </tr>
             </thead>
-            <tbody id="productsTableBody"></tbody>
+            <tbody id="productsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
           </table>
         </div>
 
@@ -1425,7 +1271,7 @@
         <div class="sheet-toolbar">
           <div class="toolbar-left">
             <div class="apple-search-box">
-              <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>🔍</span>
               <input type="text" id="searchMovements" placeholder="Filter movements by SKU, user, reason...">
             </div>
             <select id="filterMovementType" class="apple-select">
@@ -1437,10 +1283,7 @@
             </select>
           </div>
           <div class="toolbar-right">
-            <button class="btn btn-primary" onclick="openRecordMovementModal()">
-              <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>Record Movement</span>
-            </button>
+            <button class="btn btn-primary" onclick="openRecordMovementModal()">+ Record Movement</button>
           </div>
         </div>
 
@@ -1457,7 +1300,9 @@
                 <th>Recorded By</th>
               </tr>
             </thead>
-            <tbody id="movementsTableBody"></tbody>
+            <tbody id="movementsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
           </table>
         </div>
 
@@ -1499,11 +1344,13 @@
                 <th>Current Quantity</th>
                 <th>Min Threshold</th>
                 <th>Replenish Deficit</th>
-                <th>Supplier Details</th>
+                <th>Supplier Information</th>
                 <th style="text-align: right;">Quick Restock</th>
               </tr>
             </thead>
-            <tbody id="lowStockTableBody"></tbody>
+            <tbody id="lowStockTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
           </table>
         </div>
       </div>
@@ -1522,10 +1369,7 @@
             </p>
           </div>
           <div class="toolbar-right">
-            <button class="btn btn-primary" id="btnOpenAddStaffModal">
-              <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>Add Staff Member</span>
-            </button>
+            <button class="btn btn-primary" id="btnOpenAddStaffModal">+ Add Staff Member</button>
           </div>
         </div>
 
@@ -1541,7 +1385,9 @@
                 <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
-            <tbody id="staffTableBody"></tbody>
+            <tbody id="staffTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
           </table>
         </div>
       </div>
@@ -1550,305 +1396,15 @@
   </main>
 
   <!-- ==========================================================================
-       MODAL 1: STAFF STEP-BY-STEP GOOGLE FORM & CAMERA AI WIZARD
+       MODALS & DIALOGS
        ========================================================================== -->
-  <div class="modal-backdrop" id="modalStaffWizard">
-    <div class="modal-card" style="max-width: 620px;">
-      <div class="gform-top-accent"></div>
-      
-      <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon-lg" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-          <span>Staff Inventory Record Form</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalStaffWizard')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-
-      <!-- Stepper Navigation -->
-      <div class="gform-stepper">
-        <div class="gform-step-item active" id="stepPill1" onclick="jumpWizardStep(1)">
-          <span>1. Evidence &amp; AI</span>
-        </div>
-        <div class="gform-step-item" id="stepPill2" onclick="jumpWizardStep(2)">
-          <span>2. Count &amp; Details</span>
-        </div>
-        <div class="gform-step-item" id="stepPill3" onclick="jumpWizardStep(3)">
-          <span>3. Confirm</span>
-        </div>
-      </div>
-
-      <div class="modal-body">
-        
-        <!-- STEP 1: ATTACH PICTURE / CAMERA & AI DETECTION -->
-        <div id="wizardStep1" class="wizard-step-pane">
-          <div class="gform-card-section">
-            <div class="gform-card-title">
-              <span>Step 1: Product Visual Evidence</span>
-              <span class="stock-badge healthy">
-                <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                AI Enabled
-              </span>
-            </div>
-            <p class="gform-card-desc">Attach a photo or snap product evidence with camera. The AI will detect part markings, SKU, and auto-categorize it.</p>
-
-            <!-- Evidence Upload / Camera Dropzone -->
-            <div class="evidence-dropzone" id="dropzoneWizard" onclick="document.getElementById('wizFileInput').click()">
-              <svg class="icon-xl" viewBox="0 0 24 24" style="color:var(--apple-blue);"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-              <div style="font-weight:700; font-size:0.88rem;">Click to Take Photo or Attach Picture</div>
-              <div style="font-size:0.75rem; color:var(--text-secondary);">Supports Camera Snapshot, JPEG, PNG label photos</div>
-            </div>
-
-            <!-- Hidden Inputs -->
-            <input type="file" id="wizFileInput" accept="image/*" style="display:none;" onchange="handleWizardFileSelected(event)">
-            <input type="file" id="wizCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleWizardFileSelected(event)">
-
-            <div style="display:flex; justify-content:center; gap:10px;">
-              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('wizCameraInput').click()">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-                <span>Use Device Camera</span>
-              </button>
-              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('wizFileInput').click()">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Browse Picture File</span>
-              </button>
-            </div>
-
-            <!-- Image Preview Box -->
-            <div id="wizPreviewBox" style="display:none;" class="evidence-preview-wrap">
-              <img id="wizPreviewImg" class="evidence-thumb" src="" alt="Evidence Thumbnail">
-              <div style="flex:1;">
-                <div style="font-size:0.8rem; font-weight:700;" id="wizPreviewName">product_photo.jpg</div>
-                <div style="font-size:0.72rem; color:var(--text-secondary);" id="wizPreviewSize">0 KB</div>
-              </div>
-              <button class="btn btn-ai-glow btn-sm" id="btnTriggerAiDetect" onclick="executeAiDetection()">
-                <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                <span>Scan with AI</span>
-              </button>
-            </div>
-
-            <!-- AI Detection Output Banner -->
-            <div id="wizAiOutput" style="display:none;" class="ai-detected-callout">
-              <div class="ai-header-line">
-                <span style="display:flex; align-items:center; gap:5px;">
-                  <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                  <span>AI Visual Analysis Complete</span>
-                </span>
-                <span class="ai-confidence-pill" id="wizAiConfidence">98% Match</span>
-              </div>
-              <div style="font-size:0.83rem; font-weight:700; color:var(--text-primary);" id="wizAiDetectedName">—</div>
-              <div style="font-size:0.74rem; color:var(--text-secondary);" id="wizAiEvidenceSummary">—</div>
-              <div style="display:flex; gap:6px; margin-top:4px;">
-                <span class="sku-badge" id="wizAiSkuBadge">—</span>
-                <span class="stock-badge" id="wizAiCategoryBadge" style="background:#FFFFFF;">—</span>
-              </div>
-            </div>
-
-            <!-- Item selection / identification fallback -->
-            <div class="form-group" style="margin-top:4px;">
-              <label>Match Catalog Item or New Part Code</label>
-              <select id="wizProductSelect" class="form-control" onchange="handleWizardProductSelected()"></select>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 2: COUNT & RECORD DETAILS (GOOGLE FORM STYLE) -->
-        <div id="wizardStep2" class="wizard-step-pane" style="display:none;">
-          <div class="gform-card-section">
-            <div class="gform-card-title">Step 2: Stock Count &amp; Movement Type</div>
-            <p class="gform-card-desc">Specify whether items arrived, were consumed on a mechanic repair job, or represent an audit recount.</p>
-
-            <div class="form-group">
-              <label>Inventory Movement Type *</label>
-              <select id="wizMovType" class="form-control" onchange="updateWizardPreview()">
-                <option value="STOCK_IN">Stock In (+) Delivery Received / Supplier Replenishment</option>
-                <option value="STOCK_OUT">Stock Out (-) Sold at Counter / Used for Repair</option>
-                <option value="CORRECTION">Stock Correction (=) Floor Physical Audit Recount</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Quantity *</label>
-                <input type="number" id="wizQuantity" class="form-control" min="0.01" step="any" placeholder="0" oninput="updateWizardPreview()" required>
-              </div>
-              <div class="form-group">
-                <label>Balance Progression</label>
-                <div id="wizBalancePreview" style="padding: 8px 12px; background: rgba(0,0,0,0.04); border-radius:10px; font-weight:700; font-size:0.82rem;">
-                  Current: 0 &rarr; Result: 0
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Reason / Job Reference</label>
-              <input type="text" id="wizReason" class="form-control" placeholder="e.g. Repair Job #402 or Supplier DO-4481">
-            </div>
-
-            <div class="form-group">
-              <label>Staff Name Logging Record</label>
-              <input type="text" id="wizStaffName" class="form-control" value="Floor Staff">
-            </div>
-
-            <div id="wizNegativeAlert" style="display:none; padding: 10px; background: rgba(255, 59, 48, 0.1); border-radius:8px; color:var(--apple-red); font-size:0.78rem; font-weight:600;">
-              Cannot reduce stock below zero. Please enter a valid stock out quantity.
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3: REVIEW & COMMIT -->
-        <div id="wizardStep3" class="wizard-step-pane" style="display:none;">
-          <div class="gform-card-section">
-            <div class="gform-card-title">Step 3: Verification &amp; One-Tap Commit</div>
-            <p class="gform-card-desc">Review your recorded stock change before writing to the immutable audit ledger.</p>
-
-            <div style="display:flex; flex-direction:column; gap:8px; background:rgba(0,0,0,0.02); padding:12px; border-radius:12px;">
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-size:0.78rem; color:var(--text-secondary);">Hardware Part:</span>
-                <strong id="wizSummaryPart" style="font-size:0.82rem;">—</strong>
-              </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-size:0.78rem; color:var(--text-secondary);">SKU &amp; Category:</span>
-                <span id="wizSummaryCategory" style="font-size:0.82rem;">—</span>
-              </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-size:0.78rem; color:var(--text-secondary);">Quantity Change:</span>
-                <strong id="wizSummaryQty" style="font-size:0.85rem; color:var(--apple-blue);">—</strong>
-              </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-size:0.78rem; color:var(--text-secondary);">New Stock Level:</span>
-                <strong id="wizSummaryResult" style="font-size:0.85rem; color:var(--apple-green);">—</strong>
-              </div>
-              <div style="display:flex; justify-content:space-between;">
-                <span style="font-size:0.78rem; color:var(--text-secondary);">Recorded By:</span>
-                <span id="wizSummaryStaff" style="font-size:0.82rem;">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" id="btnWizBack" onclick="prevWizardStep()" style="display:none;">Back</button>
-        <button class="btn btn-primary" id="btnWizNext" onclick="nextWizardStep()">Continue &rarr;</button>
-        <button class="btn btn-primary" id="btnWizSubmit" onclick="commitWizardRecord()" style="display:none;">
-          <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Commit Record</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
-       MODAL 2: AI SMART SME INGESTION SCANNER (EXCEL / CSV / PAPER PHOTO)
-       ========================================================================== -->
-  <div class="modal-backdrop" id="modalSmeScanner">
-    <div class="modal-card" style="max-width: 680px;">
-      <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon-lg" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-          <span>AI SME Data Ingestion Scanner</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalSmeScanner')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div>
-          <div style="font-weight:700; font-size:0.88rem; margin-bottom:4px;">Upload Legacy Spreadsheet or Physical Paper Record</div>
-          <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:12px;">
-            Existing SMEs can attach their messy Excel/CSV files, or snap a photo of paper stock books, delivery invoices, or parts sheets. AI will scan, clean headers, and auto-record items.
-          </p>
-
-          <div style="display:flex; gap:10px; margin-bottom:12px;">
-            <button class="btn btn-secondary btn-sm" id="btnSmeTypeExcel" onclick="switchSmeScannerMode('excel')">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span>Excel / CSV Spreadsheet Data</span>
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btnSmeTypePhoto" onclick="switchSmeScannerMode('photo')">
-              <svg class="icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-              <span>Paper Log / Invoice Picture</span>
-            </button>
-          </div>
-
-          <!-- Excel/CSV Text Input Mode -->
-          <div id="smeExcelInputWrap">
-            <textarea id="smeRawTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.78rem;" placeholder="Paste messy Excel or CSV rows here, e.g.:&#10;Kod Barang&#9;Nama Item&#9;Baki Qty&#9;Unit&#9;Min Alert&#9;Pembekal&#10;SPK-CR8E&#9;Spark Plug CR8E Nickel&#9;24&#9;pcs&#9;10&#9;AutoPro Spares&#10;WD-40-330&#9;WD-40 Lubricant 330ml&#9;18&#9;can&#9;6&#9;ChemLub Lubricants"></textarea>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-              <input type="file" id="smeCsvFileInput" accept=".csv,.txt,.tsv" style="font-size:0.78rem;" onchange="handleSmeCsvFile(event)">
-              <button class="btn btn-primary btn-sm" id="btnRunSmeScan" onclick="executeSmeScan()">
-                <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-                <span>Run AI Ingestion Scan</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Photo Mode -->
-          <div id="smePhotoInputWrap" style="display:none;">
-            <div class="evidence-dropzone" onclick="document.getElementById('smePhotoFile').click()">
-              <svg class="icon-xl" viewBox="0 0 24 24" style="color:var(--apple-blue);"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-              <div style="font-weight:700; font-size:0.88rem;">Attach Paper Stockbook Photo or Invoice</div>
-              <div style="font-size:0.75rem; color:var(--text-secondary);">AI will run OCR to read item lines and inventory counts</div>
-            </div>
-            <input type="file" id="smePhotoFile" accept="image/*" style="display:none;" onchange="handleSmePhotoSelected(event)">
-            <div id="smePhotoPreview" style="display:none; margin-top:8px;" class="evidence-preview-wrap">
-              <img id="smePhotoImg" class="evidence-thumb" src="" alt="SME Document">
-              <span id="smePhotoName" style="font-size:0.8rem; font-weight:600;">invoice_sample.jpg</span>
-              <button class="btn btn-primary btn-sm" onclick="executeSmeScan()" style="margin-left:auto;">Run AI OCR Scan</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Extraction Results Table -->
-        <div id="smeResultsSection" style="display:none; border-top:1px solid var(--glass-hairline); padding-top:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div style="font-weight:700; font-size:0.88rem; color:var(--apple-green);">
-              <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-              <span id="smeItemsCountBadge">0 Items Extracted</span>
-            </div>
-            <span class="stock-badge healthy" id="smeConfidenceBadge">Confidence: 96%</span>
-          </div>
-
-          <div style="max-height:180px; overflow-y:auto; border:1px solid var(--glass-hairline); border-radius:10px;">
-            <table class="apple-table" style="font-size:0.75rem;">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Part Description</th>
-                  <th>Opening Qty</th>
-                  <th>Unit</th>
-                  <th>Min Alert</th>
-                  <th>Supplier</th>
-                </tr>
-              </thead>
-              <tbody id="smeResultsTbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeModal('modalSmeScanner')">Close</button>
-        <button class="btn btn-action-blue" id="btnAutoRecordSme" onclick="autoRecordExtractedSmeItems()" style="display:none;">
-          <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Auto-Record All Extracted Items</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL: ADD PRODUCT (OWNER ONLY) -->
   <div class="modal-backdrop" id="modalNewProduct">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Add Hardware Item</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalNewProduct')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-title">+ Add Hardware Item</div>
+        <button class="modal-close-btn" onclick="closeModal('modalNewProduct')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
@@ -1915,13 +1471,8 @@
   <div class="modal-backdrop" id="modalEditProduct">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-          <span>Edit Hardware Item</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalEditProduct')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-title">Edit Hardware Item</div>
+        <button class="modal-close-btn" onclick="closeModal('modalEditProduct')">&times;</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="editProductId">
@@ -1933,7 +1484,7 @@
           <div class="form-group">
             <label>Stock Unit</label>
             <input type="text" id="editUnit" class="form-control" disabled style="background:#F5F5F7;">
-            <span class="form-help" style="color:var(--apple-amber);">Unit cannot be changed once movements exist</span>
+            <span class="form-help" style="color:var(--apple-amber);">⚠️ Unit cannot be changed once movements exist</span>
           </div>
         </div>
 
@@ -1945,6 +1496,7 @@
         <div class="form-group">
           <label>Minimum Stock Level</label>
           <input type="number" id="editMinStock" class="form-control" min="0" step="any">
+          <span class="form-help">Set 0 to disable alerts</span>
         </div>
 
         <div class="form-row">
@@ -1965,17 +1517,12 @@
     </div>
   </div>
 
-  <!-- MODAL: RECORD STOCK MOVEMENT (QUICK) -->
+  <!-- MODAL: RECORD STOCK MOVEMENT (OWNER & STAFF) -->
   <div class="modal-backdrop" id="modalMovement">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title" id="movementModalTitle">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-          <span>Record Stock Movement</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalMovement')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-title" id="movementModalTitle">Record Stock Movement</div>
+        <button class="modal-close-btn" onclick="closeModal('modalMovement')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -2015,8 +1562,9 @@
           <input type="text" id="movUser" class="form-control" value="Shop Counter Staff">
         </div>
 
+        <!-- Negative stock rejection warning -->
         <div id="movNegativeAlert" style="display:none; padding: 10px 14px; background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.25); border-radius:10px; color:#B91C1C; font-size:0.78rem; font-weight:600;">
-          Cannot stock out more than available inventory. Resulting stock cannot be negative.
+          ⚠️ <strong>Rejected:</strong> Cannot stock out more than available inventory. Resulting stock cannot be negative.
         </div>
       </div>
       <div class="modal-footer">
@@ -2030,13 +1578,8 @@
   <div class="modal-backdrop" id="modalAddStaff">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-          <span>Add Staff Account</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalAddStaff')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-title">+ Add Staff Account</div>
+        <button class="modal-close-btn" onclick="closeModal('modalAddStaff')">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -2063,6 +1606,7 @@
         <div class="form-group">
           <label>Access PIN (Optional 4 Digits)</label>
           <input type="password" id="inpStaffPin" class="form-control" maxlength="4" placeholder="••••">
+          <span class="form-help">Used for quick terminal authentication</span>
         </div>
       </div>
       <div class="modal-footer">
@@ -2072,38 +1616,37 @@
     </div>
   </div>
 
-  <!-- MODAL: NON-AI CSV IMPORT WIZARD -->
+  <!-- MODAL: CSV IMPORT WIZARD (NON-AI, OWNER ONLY) -->
   <div class="modal-backdrop" id="modalCsvImport">
     <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
-        <div class="modal-title">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Non-AI CSV Product Import Wizard</span>
-        </div>
-        <button class="modal-close-btn" onclick="closeModal('modalCsvImport')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-title">📥 Non-AI CSV Product Import Wizard</div>
+        <button class="modal-close-btn" onclick="closeModal('modalCsvImport')">&times;</button>
       </div>
       <div class="modal-body">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label style="font-weight:700; font-size:0.83rem;">Step 1: Upload CSV File or Paste Data</label>
-            <button class="btn btn-secondary btn-sm" id="btnDownloadTemplate">Sample Template</button>
+            <label style="font-weight:700; font-size:0.83rem;">Step 1: Upload CSV File or Paste Spreadsheet Data</label>
+            <button class="btn btn-secondary btn-sm" id="btnDownloadTemplate">📄 Sample Template</button>
           </div>
-          <textarea id="csvTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.78rem;" placeholder="sku,name,unit,opening_stock,min_stock,supplier_name,supplier_contact&#10;00142,Hex Flange Nut M10,pcs,100,30,MegaFasteners,+6012-3334455"></textarea>
+          <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:8px;">
+            Expected columns: <code>sku, name, unit, opening_stock, min_stock, supplier_name, supplier_contact</code>
+          </p>
+          <textarea id="csvTextInput" class="form-control" rows="5" style="font-family:var(--font-mono); font-size:0.78rem;" placeholder="sku,name,unit,opening_stock,min_stock,supplier_name,supplier_contact&#10;00142,Hex Flange Nut M10,pcs,100,30,MegaFasteners,+6012-3334455&#10;SPK-09,Spark Plug CR8E,pcs,12,10,AutoPro,+6019-8765432"></textarea>
           <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
             <input type="file" id="csvFileInput" accept=".csv" style="font-size:0.8rem;">
             <button class="btn btn-primary btn-sm" id="btnValidateCsv">Validate File &amp; Rows</button>
           </div>
         </div>
 
+        <!-- Validation Results Box -->
         <div id="csvValidationBox" style="display:none; padding:12px; background:rgba(0,0,0,0.03); border-radius:12px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
             <span id="csvValidBadge" class="stock-badge healthy">0 Valid Rows</span>
             <span id="csvErrorBadge" class="stock-badge zero">0 Errors</span>
           </div>
 
-          <div id="csvErrorList" style="display:none; max-height:120px; overflow-y:auto; background:#FFFFFF; padding:8px 12px; border-radius:8px; font-size:0.75rem; color:var(--apple-red); margin-bottom:8px;"></div>
+          <div id="csvErrorList" style="display:none; max-height:120px; overflow-y:auto; background:#FFFFFF; padding:8px 12px; border-radius:8px; font-size:0.75rem; color:var(--apple-red); margin-bottom:8px; border:1px solid rgba(255,59,48,0.2);"></div>
 
           <div style="max-height: 150px; overflow-y: auto;">
             <table class="apple-table" style="font-size: 0.75rem;">
@@ -2122,100 +1665,94 @@
           </div>
         </div>
 
-        <div id="csvSuccessBox" style="display:none; padding:12px; background:rgba(52, 199, 89, 0.1); border-radius:12px;">
-          <div style="font-weight:700; font-size:0.9rem; color:#15803D;">Import Completed</div>
+        <!-- Success Box with Safe Reversal Option -->
+        <div id="csvSuccessBox" style="display:none; padding:12px; background:rgba(52, 199, 89, 0.1); border:1px solid rgba(52, 199, 89, 0.25); border-radius:12px;">
+          <div style="font-weight:700; font-size:0.9rem; color:#15803D;" id="csvSuccessTitle">✓ Import Completed</div>
           <p style="font-size:0.78rem; color:var(--text-primary); margin-top:2px;" id="csvSuccessMsg"></p>
           <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-secondary);" id="csvBatchIdDisplay"></span>
-            <button class="btn btn-danger btn-sm" id="btnReverseBatch">Reverse Batch</button>
+            <button class="btn btn-danger btn-sm" id="btnReverseBatch">↺ Reverse This Batch</button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modalCsvImport')">Close</button>
-        <button class="btn btn-action-blue" id="btnConfirmImport" style="display:none;">Confirm &amp; Import</button>
+        <button class="btn btn-action-blue" id="btnConfirmImport" style="display:none;">Confirm &amp; Import Valid Rows</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: 1-CLICK OPERATIONAL JOURNEY DEMO -->
+  <!-- MODAL: 1-CLICK OPERATIONAL SME JOURNEY (JUDGES / MENTOR PRESENTATION) -->
   <div class="modal-backdrop" id="modalJourney">
     <div class="modal-card" style="max-width: 640px;">
       <div class="modal-header">
         <div>
-          <div class="modal-title">
-            <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span>Operational SME Journey</span>
-          </div>
+          <div class="modal-title">⚡ 1-Click Operational SME Journey</div>
           <div style="font-size:0.76rem; color:var(--text-secondary); margin-top:2px;">
             Mechanic workshop: Oil filter replenishment workflow (Trigger &rarr; Connected Data &rarr; Decision Logic &rarr; Human Approval &rarr; Visible Outcome &rarr; Scale)
           </div>
         </div>
-        <button class="modal-close-btn" onclick="closeModal('modalJourney')">
-          <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <button class="modal-close-btn" onclick="closeModal('modalJourney')">&times;</button>
       </div>
       <div class="modal-body" style="gap: 8px;">
         <div class="journey-step" id="jStep1">
           <div class="journey-num">1</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">1. Trigger &mdash; Workshop Consumption</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">Mechanic consumes 8 units of Oil Filter (<code>FLT-02</code>) for morning car servicing, dropping stock from 16 to 8.</p>
+            <h4>1. Trigger &mdash; Workshop Consumption</h4>
+            <p>Mechanic consumes 8 units of Oil Filter (<code>FLT-02</code>) for morning car servicing, dropping stock from 16 to 8.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep2">
           <div class="journey-num">2</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">2. Connected Data &mdash; Automatic Linkage</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">System links SKU <code>FLT-02</code>, current stock (8 pcs), min threshold (20 pcs), and supplier <em>Huat Kee Auto Spares (+6012-8889999)</em>.</p>
+            <h4>2. Connected Data &mdash; Automatic Linkage</h4>
+            <p>System links SKU <code>FLT-02</code>, current stock (8 pcs), min threshold (20 pcs), and supplier <em>Huat Kee Auto Spares (+6012-8889999)</em>.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep3">
           <div class="journey-num">3</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">3. Decision Logic &mdash; Deterministic Deficit Calculation</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">System computes deficit of exactly <strong>12 units</strong> (20 &minus; 8) and triggers an in-app Low Stock alert.</p>
+            <h4>3. Decision Logic &mdash; Deterministic Deficit Calculation</h4>
+            <p>System computes deficit of exactly <strong>12 units</strong> (20 &minus; 8) and triggers an in-app Low Stock alert.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep4">
           <div class="journey-num">4</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">4. Human Approval &mdash; Restock Sign-off</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">Shop owner approves incoming supplier delivery and commits a 12-unit Stock In replenishment.</p>
+            <h4>4. Human Approval &mdash; Restock Sign-off</h4>
+            <p>Shop owner approves incoming supplier delivery and commits a 12-unit Stock In replenishment.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep5">
           <div class="journey-num">5</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">5. Visible Outcome &mdash; Atomic Update</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">Stock balance restores to 20 pcs atomically, low-stock alert clears, and movement is saved in immutable ledger.</p>
+            <h4>5. Visible Outcome &mdash; Atomic Update</h4>
+            <p>Stock balance restores to 20 pcs atomically, low-stock alert clears, and movement is saved in immutable ledger.</p>
           </div>
         </div>
 
         <div class="journey-step" id="jStep6">
           <div class="journey-num">6</div>
           <div class="journey-content">
-            <h4 style="font-size:0.82rem; font-weight:700;">6. Scale &mdash; Independent SME Catalog</h4>
-            <p style="font-size:0.77rem; color:var(--text-secondary);">Shop scales catalog to 1,000+ non-expiry hardware items with batch CSV validation and multi-tenant isolation.</p>
+            <h4>6. Scale &mdash; Independent SME Catalog</h4>
+            <p>Shop scales catalog to 1,000+ non-expiry hardware items with batch CSV validation and multi-tenant isolation.</p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="closeModal('modalJourney')">Close</button>
-        <button class="btn btn-primary" id="btnExecuteDemoJourney">Play Live Demo</button>
+        <button class="btn btn-primary" id="btnExecuteDemoJourney">▶ Play Live Demo</button>
       </div>
     </div>
   </div>
 
   <!-- Toast Notification Pill -->
   <div class="toast-pill" id="appToast">
-    <span id="toastIcon">
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-    </span>
+    <span id="toastIcon">✓</span>
     <span id="toastMsg">Operation successful</span>
   </div>
 
@@ -2239,19 +1776,11 @@
       pageSize: 10,
       backendAlive: false,
       lastImportBatchId: null,
-      importValidationCache: null,
-      
-      // Staff Wizard State
-      wizardStep: 1,
-      wizardEvidenceBase64: null,
-      wizardDetectedData: null,
-
-      // SME Ingest State
-      smeDetectedItems: []
+      importValidationCache: null
     };
 
     // --- In-Memory Store for Offline / Local Fallback ---
-    const localStoreKey = "stockwise_local_store_v3";
+    const localStoreKey = "stockwise_local_store_v2";
     let localData = (function () {
       try {
         const saved = localStorage.getItem(localStoreKey);
@@ -2284,7 +1813,7 @@
       } catch (e) {}
     }
 
-    // --- Role Switching (Owner vs Staff) ---
+    // --- Role Management (Owner vs. Staff) ---
     function switchRole(role) {
       state.currentRole = role;
       localStorage.setItem("stockwise_role", role);
@@ -2293,6 +1822,7 @@
       const btnOwner = document.getElementById("btnRoleOwner");
       const btnStaff = document.getElementById("btnRoleStaff");
       const badge = document.getElementById("roleBadge");
+      const badgeText = document.getElementById("roleBadgeText");
       const desc = document.getElementById("roleBannerDesc");
       const quickTarget = document.getElementById("quickSwitchTargetName");
       const tabTitleProducts = document.getElementById("tabTitleProducts");
@@ -2301,7 +1831,7 @@
         btnOwner.classList.add("active");
         btnStaff.classList.remove("active");
         badge.className = "role-badge-tag role-badge-owner";
-        badge.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"/></svg><span>Owner Mode</span>`;
+        badge.innerHTML = "<span>👑</span><span>Owner Mode</span>";
         desc.innerHTML = "<strong>Full Administrative Access:</strong> Unrestricted catalog management, confidential supplier contacts, CSV batch import/reversal, and staff user control.";
         quickTarget.innerText = "Staff Mode";
         tabTitleProducts.innerText = "Products";
@@ -2309,12 +1839,15 @@
         btnStaff.classList.add("active");
         btnOwner.classList.remove("active");
         badge.className = "role-badge-tag role-badge-staff";
-        badge.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Staff Mode</span>`;
-        desc.innerHTML = "<strong>Floor Counter View:</strong> Fast hardware search, balance check, and stock in/out logging. Tap hovering Record button to open step-by-step form with Camera AI.";
+        badge.innerHTML = "<span>👤</span><span>Staff Mode</span>";
+        desc.innerHTML = "<strong>Floor Counter View:</strong> Fast hardware search, balance check, and stock in/out logging. Confidential supplier details &amp; admin controls are restricted.";
         quickTarget.innerText = "Owner Mode";
         tabTitleProducts.innerText = "Inventory Count";
 
-        if (state.activeTab === "staff") switchTab("products");
+        // If staff view was active on staff tab, switch to products
+        if (state.activeTab === "staff") {
+          switchTab("products");
+        }
       }
 
       renderProductsTable();
@@ -2488,7 +2021,7 @@
       document.getElementById("countStaff").innerText = state.staffList.length;
     }
 
-    // --- Render Tables ---
+    // --- Render Functions ---
     function renderProductsTable() {
       const tbody = document.getElementById("productsTableBody");
       tbody.innerHTML = "";
@@ -2511,28 +2044,27 @@
         if (isZero) stockPill = `<span class="stock-badge zero">0 ${p.unit} (OUT)</span>`;
         else if (isLow) stockPill = `<span class="stock-badge low">${cur} ${p.unit} (LOW)</span>`;
 
+        // Confidentiality handling for supplier
         let supplierHtml = "";
         if (isStaff) {
-          supplierHtml = `
-            <span class="confidential-badge">
-              <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>Confidential &middot; Owner Access</span>
-            </span>`;
+          supplierHtml = `<span class="confidential-badge">🔒 Confidential · Owner Access</span>`;
         } else {
           supplierHtml = `
-            <div style="font-size:0.8rem;">
-              ${p.supplier_name ? `<strong>${escapeHtml(p.supplier_name)}</strong>` : '<span style="color:var(--text-tertiary);">&mdash;</span>'}
+            <div class="supplier-visible">
+              ${p.supplier_name ? `<strong>${escapeHtml(p.supplier_name)}</strong>` : '<span style="color:var(--text-tertiary);">—</span>'}
               ${p.supplier_contact ? `<div><a href="tel:${escapeHtml(p.supplier_contact)}" class="supplier-phone">${escapeHtml(p.supplier_contact)}</a></div>` : ''}
-            </div>`;
+            </div>
+          `;
         }
 
+        // Action buttons
         let actionsHtml = `
           <button class="btn btn-secondary btn-sm" onclick="quickStockAction('${p.id}', 'STOCK_IN')">+ In</button>
           <button class="btn btn-secondary btn-sm" onclick="quickStockAction('${p.id}', 'STOCK_OUT')">- Out</button>
         `;
         if (!isStaff) {
           actionsHtml += `
-            <button class="btn btn-secondary btn-sm owner-only" onclick="openEditProduct('${p.id}')">Edit</button>
+            <button class="btn btn-secondary btn-sm owner-only" onclick="openEditProduct('${p.id}')">✏️ Edit</button>
             <button class="btn btn-secondary btn-sm owner-only" onclick="toggleArchiveProduct('${p.id}', ${!p.is_archived})">${p.is_archived ? 'Restore' : 'Archive'}</button>
           `;
         }
@@ -2602,7 +2134,7 @@
       tbody.innerHTML = "";
 
       if (state.lowStock.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--apple-green); font-weight:600;">All stock levels are sufficient.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 24px; color:var(--apple-green); font-weight:600;">✓ All stock levels are sufficient.</td></tr>`;
         return;
       }
 
@@ -2610,24 +2142,22 @@
 
       state.lowStock.forEach(item => {
         const tr = document.createElement("tr");
-        let alertBadge = `<span class="stock-badge low">LOW STOCK</span>`;
+        let alertBadge = `<span class="stock-badge low">⚠️ LOW STOCK</span>`;
         if (item.is_zero_stock) {
-          alertBadge = `<span class="stock-badge zero">OUT OF STOCK (0)</span>`;
+          alertBadge = `<span class="stock-badge zero">🚨 OUT OF STOCK (0)</span>`;
         }
 
+        // Supplier details (masked for staff)
         let supplierHtml = "";
         if (isStaff) {
-          supplierHtml = `
-            <span class="confidential-badge">
-              <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>Confidential &middot; Owner Access</span>
-            </span>`;
+          supplierHtml = `<span class="confidential-badge">🔒 Confidential · Owner Access</span>`;
         } else {
           supplierHtml = `
-            <div style="font-size:0.8rem;">
+            <div class="supplier-visible">
               ${item.supplier_name ? `<strong>${escapeHtml(item.supplier_name)}</strong>` : ''}
               ${item.supplier_contact ? `<div><a href="tel:${escapeHtml(item.supplier_contact)}" class="supplier-phone">${escapeHtml(item.supplier_contact)}</a></div>` : '<span style="color:var(--text-tertiary);">No phone</span>'}
-            </div>`;
+            </div>
+          `;
         }
 
         tr.innerHTML = `
@@ -2703,438 +2233,11 @@
       }
     }
 
-    // ========================================================================
-    // STAFF STEP-BY-STEP GOOGLE FORM & CAMERA AI
-    // ========================================================================
-    function openStaffWizardModal() {
-      state.wizardStep = 1;
-      state.wizardEvidenceBase64 = null;
-      state.wizardDetectedData = null;
-
-      populateWizardProductSelect();
-      document.getElementById("wizQuantity").value = "";
-      document.getElementById("wizReason").value = "Floor counter stock update";
-      document.getElementById("wizStaffName").value = "Staff Operator";
-      document.getElementById("wizPreviewBox").style.display = "none";
-      document.getElementById("wizAiOutput").style.display = "none";
-      
-      jumpWizardStep(1);
-      openModal("modalStaffWizard");
-    }
-
-    function populateWizardProductSelect() {
-      const sel = document.getElementById("wizProductSelect");
-      sel.innerHTML = `<option value="">+ Detect New Item or Select Existing Part...</option>`;
-      state.products.filter(p => !p.is_archived).forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.innerText = `[${p.sku}] ${p.name} (Balance: ${p.current_stock} ${p.unit})`;
-        sel.appendChild(opt);
-      });
-    }
-
-    function jumpWizardStep(stepNum) {
-      state.wizardStep = stepNum;
-      
-      document.querySelectorAll(".gform-step-item").forEach((el, idx) => {
-        el.classList.toggle("active", idx + 1 === stepNum);
-      });
-
-      document.getElementById("wizardStep1").style.display = stepNum === 1 ? "block" : "none";
-      document.getElementById("wizardStep2").style.display = stepNum === 2 ? "block" : "none";
-      document.getElementById("wizardStep3").style.display = stepNum === 3 ? "block" : "none";
-
-      const btnBack = document.getElementById("btnWizBack");
-      const btnNext = document.getElementById("btnWizNext");
-      const btnSubmit = document.getElementById("btnWizSubmit");
-
-      btnBack.style.display = stepNum > 1 ? "inline-flex" : "none";
-      if (stepNum === 3) {
-        btnNext.style.display = "none";
-        btnSubmit.style.display = "inline-flex";
-        populateWizardSummary();
-      } else {
-        btnNext.style.display = "inline-flex";
-        btnSubmit.style.display = "none";
-      }
-    }
-
-    function prevWizardStep() {
-      if (state.wizardStep > 1) jumpWizardStep(state.wizardStep - 1);
-    }
-
-    function nextWizardStep() {
-      if (state.wizardStep === 1) {
-        const selectedProdId = document.getElementById("wizProductSelect").value;
-        if (!selectedProdId && !state.wizardDetectedData) {
-          showToast("Attach evidence or choose a product to continue", true);
-          return;
-        }
-        updateWizardPreview();
-        jumpWizardStep(2);
-      } else if (state.wizardStep === 2) {
-        const qty = parseFloat(document.getElementById("wizQuantity").value);
-        if (isNaN(qty) || qty <= 0) {
-          showToast("Please enter a valid quantity greater than 0", true);
-          return;
-        }
-        jumpWizardStep(3);
-      }
-    }
-
-    function handleWizardFileSelected(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        state.wizardEvidenceBase64 = evt.target.result;
-        document.getElementById("wizPreviewImg").src = evt.target.result;
-        document.getElementById("wizPreviewName").innerText = file.name;
-        document.getElementById("wizPreviewSize").innerText = `${Math.round(file.size / 1024)} KB &middot; Ready for AI scan`;
-        document.getElementById("wizPreviewBox").style.display = "flex";
-        
-        // Auto trigger AI identification for convenience
-        executeAiDetection(file.name);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function executeAiDetection(filenameHint = "part_photo.jpg") {
-      const btn = document.getElementById("btnTriggerAiDetect");
-      btn.disabled = true;
-      btn.innerText = "Analyzing Part...";
-
-      try {
-        let result;
-        const payload = {
-          filename: filenameHint,
-          hints: filenameHint,
-          image_base64: state.wizardEvidenceBase64 ? state.wizardEvidenceBase64.substring(0, 100) : null
-        };
-
-        if (state.backendAlive && window.StockWiseBridge) {
-          result = await window.StockWiseBridge.apiFetch("/api/hardware/ai/detect-product", "POST", payload);
-        } else {
-          // Local fallback simulation
-          result = {
-            sku: "BRG-6204-2RS",
-            name: "Deep Groove Ball Bearing 6204-2RS Rubber Sealed",
-            category: "Bearings & Seals",
-            unit: "pcs",
-            confidence: 0.98,
-            evidence_summary: "AI Vision identified radial ball bearing with 6204-2RS laser etching."
-          };
-        }
-
-        state.wizardDetectedData = result;
-
-        // Populate AI Output UI
-        document.getElementById("wizAiOutput").style.display = "flex";
-        document.getElementById("wizAiConfidence").innerText = `${Math.round(result.confidence * 100)}% Confidence`;
-        document.getElementById("wizAiDetectedName").innerText = result.name;
-        document.getElementById("wizAiEvidenceSummary").innerText = result.evidence_summary;
-        document.getElementById("wizAiSkuBadge").innerText = result.sku;
-        document.getElementById("wizAiCategoryBadge").innerText = result.category;
-
-        // Auto select or match existing product
-        const matchedProd = state.products.find(p => p.sku.toLowerCase() === result.sku.toLowerCase());
-        const sel = document.getElementById("wizProductSelect");
-        if (matchedProd) {
-          sel.value = matchedProd.id;
-        } else {
-          // Create temp option
-          const opt = document.createElement("option");
-          opt.value = `new-${result.sku}`;
-          opt.innerText = `[AI NEW] ${result.sku} - ${result.name}`;
-          opt.selected = true;
-          sel.appendChild(opt);
-        }
-
-        showToast(`AI Detected: ${result.name}`);
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg><span>Scan with AI</span>`;
-      }
-    }
-
-    function handleWizardProductSelected() {
-      updateWizardPreview();
-    }
-
-    function updateWizardPreview() {
-      const selVal = document.getElementById("wizProductSelect").value;
-      const type = document.getElementById("wizMovType").value;
-      const qty = parseFloat(document.getElementById("wizQuantity").value) || 0;
-      const previewEl = document.getElementById("wizBalancePreview");
-      const alertEl = document.getElementById("wizNegativeAlert");
-      const nextBtn = document.getElementById("btnWizNext");
-
-      let current = 0;
-      let unit = "pcs";
-
-      if (selVal && !selVal.startsWith("new-")) {
-        const prod = state.products.find(p => p.id === selVal);
-        if (prod) {
-          current = Number(prod.current_stock);
-          unit = prod.unit;
-        }
-      } else if (state.wizardDetectedData) {
-        unit = state.wizardDetectedData.unit;
-      }
-
-      let result = current;
-      if (type === "STOCK_IN") result = current + qty;
-      else if (type === "STOCK_OUT") result = current - qty;
-      else if (type === "CORRECTION") result = qty;
-
-      previewEl.innerText = `Current: ${current} ${unit} \u2192 Result: ${result} ${unit}`;
-
-      if (result < 0) {
-        alertEl.style.display = "block";
-        nextBtn.disabled = true;
-      } else {
-        alertEl.style.display = "none";
-        nextBtn.disabled = false;
-      }
-    }
-
-    function populateWizardSummary() {
-      const selVal = document.getElementById("wizProductSelect").value;
-      const type = document.getElementById("wizMovType").value;
-      const qty = parseFloat(document.getElementById("wizQuantity").value) || 0;
-      const staffName = document.getElementById("wizStaffName").value.trim() || "Staff";
-
-      let prodName = "New AI Hardware Item";
-      let sku = "SKU-AUTO";
-      let category = "General Hardware";
-      let unit = "pcs";
-      let current = 0;
-
-      if (selVal && !selVal.startsWith("new-")) {
-        const p = state.products.find(x => x.id === selVal);
-        if (p) {
-          prodName = p.name;
-          sku = p.sku;
-          unit = p.unit;
-          current = Number(p.current_stock);
-        }
-      } else if (state.wizardDetectedData) {
-        prodName = state.wizardDetectedData.name;
-        sku = state.wizardDetectedData.sku;
-        category = state.wizardDetectedData.category;
-        unit = state.wizardDetectedData.unit;
-      }
-
-      let result = current;
-      if (type === "STOCK_IN") result = current + qty;
-      else if (type === "STOCK_OUT") result = current - qty;
-      else if (type === "CORRECTION") result = qty;
-
-      document.getElementById("wizSummaryPart").innerText = `${prodName} (${sku})`;
-      document.getElementById("wizSummaryCategory").innerText = category;
-      document.getElementById("wizSummaryQty").innerText = `${type === 'STOCK_IN' ? '+' : (type === 'STOCK_OUT' ? '-' : '=')}${qty} ${unit}`;
-      document.getElementById("wizSummaryResult").innerText = `${result} ${unit}`;
-      document.getElementById("wizSummaryStaff").innerText = staffName;
-    }
-
-    async function commitWizardRecord() {
-      const selVal = document.getElementById("wizProductSelect").value;
-      const type = document.getElementById("wizMovType").value;
-      const qty = parseFloat(document.getElementById("wizQuantity").value);
-      const reason = document.getElementById("wizReason").value.trim() || "Staff Form Record";
-      const staff = document.getElementById("wizStaffName").value.trim() || "Staff";
-
-      try {
-        let prodId = selVal;
-
-        // If newly detected item, create it first
-        if (!selVal || selVal.startsWith("new-")) {
-          const itemData = state.wizardDetectedData || {
-            sku: `HRD-${Date.now().toString().slice(-4)}`,
-            name: "Floor Detected Hardware Item",
-            unit: "pcs",
-            suggested_min_stock: 10
-          };
-
-          const createPayload = {
-            sku: itemData.sku,
-            name: itemData.name,
-            unit: itemData.unit,
-            opening_stock: 0,
-            min_stock: itemData.suggested_min_stock || 10,
-            user_recorded: staff
-          };
-
-          if (state.backendAlive && window.StockWiseBridge) {
-            const created = await window.StockWiseBridge.apiFetch(`/api/hardware/products?business_id=${state.businessId}`, "POST", createPayload);
-            prodId = created.id;
-          } else {
-            createLocalProduct(createPayload);
-            prodId = localData.products[0].id;
-          }
-        }
-
-        // Commit stock movement
-        const movPayload = {
-          product_id: prodId,
-          movement_type: type,
-          quantity: qty,
-          reason: reason,
-          user_recorded: staff,
-          idempotency_key: `wiz-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`
-        };
-
-        if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch(`/api/hardware/movements?business_id=${state.businessId}`, "POST", movPayload);
-        } else {
-          commitLocalMovement(movPayload);
-        }
-
-        closeModal("modalStaffWizard");
-        showToast("Stock movement committed to ledger");
-        await loadProducts();
-        if (state.activeTab === "movements") await loadMovements();
-        if (state.activeTab === "lowstock") await loadLowStock();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    }
-
-    // ========================================================================
-    // AI SMART SME INGESTION SCANNER (EXCEL / CSV / PAPER PHOTO)
-    // ========================================================================
-    document.getElementById("btnOpenSmeScanner").addEventListener("click", () => {
-      document.getElementById("smeResultsSection").style.display = "none";
-      document.getElementById("btnAutoRecordSme").style.display = "none";
-      openModal("modalSmeScanner");
-    });
-
-    function switchSmeScannerMode(mode) {
-      if (mode === "excel") {
-        document.getElementById("smeExcelInputWrap").style.display = "block";
-        document.getElementById("smePhotoInputWrap").style.display = "none";
-      } else {
-        document.getElementById("smeExcelInputWrap").style.display = "none";
-        document.getElementById("smePhotoInputWrap").style.display = "block";
-      }
-    }
-
-    function handleSmeCsvFile(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        document.getElementById("smeRawTextInput").value = evt.target.result;
-      };
-      reader.readAsText(file);
-    }
-
-    function handleSmePhotoSelected(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        document.getElementById("smePhotoImg").src = evt.target.result;
-        document.getElementById("smePhotoName").innerText = file.name;
-        document.getElementById("smePhotoPreview").style.display = "flex";
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function executeSmeScan() {
-      const rawText = document.getElementById("smeRawTextInput").value.trim();
-      const btn = document.getElementById("btnRunSmeScan");
-      btn.disabled = true;
-      btn.innerText = "Scanning Data...";
-
-      try {
-        let res;
-        const payload = {
-          content_type: "text",
-          raw_data: rawText || "sample",
-          filename: "legacy_sme_data"
-        };
-
-        if (state.backendAlive && window.StockWiseBridge) {
-          res = await window.StockWiseBridge.apiFetch("/api/hardware/ai/scan-sme-records", "POST", payload);
-        } else {
-          // Local fallback simulation
-          res = {
-            total_detected: 3,
-            confidence_score: 0.96,
-            items_detected: [
-              { sku: "SPK-CR8E", name: "NGK Spark Plug CR8E Nickel Alloy", unit: "pcs", opening_stock: 24, min_stock: 10, supplier_name: "AutoPro Spares", supplier_contact: "+6019-8765432" },
-              { sku: "WD-40-330", name: "WD-40 Multi-Use Lubricant Spray 330ml", unit: "can", opening_stock: 18, min_stock: 6, supplier_name: "ChemLub Lubricants", supplier_contact: "+6013-4567890" },
-              { sku: "NUT-FLG-M10", name: "Hex Flange Lock Nut M10 Zinc", unit: "pcs", opening_stock: 100, min_stock: 40, supplier_name: "MegaFasteners Malaysia", supplier_contact: "+6012-3334455" }
-            ]
-          };
-        }
-
-        state.smeDetectedItems = res.items_detected || [];
-        document.getElementById("smeResultsSection").style.display = "block";
-        document.getElementById("smeItemsCountBadge").innerText = `${state.smeDetectedItems.length} Items Extracted`;
-        document.getElementById("smeConfidenceBadge").innerText = `Confidence: ${Math.round(res.confidence_score * 100)}%`;
-
-        const tbody = document.getElementById("smeResultsTbody");
-        tbody.innerHTML = "";
-        state.smeDetectedItems.forEach(item => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><code>${escapeHtml(item.sku)}</code></td>
-            <td style="font-weight:600;">${escapeHtml(item.name)}</td>
-            <td><strong>${item.opening_stock}</strong></td>
-            <td>${escapeHtml(item.unit)}</td>
-            <td>${item.min_stock}</td>
-            <td>${escapeHtml(item.supplier_name || '—')}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-
-        if (state.smeDetectedItems.length > 0) {
-          document.getElementById("btnAutoRecordSme").style.display = "inline-flex";
-        }
-        showToast(`AI Ingested ${state.smeDetectedItems.length} catalog items`);
-      } catch (err) {
-        showToast(err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg><span>Run AI Ingestion Scan</span>`;
-      }
-    }
-
-    async function autoRecordExtractedSmeItems() {
-      if (!state.smeDetectedItems || state.smeDetectedItems.length === 0) return;
-
-      try {
-        if (state.backendAlive && window.StockWiseBridge) {
-          await window.StockWiseBridge.apiFetch("/api/hardware/import/confirm", "POST", {
-            valid_rows: state.smeDetectedItems,
-            filename: "sme_ai_ingested.csv",
-            user_recorded: "AI SME Scanner",
-            business_id: state.businessId
-          });
-        } else {
-          state.smeDetectedItems.forEach(r => createLocalProduct(r));
-        }
-
-        closeModal("modalSmeScanner");
-        showToast(`Successfully auto-recorded ${state.smeDetectedItems.length} items`);
-        await loadProducts();
-      } catch (err) {
-        showToast(err.message, true);
-      }
-    }
-
-    // ========================================================================
-    // STANDARD ACTIONS: PRODUCT & MOVEMENT (PRESERVED)
-    // ========================================================================
+    // --- Actions: Stock Movement ---
     function openRecordMovementModal() {
       populateMovementProductSelect();
       document.getElementById("movQuantity").value = "";
-      document.getElementById("movReason").value = "Daily inventory check";
+      document.getElementById("movReason").value = "Daily counter inventory update";
       document.getElementById("movUser").value = state.currentRole === "owner" ? "Shop Owner" : "Floor Staff";
       updateMovementBalancePreview();
       openModal("modalMovement");
@@ -3238,8 +2341,10 @@
       }
     });
 
-    // Product actions
-    document.getElementById("btnOpenNewProduct").addEventListener("click", () => openModal("modalNewProduct"));
+    // --- Actions: Product Management (Owner Only) ---
+    document.getElementById("btnOpenNewProduct").addEventListener("click", () => {
+      openModal("modalNewProduct");
+    });
 
     document.getElementById("btnSubmitNewProduct").addEventListener("click", async () => {
       const sku = document.getElementById("inpNewSku").value.trim();
@@ -3256,8 +2361,14 @@
       }
 
       const payload = {
-        sku, name, unit, opening_stock: opening, min_stock: minStock,
-        supplier_name: supp, supplier_contact: contact, user_recorded: "Shop Owner"
+        sku: sku,
+        name: name,
+        unit: unit,
+        opening_stock: opening,
+        min_stock: minStock,
+        supplier_name: supp,
+        supplier_contact: contact,
+        user_recorded: "Shop Owner"
       };
 
       try {
@@ -3301,7 +2412,12 @@
         return;
       }
 
-      const payload = { name, min_stock: minStock, supplier_name: supp, supplier_contact: contact };
+      const payload = {
+        name: name,
+        min_stock: minStock,
+        supplier_name: supp,
+        supplier_contact: contact
+      };
 
       try {
         if (state.backendAlive && window.StockWiseBridge) {
@@ -3333,7 +2449,7 @@
       }
     }
 
-    // Staff admin
+    // --- Actions: Staff Management (Owner Only) ---
     document.getElementById("btnOpenAddStaffModal").addEventListener("click", () => {
       document.getElementById("inpStaffName").value = "";
       document.getElementById("inpStaffUsername").value = "";
@@ -3358,7 +2474,15 @@
         if (state.backendAlive && window.StockWiseBridge) {
           await window.StockWiseBridge.apiFetch(`/api/hardware/staff?business_id=${state.businessId}`, "POST", payload);
         } else {
-          localData.staff.push({ id: "staff-" + Date.now(), name, username: username.toLowerCase(), role, is_active: true, created_at: new Date().toISOString() });
+          const newStaff = {
+            id: "staff-" + Date.now(),
+            name,
+            username: username.toLowerCase(),
+            role,
+            is_active: true,
+            created_at: new Date().toISOString()
+          };
+          localData.staff.push(newStaff);
           saveLocalStore();
         }
         closeModal("modalAddStaff");
@@ -3400,7 +2524,7 @@
       }
     }
 
-    // CSV import & export
+    // --- Actions: Non-AI CSV Import Wizard (Owner Only) ---
     document.getElementById("btnOpenImportCsv").addEventListener("click", () => {
       document.getElementById("csvValidationBox").style.display = "none";
       document.getElementById("csvSuccessBox").style.display = "none";
@@ -3416,6 +2540,16 @@
       window.location.href = `http://localhost:8000/api/hardware/export?business_id=${state.businessId}`;
     });
 
+    document.getElementById("csvFileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        document.getElementById("csvTextInput").value = evt.target.result;
+      };
+      reader.readAsText(file);
+    });
+
     document.getElementById("btnValidateCsv").addEventListener("click", async () => {
       const csvText = document.getElementById("csvTextInput").value.trim();
       if (!csvText) {
@@ -3426,17 +2560,25 @@
       try {
         let valResult;
         if (state.backendAlive && window.StockWiseBridge) {
-          valResult = await window.StockWiseBridge.apiFetch(`/api/hardware/import/validate`, "POST", { csv_content: csvText, business_id: state.businessId });
+          valResult = await window.StockWiseBridge.apiFetch(`/api/hardware/import/validate`, "POST", {
+            csv_content: csvText,
+            business_id: state.businessId
+          });
         } else {
           valResult = validateCsvLocally(csvText);
         }
 
         state.importValidationCache = valResult;
-        document.getElementById("csvValidationBox").style.display = "block";
-        document.getElementById("csvValidBadge").innerText = `${valResult.valid_count} Valid Rows`;
-        document.getElementById("csvErrorBadge").innerText = `${valResult.error_count} Errors`;
-
+        const validBadge = document.getElementById("csvValidBadge");
+        const errBadge = document.getElementById("csvErrorBadge");
         const errList = document.getElementById("csvErrorList");
+        const confirmBtn = document.getElementById("btnConfirmImport");
+        const previewTbody = document.getElementById("csvPreviewTableBody");
+
+        document.getElementById("csvValidationBox").style.display = "block";
+        validBadge.innerText = `${valResult.valid_count} Valid Rows`;
+        errBadge.innerText = `${valResult.error_count} Errors`;
+
         if (valResult.errors && valResult.errors.length > 0) {
           errList.style.display = "block";
           errList.innerHTML = valResult.errors.map(e => `<div>Row ${e.row_number}: ${escapeHtml(e.error)}</div>`).join("");
@@ -3444,15 +2586,20 @@
           errList.style.display = "none";
         }
 
-        const previewTbody = document.getElementById("csvPreviewTableBody");
         previewTbody.innerHTML = "";
         valResult.preview_valid.forEach(r => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${r.row_number}</td><td><code>${escapeHtml(r.sku)}</code></td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.unit)}</td><td>${r.opening_stock}</td><td>${r.min_stock}</td>`;
+          tr.innerHTML = `
+            <td>${r.row_number}</td>
+            <td><code>${escapeHtml(r.sku)}</code></td>
+            <td>${escapeHtml(r.name)}</td>
+            <td>${escapeHtml(r.unit)}</td>
+            <td>${r.opening_stock}</td>
+            <td>${r.min_stock}</td>
+          `;
           previewTbody.appendChild(tr);
         });
 
-        const confirmBtn = document.getElementById("btnConfirmImport");
         if (valResult.can_import && valResult.valid_count > 0) {
           confirmBtn.style.display = "inline-flex";
           confirmBtn.innerText = `Confirm & Import (${valResult.valid_count} Rows)`;
@@ -3472,7 +2619,10 @@
         let result;
         if (state.backendAlive && window.StockWiseBridge) {
           result = await window.StockWiseBridge.apiFetch(`/api/hardware/import/confirm`, "POST", {
-            valid_rows: validRows, filename: "hardware_batch.csv", user_recorded: "Shop Owner", business_id: state.businessId
+            valid_rows: validRows,
+            filename: "hardware_batch.csv",
+            user_recorded: "Shop Owner",
+            business_id: state.businessId
           });
         } else {
           result = confirmImportLocally(validRows);
@@ -3480,7 +2630,7 @@
 
         state.lastImportBatchId = result.batch_id;
         document.getElementById("csvSuccessBox").style.display = "block";
-        document.getElementById("csvSuccessMsg").innerText = `Successfully imported ${result.imported_count} hardware items.`;
+        document.getElementById("csvSuccessMsg").innerText = `Successfully imported ${result.imported_count} hardware items and initialized opening baselines.`;
         document.getElementById("csvBatchIdDisplay").innerText = `Batch ID: ${result.batch_id}`;
         document.getElementById("btnConfirmImport").style.display = "none";
 
@@ -3510,8 +2660,10 @@
       }
     });
 
-    // Operational Journey Demo
-    document.getElementById("btnOpenJourneyModal").addEventListener("click", () => openModal("modalJourney"));
+    // --- Actions: 1-Click Operational SME Journey Demo ---
+    document.getElementById("btnOpenJourneyModal").addEventListener("click", () => {
+      openModal("modalJourney");
+    });
 
     document.getElementById("btnExecuteDemoJourney").addEventListener("click", async () => {
       const btn = document.getElementById("btnExecuteDemoJourney");
@@ -3526,10 +2678,10 @@
 
       showToast("Live operational journey demonstration complete");
       btn.disabled = false;
-      btn.innerText = "Replay Demo";
+      btn.innerText = "▶ Replay Demo";
     });
 
-    // Local engine
+    // --- Local Fallback Engine ---
     function commitLocalMovement(m) {
       const p = localData.products.find(x => x.id === m.product_id);
       if (!p) throw new Error("Product not found");
@@ -3539,7 +2691,7 @@
 
       if (m.movement_type === "STOCK_IN") res = cur + change;
       else if (m.movement_type === "STOCK_OUT") {
-        if (cur < change) throw new Error("Insufficient stock: balance cannot be negative");
+        if (cur < change) throw new Error("Insufficient stock: resulting balance cannot be negative");
         res = cur - change;
         change = -change;
       } else if (m.movement_type === "CORRECTION") {
@@ -3656,7 +2808,7 @@
       saveLocalStore();
     }
 
-    // Search & Filter
+    // --- Search & Filter Event Listeners ---
     document.getElementById("searchProducts").addEventListener("input", debounce(() => {
       state.currentProductPage = 1;
       loadProducts();
@@ -3716,16 +2868,27 @@
       showToast(`Switched shop workspace: ${e.target.value}`);
     });
 
-    // Helpers
-    function openModal(id) { document.getElementById(id).classList.add("open"); }
-    function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+    // --- UI Helpers ---
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
 
     function showToast(msg, isErr = false) {
       const toast = document.getElementById("appToast");
+      const icon = document.getElementById("toastIcon");
       const text = document.getElementById("toastMsg");
+
       text.innerText = msg;
+      icon.innerText = isErr ? "⚠️" : "✓";
       toast.className = `toast-pill show ${isErr ? 'toast-err' : ''}`;
-      setTimeout(() => { toast.classList.remove("show"); }, 3200);
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3200);
     }
 
     function escapeHtml(str) {
@@ -3754,10 +2917,12 @@
 
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    // App Init
+    // --- App Initialization ---
     async function init() {
+      // Initialize active role
       switchRole(state.currentRole);
 
+      // Check backend health
       if (window.StockWiseBridge) {
         try {
           const health = await window.StockWiseBridge.checkBackendHealth();
@@ -3779,13 +2944,12 @@
 
       await loadProducts();
       await loadLowStock();
-      if (state.currentRole === "owner") await loadStaff();
+      if (state.currentRole === "owner") {
+        await loadStaff();
+      }
     }
 
     window.addEventListener("DOMContentLoaded", init);
   </script>
-</head>
-<body style="font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #0f172a; color: #f8fafc;">
-  <p>Loading StockWise... If you are not redirected automatically, <a href="/stockwise-updated.html" style="color: #38bdf8;">click here</a>.</p>
 </body>
 </html>
