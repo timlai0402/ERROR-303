@@ -19,6 +19,9 @@ class ItemBase(BaseModel):
     daily: float = Field(..., ge=0, example=2.5)
     initialDemand: Optional[float] = Field(None, example=75.0)
 
+class ItemCreate(ItemBase):
+    pass
+
 class ItemResponse(ItemBase):
     available: float
     status: str # 'OUT_OF_STOCK', 'CRITICAL', 'REORDER', 'HEALTHY'

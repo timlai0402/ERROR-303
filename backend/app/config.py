@@ -14,9 +14,12 @@ class Settings(BaseSettings):
         "*"
     ]
 
-    # Supabase credentials
-    SUPABASE_URL: str = ""
+    # Supabase credentials (2026 API Keys & JWKS)
+    SUPABASE_URL: str = "https://qrqcjxlexwvvgvisnphx.supabase.co"
     SUPABASE_KEY: str = ""
+    SUPABASE_PUBLISHABLE_KEY: str = "sb_publishable_im4IGU7Cwf4VAcQN87H0aA_5KQjoZB5"
+    SUPABASE_SECRET_KEY: str = "sb_secret__xJg7qLzP7ZiVIsevVoDoQ_9T9trcAH"
+    SUPABASE_JWKS_URL: str = "https://qrqcjxlexwvvgvisnphx.supabase.co/auth/v1/.well-known/jwks.json"
 
     # GenAI (Google Gemini)
     GEMINI_API_KEY: str = ""

@@ -1,0 +1,27 @@
+{
+  "name": "error-303",
+  "version": "1.0.0",
+  "description": "---",
+  "main": "frontend-bridge.js",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 .",
+    "backend": "backend/.venv/Scripts/uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000 --reload",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timlai0402/ERROR-303.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/timlai0402/ERROR-303/issues"
+  },
+  "homepage": "https://github.com/timlai0402/ERROR-303#readme",
+  "dependencies": {
+    "@supabase/server": "^1.9.2"
+  }
+}
