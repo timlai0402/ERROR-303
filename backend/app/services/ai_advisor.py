@@ -11,42 +11,38 @@ class AIAdvisorService:
         self.kracked_base_url = (getattr(settings, "KRACKED_BASE_URL", "") or os.getenv("KRACKED_BASE_URL", "https://litellm.rapidscreen.io/v1")).rstrip("/")
         self.kracked_model = getattr(settings, "KRACKED_MODEL", "") or os.getenv("KRACKED_MODEL", "gpt-5.5")
 
-        # Fallback Gemini settings
-        self.gemini_api_key = getattr(settings, "GEMINI_API_KEY", "") or os.getenv("GEMINI_API_KEY", "")
-        self.gemini_model = getattr(settings, "GEMINI_MODEL", "") or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-
         if self.is_kracked_configured():
-            print(f"[AI Advisor] KrackedDevs API configured (URL: {self.kracked_base_url}, Model: {self.kracked_model})")
-        elif self.gemini_api_key:
-            print(f"[AI Advisor] Gemini API configured (Model: {self.gemini_model})")
+            print(f"[AI Advisor] KrackedDevs API connected (Base: {self.kracked_base_url}, Model: {self.kracked_model})")
         else:
-            print("[AI Advisor] No active API key found. Using deterministic rule-based synthesis.")
+            print("[AI Advisor] KrackedDevs API key not configured. Operating with deterministic rule synthesis.")
 
     def is_kracked_configured(self) -> bool:
         return bool(self.kracked_api_key and self.kracked_api_key != "your_actual_key")
 
-    async def _call_kracked(self, prompt: str) -> Optional[Dict[str, Any]]:
+    async def _call_kracked(self, prompt: str, system_prompt: Optional[str] = None) -> Optional[Dict[str, Any]]:
         url = f"{self.kracked_base_url}/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.kracked_api_key}",
             "Content-Type": "application/json"
         }
+        
+        sys_msg = system_prompt or (
+            "You are the Chief Procurement AI for StockWise, an automated inventory control system for Malaysian SMEs. "
+            "Analyze inventory, lead times, and live supply chain news signals. "
+            "You must respond strictly with valid JSON without conversational filler or markdown code blocks."
+        )
+
         payload = {
             "model": self.kracked_model,
             "messages": [
-                {
-                    "role": "system",
-                    "content": "You are the Chief Procurement AI for StockWise, an automated inventory control system for Malaysian SMEs. Respond strictly in valid JSON format without markdown code blocks."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
+                {"role": "system", "content": sys_msg},
+                {"role": "user", "content": prompt}
             ],
+            "response_format": {"type": "json_object"},
             "temperature": 0.2
         }
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=25.0) as client:
             resp = await client.post(url, headers=headers, json=payload)
             resp.raise_for_status()
             data = resp.json()
@@ -58,31 +54,7 @@ class AIAdvisorService:
                 content = "\n".join(lines).strip()
 
             parsed = json.loads(content)
-            return {
-                "action_recommendation": parsed.get("action_recommendation", "ORDER_ROUTINE"),
-                "executive_rationale": parsed.get("executive_rationale", ""),
-                "supply_risk_level": parsed.get("supply_risk_level", "LOW"),
-                "supplier_negotiation_tip": parsed.get("supplier_negotiation_tip", "")
-            }
-
-    async def _call_gemini(self, prompt: str) -> Optional[Dict[str, Any]]:
-        from google import genai
-        client = genai.Client(api_key=self.gemini_api_key)
-        response = client.models.generate_content(
-            model=self.gemini_model,
-            contents=prompt
-        )
-        text = response.text.strip()
-        if "```" in text:
-            lines = [line for line in text.splitlines() if not line.strip().startswith("```")]
-            text = "\n".join(lines).strip()
-        parsed = json.loads(text)
-        return {
-            "action_recommendation": parsed.get("action_recommendation", "ORDER_ROUTINE"),
-            "executive_rationale": parsed.get("executive_rationale", ""),
-            "supply_risk_level": parsed.get("supply_risk_level", "LOW"),
-            "supplier_negotiation_tip": parsed.get("supplier_negotiation_tip", "")
-        }
+            return parsed
 
     async def explain_restocking_decision(
         self,
@@ -92,10 +64,10 @@ class AIAdvisorService:
         market_signals: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        Interprets inventory deficit, supplier lead time, and market context
-        to generate actionable plain-language justification for human manager approval.
+        Interprets inventory deficit, supplier lead time, and live NewsAPI market context
+        via KrackedDevs LLM to generate actionable justification for human manager approval.
         """
-        item_id = item.get("id", "N/A")
+        item_id = item.get("id") or item.get("sku", "N/A")
         item_name = item.get("name", "Unknown Item")
         available = float(item.get("physical", 0)) - float(item.get("reserved", 0))
         rop = float(item.get("reorder", 0))
@@ -117,7 +89,7 @@ Supplier: {supplier} (Lead Time: {lead_days} days)
 Unit Cost: MYR {unit_cost}
 Calculated Recommended Restock Qty: {rec_quantity}
 Active Deficit from confirmed orders: {deficit}
-Market Intelligence Signals: {signals_text}
+Live NewsAPI Market Signals: {signals_text}
 
 Respond strictly with valid JSON with keys:
 - "action_recommendation": one of "ORDER_IMMEDIATELY", "ORDER_ROUTINE", "HOLD_REVIEW"
@@ -130,26 +102,22 @@ Respond strictly with valid JSON with keys:
         if self.is_kracked_configured():
             try:
                 res = await self._call_kracked(prompt)
-                if res:
-                    return res
+                if res and "executive_rationale" in res:
+                    return {
+                        "action_recommendation": res.get("action_recommendation", "ORDER_ROUTINE"),
+                        "executive_rationale": res.get("executive_rationale", ""),
+                        "supply_risk_level": res.get("supply_risk_level", "LOW").upper(),
+                        "supplier_negotiation_tip": res.get("supplier_negotiation_tip", "")
+                    }
             except Exception as e:
-                print(f"[AI Advisor] KrackedDevs API call failed: {e}. Falling back...")
+                print(f"[AI Advisor] KrackedDevs API call failed: {e}. Falling back to deterministic rule synthesis.")
 
-        # 2. Secondary: Gemini API
-        if self.gemini_api_key:
-            try:
-                res = await self._call_gemini(prompt)
-                if res:
-                    return res
-            except Exception as e:
-                print(f"[AI Advisor] Gemini API call failed: {e}. Falling back to rule-based synthesis.")
-
-        # 3. High-precision deterministic fallback
+        # 2. High-precision deterministic fallback
         if available <= 0 or deficit > 0:
             rec = "ORDER_IMMEDIATELY"
             risk = "HIGH"
             rationale = (
-                f"Available stock is in deficit ({available} {item.get('unit')}) against active commitments. "
+                f"Available stock is in deficit ({available} {item.get('unit', 'units')}) against active commitments. "
                 f"With a {lead_days}-day lead time from {supplier}, an immediate purchase of {rec_quantity} units "
                 f"is necessary to prevent production stoppage."
             )
@@ -157,7 +125,7 @@ Respond strictly with valid JSON with keys:
             rec = "ORDER_IMMEDIATELY"
             risk = "MEDIUM"
             rationale = (
-                f"Available reserves have breached the safety stock threshold ({safety} {item.get('unit')}). "
+                f"Available reserves have breached the safety stock threshold ({safety} {item.get('unit', 'units')}). "
                 f"Ordering {rec_quantity} units now buffers against delivery variability from {supplier}."
             )
         else:
@@ -175,6 +143,53 @@ Respond strictly with valid JSON with keys:
             "executive_rationale": rationale,
             "supply_risk_level": risk,
             "supplier_negotiation_tip": negotiation
+        }
+
+    async def assess_market_disruption(
+        self,
+        item: Dict[str, Any],
+        news_articles: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """
+        Synthesizes live NewsAPI supply chain headlines into an actionable KrackedDevs risk assessment for an item.
+        """
+        item_name = item.get("name", "Unknown Item")
+        category = item.get("category", "General")
+        supplier = item.get("supplier", "Vendor")
+
+        headlines = [f"- {a.get('title', '')} ({a.get('source', 'News')})" for a in news_articles[:5]]
+        news_block = "\n".join(headlines) if headlines else "No recent supply disruption news."
+
+        prompt = f"""
+Evaluate the market supply risk for item '{item_name}' (Category: {category}, Supplier: {supplier}) given these recent news headlines:
+
+{news_block}
+
+Return a valid JSON object with:
+- "risk_level": "LOW", "MEDIUM", or "HIGH"
+- "risk_score": float between 0.0 (safest) and 1.0 (severe disruption)
+- "impact_analysis": 2 sentences explaining how external news affects procurement/pricing for this item
+- "proactive_action": 1 recommended action for procurement managers (e.g. advance purchase, dual-sourcing)
+"""
+        if self.is_kracked_configured():
+            try:
+                res = await self._call_kracked(prompt)
+                if res and "impact_analysis" in res:
+                    return {
+                        "risk_level": res.get("risk_level", "MEDIUM").upper(),
+                        "risk_score": float(res.get("risk_score", 0.5)),
+                        "impact_analysis": res.get("impact_analysis", ""),
+                        "proactive_action": res.get("proactive_action", "Maintain regular replenishment cycle.")
+                    }
+            except Exception as e:
+                print(f"[AI Advisor] KrackedDevs market evaluation failed: {e}. Falling back to default risk analysis.")
+
+        # Deterministic fallback
+        return {
+            "risk_level": "MEDIUM",
+            "risk_score": 0.45,
+            "impact_analysis": f"Potential macroeconomic or logistics friction may impact {category} lead times. Monitor supplier confirmations.",
+            "proactive_action": f"Verify quotation stability with {supplier} before placing bulk replenishment."
         }
 
 ai_advisor = AIAdvisorService()

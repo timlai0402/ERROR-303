@@ -4,20 +4,20 @@ from datetime import date, datetime
 
 # --- Inventory Item Models ---
 class ItemBase(BaseModel):
-    id: str = Field(..., example="BLD-001")
-    name: str = Field(..., example="Portland Cement 50kg")
-    category: str = Field(..., example="Building materials")
-    physical: float = Field(..., ge=0, example=45.0)
-    reserved: float = Field(..., ge=0, example=15.0)
-    reorder: float = Field(..., ge=0, example=30.0)
-    safety: float = Field(..., ge=0, example=15.0)
-    cost: float = Field(..., ge=0, example=21.50)
-    unit: str = Field(..., example="bags")
-    supplier: str = Field(..., example="SolidBuild Materials")
-    lead: int = Field(..., ge=1, example=3)
-    minOrder: float = Field(..., ge=1, example=20.0)
-    daily: float = Field(..., ge=0, example=2.5)
-    initialDemand: Optional[float] = Field(None, example=75.0)
+    id: str = Field(..., examples=["BLD-001"])
+    name: str = Field(..., examples=["Portland Cement 50kg"])
+    category: str = Field(..., examples=["Building materials"])
+    physical: float = Field(..., ge=0, examples=[45.0])
+    reserved: float = Field(..., ge=0, examples=[15.0])
+    reorder: float = Field(..., ge=0, examples=[30.0])
+    safety: float = Field(..., ge=0, examples=[15.0])
+    cost: float = Field(..., ge=0, examples=[21.50])
+    unit: str = Field(..., examples=["bags"])
+    supplier: str = Field(..., examples=["SolidBuild Materials"])
+    lead: int = Field(..., ge=1, examples=[3])
+    minOrder: float = Field(..., ge=1, examples=[20.0])
+    daily: float = Field(..., ge=0, examples=[2.5])
+    initialDemand: Optional[float] = Field(None, examples=[75.0])
 
 class ItemCreate(ItemBase):
     pass
@@ -29,24 +29,24 @@ class ItemResponse(ItemBase):
 
 # --- Supplier Models ---
 class SupplierBase(BaseModel):
-    id: str = Field(..., example="SUP-01")
-    name: str = Field(..., example="SolidBuild Materials")
-    items: str = Field(..., example="Cement, aggregate, bricks")
-    lead: int = Field(..., ge=1, example=3)
-    reliability: float = Field(..., ge=0, le=100, example=96.0)
-    terms: str = Field(..., example="Net 30")
+    id: str = Field(..., examples=["SUP-01"])
+    name: str = Field(..., examples=["SolidBuild Materials"])
+    items: str = Field(..., examples=["Cement, aggregate, bricks"])
+    lead: int = Field(..., ge=1, examples=[3])
+    reliability: float = Field(..., ge=0, le=100, examples=[96.0])
+    terms: str = Field(..., examples=["Net 30"])
 
 # --- Order / Demand Models ---
 class OrderBase(BaseModel):
-    id: str = Field(..., example="ORD-101")
-    customer: str = Field(..., example="Riverside Apartments")
-    itemName: str = Field(..., example="Cement")
-    itemId: Optional[str] = Field(None, example="BLD-001")
-    quantity: float = Field(..., ge=1, example=1.0)
-    demand: float = Field(..., ge=1, example=25.0)
-    due: str = Field(..., example="2026-11-05")
-    type: str = Field("Customer order", example="Customer order")
-    status: str = Field("Confirmed", example="Confirmed")
+    id: str = Field(..., examples=["ORD-101"])
+    customer: str = Field(..., examples=["Riverside Apartments"])
+    itemName: str = Field(..., examples=["Cement"])
+    itemId: Optional[str] = Field(None, examples=["BLD-001"])
+    quantity: float = Field(..., ge=1, examples=[1.0])
+    demand: float = Field(..., ge=1, examples=[25.0])
+    due: str = Field(..., examples=["2026-11-05"])
+    type: str = Field("Customer order", examples=["Customer order"])
+    status: str = Field("Confirmed", examples=["Confirmed"])
 
 # --- Procurement & Purchase Order Models ---
 class PurchaseOrderCreate(BaseModel):
@@ -59,7 +59,7 @@ class PurchaseOrderCreate(BaseModel):
 
 class PurchaseOrderAction(BaseModel):
     id: Optional[str] = None
-    action: str = Field(..., example="approve") # create, submit, approve, reject, return, cancel
+    action: str = Field(..., examples=["approve"]) # create, submit, approve, reject, return, cancel
     itemId: Optional[str] = None
     quantity: Optional[float] = None
     unitCost: Optional[float] = None
@@ -96,7 +96,7 @@ class ForecastRequest(BaseModel):
     itemId: str
     historical_periods: List[float] = Field(..., description="Chronological sales/usage quantities")
     horizon: int = Field(default=30, ge=1, le=180, description="Forecast horizon in days")
-    method: str = Field(default="holt_winters", example="holt_winters") # sma, exponential_smoothing, holt_winters
+    method: str = Field(default="holt_winters", examples=["holt_winters"]) # sma, exponential_smoothing, holt_winters
 
 class ForecastResponse(BaseModel):
     itemId: str
@@ -151,4 +151,3 @@ class WorkspaceState(BaseModel):
     pos: List[PurchaseOrderResponse]
     activities: List[ActivityLog]
     settings: CompanySettings
-

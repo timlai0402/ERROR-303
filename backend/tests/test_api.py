@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.inventory_engine import inventory_engine
 from app.services.forecasting import forecaster
+from app.services.ai_advisor import ai_advisor
+from app.services.market_news import market_news
 
 client = TestClient(app)
 
@@ -12,6 +14,15 @@ def test_root():
     data = response.json()
     assert data["product"] == "StockWise AI"
     assert "FastAPI Business Logic" in data["features"]
+    assert "KrackedDevs Chief Procurement AI Rationale" in data["features"]
+
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["kracked_ai"]["configured"] is True
+    assert data["news_api"]["configured"] is True
 
 def test_inventory_list():
     response = client.get("/api/inventory")
@@ -45,6 +56,26 @@ def test_statistical_forecasting():
     assert res["reorder_point_calculated"] > 0
     assert "upper" in res["confidence_interval_95"]
 
+def test_market_signals():
+    response = client.get("/api/market/signals?query=logistics")
+    assert response.status_code == 200
+    data = response.json()
+    assert "signals" in data
+    assert len(data["signals"]) > 0
+    first = data["signals"][0]
+    assert "title" in first
+    assert "sentiment" in first
+    assert "supply_risk" in first
+
+def test_market_assess_item():
+    response = client.get("/api/market/assess-item/RAW-001")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["item_id"] == "RAW-001"
+    assert "ai_risk_assessment" in data
+    assert "restock_decision" in data
+    assert "executive_rationale" in data["restock_decision"]
+
 def test_workspace_sync():
     response = client.get("/api/workspace")
     assert response.status_code == 200
@@ -66,6 +97,8 @@ def test_procurement_human_approval_flow():
     po = create_res.json()["po"]
     po_id = po["id"]
     assert po["status"] == "Draft"
+    assert "aiRationale" in po
+    assert len(po["aiRationale"]) > 0
 
     # 2. Submit for manager approval
     submit_res = client.post("/api/purchase-requests/action", json={
@@ -82,4 +115,3 @@ def test_procurement_human_approval_flow():
     })
     assert approve_res.status_code == 200
     assert approve_res.json()["status"] == "Approved"
-
