@@ -11,7 +11,7 @@
  * 3. Visual Header Bar & Warning Alert:
  *    - Logo [SW], Status Pills (Supabase + FastAPI/AI Hub)
  *    - Role Switcher ("Worker" | "Owner (Approver)")
- *    - Dynamic Nav Tabs: Overview & Restock, Inventory (N), Purchase Orders (N), Demand Orders (N), Suppliers (N), Market Intelligence, Settings
+ *    - Dynamic Nav Tabs: Overview & Restock, Inventory (N), Purchase Orders (N), Demand Orders (N), Suppliers (N), Settings
  * 4. Two-Way Live Database Synchronization:
  *    - Push to Supabase Table Editor on inventory mutation
  *    - Pull live records from PostgreSQL on load
@@ -1157,7 +1157,6 @@
           <a class="sw-tab-item" data-tab="pos" href="#/procurement">Purchase Orders (<span id="sw-count-pos">${config.stats.pos}</span>)</a>
           <a class="sw-tab-item" data-tab="orders" href="#/orders">Demand Orders (<span id="sw-count-orders">${config.stats.orders}</span>)</a>
           <a class="sw-tab-item" data-tab="suppliers" href="#/suppliers">Suppliers (<span id="sw-count-suppliers">${config.stats.suppliers}</span>)</a>
-          <a class="sw-tab-item" data-tab="market" href="#/market">📰 Market Intelligence</a>
           <a class="sw-tab-item" data-tab="settings" href="#/settings">⚙ Settings</a>
         </nav>
       </div>
@@ -1687,9 +1686,7 @@
       }
     });
 
-    if (hash === "#/market") {
-      enhanceMarketPage();
-    } else if (hash === "#/settings") {
+    if (hash === "#/settings") {
       injectSettingsPanels();
     }
   }
